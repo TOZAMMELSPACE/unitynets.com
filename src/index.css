@@ -18,10 +18,10 @@
     --popover: 255 255 255;
     --popover-foreground: 15 23 42;
     
-    /* Unity Brand Colors - Trust & Community */
-    --primary: 236 72% 79%;  /* Warm coral for unity */
+    /* Unity Brand Colors - Green Focus */
+    --primary: 142 76% 36%;  /* Trust green as primary */
     --primary-foreground: 255 255 255;
-    --primary-glow: 236 72% 85%;
+    --primary-glow: 142 76% 45%;
     
     --secondary: 220 14% 96%;
     --secondary-foreground: 15 23 42;
@@ -29,9 +29,9 @@
     --muted: 220 14% 96%;
     --muted-foreground: 100 116 139;
     
-    --accent: 142 76% 36%;  /* Trust green */
+    --accent: 120 60% 50%;  /* Brighter green accent */
     --accent-foreground: 255 255 255;
-    --accent-glow: 142 76% 45%;
+    --accent-glow: 120 60% 60%;
     
     --success: 142 76% 36%;
     --success-foreground: 255 255 255;
@@ -44,7 +44,7 @@
     
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 236 72% 79%;
+    --ring: 142 76% 36%;
     
     --radius: 0.75rem;
     
@@ -90,9 +90,9 @@
     --popover: 30 41 59;
     --popover-foreground: 248 250 252;
     
-    --primary: 236 72% 79%;
+    --primary: 142 76% 45%;
     --primary-foreground: 255 255 255;
-    --primary-glow: 236 72% 85%;
+    --primary-glow: 142 76% 50%;
     
     --secondary: 30 41 59;
     --secondary-foreground: 248 250 252;
@@ -115,7 +115,7 @@
     
     --border: 51 65 85;
     --input: 51 65 85;
-    --ring: 236 72% 79%;
+    --ring: 142 76% 45%;
     
     /* Dark mode gradients */
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
