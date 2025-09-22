@@ -35,11 +35,39 @@ export interface Post {
   comments: Comment[];
 }
 
+export interface Message {
+  id: string;
+  chatId: string;
+  senderId: string;
+  senderName: string;
+  content: string;
+  type: 'text' | 'image' | 'file';
+  fileUrl?: string;
+  fileName?: string;
+  createdAt: string;
+  isRead: boolean;
+}
+
+export interface Chat {
+  id: string;
+  participants: string[];
+  participantNames: string[];
+  participantImages?: string[];
+  isGroup: boolean;
+  groupName?: string;
+  lastMessage?: string;
+  lastMessageTime?: string;
+  unreadCount: number;
+  createdAt: string;
+}
+
 // Storage keys
 export const STORAGE = {
   USERS: 'unity_users_v1',
   POSTS: 'unity_posts_v1',
   COMMENTS: 'unity_comments_v1',
+  CHATS: 'unity_chats_v1',
+  MESSAGES: 'unity_messages_v1',
   THEME: 'unity_theme_v1',
   CURRENT_USER: 'unity_current_user_v1',
 };
