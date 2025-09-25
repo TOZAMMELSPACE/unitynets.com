@@ -60,7 +60,8 @@ const Index = ({
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         <Header 
           currentUser={currentUser} 
-          onSignOut={onSignOut} 
+          onSignOut={onSignOut}
+          onCreatePost={() => handleCreatePost('text')}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
