@@ -111,15 +111,22 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
   };
 
   const onSignupSubmit = (data: SignupFormData) => {
+    console.log('Signup form submitted with data:', { 
+      username: data.username, 
+      phone: data.phone,
+      nid: data.nid 
+    });
+
     // Check if username already exists
     const existingUsername = users.find(u => 
       u.username.toLowerCase() === data.username.toLowerCase()
     );
     
     if (existingUsername) {
+      console.log('Username already exists:', data.username);
       toast({
-        title: "Error",
-        description: "Username already exists",
+        title: "ত্রুটি / Error",
+        description: "এই ইউজারনেম ইতিমধ্যে ব্যবহৃত হয়েছে / Username already exists",
         variant: "destructive"
       });
       return;
@@ -129,28 +136,30 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
     const existingPhone = users.find(u => u.phone === data.phone);
     
     if (existingPhone) {
+      console.log('Phone already exists:', data.phone);
       toast({
-        title: "Error",
-        description: "Phone number already registered",
+        title: "ত্রুটি / Error",
+        description: "এই ফোন নম্বর ইতিমধ্যে নিবন্ধিত / Phone number already registered",
         variant: "destructive"
       });
       return;
     }
 
     // Check if NID already exists
-    const existingNID = users.find(u => u.nidMasked.includes(data.nid));
+    const existingNID = users.find(u => u.nidMasked && u.nidMasked.includes(data.nid));
     
     if (existingNID) {
+      console.log('NID already exists:', data.nid);
       toast({
-        title: "Error",
-        description: "NID already registered",
+        title: "ত্রুটি / Error",
+        description: "এই NID ইতিমধ্যে নিবন্ধিত / NID already registered",
         variant: "destructive"
       });
       return;
     }
 
     const newUser: User = {
-      id: Date.now().toString(),
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       name: data.fullName.trim(),
       username: data.username.toLowerCase().trim(),
       phone: data.phone.trim(),
@@ -166,13 +175,26 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
       joinDate: new Date().toISOString()
     };
     
-    onRegister(newUser);
-    onLogin(newUser);
+    console.log('Creating new user:', newUser.username);
     
-    toast({
-      title: "Success!",
-      description: "Your account has been created successfully"
-    });
+    try {
+      onRegister(newUser);
+      onLogin(newUser);
+      
+      console.log('User registered and logged in successfully');
+      
+      toast({
+        title: "সফল! / Success!",
+        description: "আপনার একাউন্ট সফলভাবে তৈরি হয়েছে / Your account has been created successfully"
+      });
+    } catch (error) {
+      console.error('Error during registration:', error);
+      toast({
+        title: "ত্রুটি / Error",
+        description: "একাউন্ট তৈরিতে সমস্যা হয়েছে / Error creating account",
+        variant: "destructive"
+      });
+    }
   };
 
   const onLoginSubmit = (data: LoginFormData) => {
