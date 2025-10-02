@@ -30,27 +30,16 @@ export const Header = ({ currentUser, onSignOut, onCreatePost, onSearch }: Heade
   return (
     <header className="card-enhanced p-4 mb-6">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-              UnityNet
-            </h1>
-            <p className="text-muted-foreground text-bengali font-medium text-sm">
-              Trust • Learn • Unite
-            </p>
-          </div>
-          
-          {/* Create Post Button */}
-          {currentUser && onCreatePost && (
-            <Button
-              onClick={onCreatePost}
-              className="btn-hero flex items-center gap-2 px-4 py-2 shadow-elegant hover:shadow-glow transition-all duration-300"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline text-bengali">নতুন পোস্ট</span>
-            </Button>
-          )}
-        </div>
+        {/* Create Post Button */}
+        {currentUser && onCreatePost && (
+          <Button
+            onClick={onCreatePost}
+            className="btn-hero flex items-center gap-2 px-4 py-2 shadow-elegant hover:shadow-glow transition-all duration-300"
+          >
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline text-bengali">নতুন পোস্ট</span>
+          </Button>
+        )}
 
         {/* Search Bar */}
         {onSearch && (
