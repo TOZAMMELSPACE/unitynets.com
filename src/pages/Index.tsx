@@ -82,6 +82,16 @@ const Index = ({
           onSearch={handleSearch}
         />
 
+        {/* Page Heading with Topics */}
+        <div className="card-enhanced p-4 mb-6">
+          <h1 className="text-2xl font-bold mb-2">
+            <span className="bg-gradient-hero bg-clip-text text-transparent">Home | হোম</span>
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Dashboard, Recent Updates, Suggested Content, Community Feed, Events & Jobs
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">

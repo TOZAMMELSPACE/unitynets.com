@@ -40,9 +40,17 @@ export default function Explore({ currentUser, onSignOut }: ExploreProps) {
       <Header currentUser={currentUser} onSignOut={onSignOut} />
       
       <main className="container mx-auto px-4 max-w-2xl">
+        {/* Page Heading with Topics */}
+        <div className="card-enhanced p-4 mb-6">
+          <h1 className="text-2xl font-bold mb-2">
+            <span className="bg-gradient-hero bg-clip-text text-transparent">Explore | এক্সপ্লোর</span>
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Trending Topics, Search Posts & Users, Discover New People, Categories, Hashtags
+          </p>
+        </div>
+
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-bengali mb-4">এক্সপ্লোর</h2>
-          
           <div className="relative mb-6">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input

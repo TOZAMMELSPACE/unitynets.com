@@ -72,9 +72,19 @@ export default function Messages({ currentUser, users, onSignOut }: MessagesProp
       <Header currentUser={currentUser} onSignOut={onSignOut} />
       
       <main className="container mx-auto px-4 max-w-2xl">
+        {/* Page Heading with Topics */}
+        <div className="card-enhanced p-4 mb-6">
+          <h1 className="text-2xl font-bold mb-2">
+            <span className="bg-gradient-hero bg-clip-text text-transparent">Messages | মেসেজ</span>
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Chats, Inbox, Direct Messaging, Conversations, Group Chats, Online Status
+          </p>
+        </div>
+
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-bengali">চ্যাট</h2>
+            <h2 className="text-xl font-semibold text-bengali">চ্যাট</h2>
             <Button 
               size="sm" 
               className="gap-2"

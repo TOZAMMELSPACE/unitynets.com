@@ -53,9 +53,14 @@ export default function Notifications({ currentUser, onSignOut }: NotificationsP
       <Header currentUser={currentUser} onSignOut={onSignOut} />
       
       <main className="container mx-auto px-4 max-w-2xl">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-bengali mb-2">বিজ্ঞপ্তি</h2>
-          <p className="text-muted-foreground">আপনার সকল নোটিফিকেশন দেখুন</p>
+        {/* Page Heading with Topics */}
+        <div className="card-enhanced p-4 mb-6">
+          <h1 className="text-2xl font-bold mb-2">
+            <span className="bg-gradient-hero bg-clip-text text-transparent">Notifications | নোটিফিকেশন</span>
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Alerts, Mentions, Reactions, Likes, Comments, Follows, Activity Updates
+          </p>
         </div>
 
         <div className="space-y-4">

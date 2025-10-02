@@ -83,6 +83,16 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
       <Header currentUser={currentUser} onSignOut={onSignOut} />
       
       <main className="container mx-auto px-4 max-w-4xl">
+        {/* Page Heading with Topics */}
+        <div className="card-enhanced p-4 mb-6">
+          <h1 className="text-2xl font-bold mb-2">
+            <span className="bg-gradient-hero bg-clip-text text-transparent">Profile | প্রোফাইল</span>
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            User Info, Posts, Activities, Followers & Following, Portfolio, Achievements, Media
+          </p>
+        </div>
+
         {/* Cover Image & Profile Header */}
         <div className="relative mb-6">
           {/* Cover Image */}

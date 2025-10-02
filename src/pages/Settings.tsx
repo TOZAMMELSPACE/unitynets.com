@@ -64,10 +64,13 @@ export default function Settings({ currentUser, onSignOut }: SettingsProps) {
       <Header currentUser={currentUser} onSignOut={onSignOut} />
       
       <main className="container mx-auto px-4 max-w-2xl">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-bengali mb-2">সেটিংস</h2>
-          <p className="text-muted-foreground text-bengali">
-            আপনার অ্যাকাউন্ট এবং প্রাইভেসি সেটিংস পরিচালনা করুন
+        {/* Page Heading with Topics */}
+        <div className="card-enhanced p-4 mb-6">
+          <h1 className="text-2xl font-bold mb-2">
+            <span className="bg-gradient-hero bg-clip-text text-transparent">Settings | সেটিংস</span>
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Privacy, Security, Preferences, Account Control, Notifications, Display, Help & Support
           </p>
         </div>
 
