@@ -27,9 +27,9 @@ const App = () => (
             {(props) => (
               <Routes>
                 <Route path="/" element={<Index {...props} />} />
-                <Route path="/notifications" element={<Notifications currentUser={props.currentUser} onSignOut={props.onSignOut} />} />
+                <Route path="/notifications" element={<Notifications currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} socialActions={props.socialActions} setUsers={props.setUsers} />} />
                 <Route path="/messages" element={<Messages currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} />} />
-                <Route path="/explore" element={<Explore currentUser={props.currentUser} onSignOut={props.onSignOut} />} />
+                <Route path="/explore" element={<Explore currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} socialActions={props.socialActions} setUsers={props.setUsers} />} />
                 <Route path="/profile" element={<Profile currentUser={props.currentUser} onSignOut={props.onSignOut} posts={props.posts} onUpdateProfile={props.onUpdateProfile} />} />
                 <Route path="/groups" element={<Groups currentUser={props.currentUser} onSignOut={props.onSignOut} />} />
                 <Route path="/settings" element={<Settings currentUser={props.currentUser} onSignOut={props.onSignOut} />} />

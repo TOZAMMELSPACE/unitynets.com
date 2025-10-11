@@ -25,6 +25,8 @@ interface IndexProps {
   onLikeComment: (commentId: string) => void;
   onCreatePost?: () => void;
   registerCreatePostTrigger?: (trigger: () => void) => void;
+  socialActions: any;
+  setUsers: (users: User[]) => void;
 }
 
 const Index = ({
@@ -38,6 +40,8 @@ const Index = ({
   onLikeComment,
   onCreatePost,
   registerCreatePostTrigger,
+  socialActions,
+  setUsers,
 }: IndexProps) => {
   const [showPostForm, setShowPostForm] = useState(false);
   const [selectedPostType, setSelectedPostType] = useState<'text' | 'image' | 'video' | 'poll' | 'event' | 'job'>('text');
@@ -132,6 +136,8 @@ const Index = ({
               onAddComment={onAddComment}
               onLikeComment={onLikeComment}
               onVotePoll={handleVotePoll}
+              onSavePost={socialActions.toggleSavePost}
+              isPostSaved={socialActions.isPostSaved}
             />
           </div>
 

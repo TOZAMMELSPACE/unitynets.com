@@ -3,6 +3,7 @@ import { User, Post, Comment, STORAGE, save, load, initializeData } from "@/lib/
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { LeftSidebar } from "@/components/LeftSidebar";
 import { Login } from "@/components/Login";
+import { useSocial } from "@/hooks/useSocial";
 
 interface AppLayoutProps {
   children: (props: {
@@ -20,6 +21,8 @@ interface AppLayoutProps {
     onUpdateProfile: (user: User) => void;
     onCreatePost?: () => void;
     registerCreatePostTrigger?: (trigger: () => void) => void;
+    socialActions: ReturnType<typeof useSocial>;
+    setUsers: (users: User[]) => void;
   }) => React.ReactNode;
 }
 
@@ -29,6 +32,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [createPostTrigger, setCreatePostTrigger] = useState<(() => void) | null>(null);
+
+  const socialActions = useSocial(currentUser, users, setUsers);
 
   useEffect(() => {
     initializeData();
@@ -217,6 +222,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           onUpdateProfile: handleUpdateProfile,
           onCreatePost: handleCreatePost,
           registerCreatePostTrigger,
+          socialActions,
+          setUsers,
         })}
       </div>
       

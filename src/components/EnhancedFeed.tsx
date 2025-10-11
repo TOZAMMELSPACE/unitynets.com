@@ -13,7 +13,9 @@ import {
   Briefcase,
   BarChart3,
   Users,
-  Clock
+  Clock,
+  Bookmark,
+  BookmarkCheck
 } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { ShareButton } from "@/components/ShareButton";
@@ -27,6 +29,8 @@ interface EnhancedFeedProps {
   onAddComment: (postId: string, content: string) => void;
   onLikeComment: (commentId: string) => void;
   onVotePoll?: (postId: string, optionIndex: number) => void;
+  onSavePost?: (postId: string) => void;
+  isPostSaved?: (postId: string) => boolean;
 }
 
 export const EnhancedFeed = ({ 
@@ -36,7 +40,9 @@ export const EnhancedFeed = ({
   onDislikePost,
   onAddComment, 
   onLikeComment,
-  onVotePoll
+  onVotePoll,
+  onSavePost,
+  isPostSaved
 }: EnhancedFeedProps) => {
   const [filters, setFilters] = useState({
     search: "",
@@ -335,8 +341,27 @@ export const EnhancedFeed = ({
                 postContent={post.content}
               />
 
+              {onSavePost && isPostSaved && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onSavePost(post.id)}
+                  className={`ml-auto transition-colors ${
+                    isPostSaved(post.id) 
+                      ? 'text-primary hover:text-primary/80' 
+                      : 'text-muted-foreground hover:text-primary'
+                  }`}
+                >
+                  {isPostSaved(post.id) ? (
+                    <BookmarkCheck className="w-4 h-4" />
+                  ) : (
+                    <Bookmark className="w-4 h-4" />
+                  )}
+                </Button>
+              )}
+
               {/* Trending indicator */}
-              {filters.sortBy === "trending" && (
+              {filters.sortBy === "trending" && !onSavePost && (
                 <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
                   <Users className="w-3 h-3" />
                   {((post.likes || 0) + (post.comments?.length || 0) * 2)} engagement

@@ -14,6 +14,10 @@ export interface User {
   trustScore: number;
   followers: number;
   following: number;
+  followersList?: string[]; // Array of user IDs
+  followingList?: string[]; // Array of user IDs
+  friendRequests?: string[]; // Array of user IDs who sent requests
+  savedPosts?: string[]; // Array of post IDs
   achievements: string[];
   portfolioItems?: PortfolioItem[];
   lastOnline?: string;
@@ -117,6 +121,30 @@ export interface Chat {
   createdAt: string;
 }
 
+export interface Notification {
+  id: string;
+  userId: string; // Who receives the notification
+  type: 'like' | 'comment' | 'follow' | 'friend_request' | 'friend_accept' | 'mention' | 'post_share';
+  fromUserId: string; // Who triggered the notification
+  fromUserName: string;
+  fromUserImage?: string;
+  content: string;
+  postId?: string;
+  commentId?: string;
+  createdAt: string;
+  isRead: boolean;
+}
+
+export interface Activity {
+  id: string;
+  userId: string;
+  type: 'post' | 'comment' | 'like' | 'follow' | 'join';
+  content: string;
+  postId?: string;
+  targetUserId?: string;
+  createdAt: string;
+}
+
 // Storage keys
 export const STORAGE = {
   USERS: 'unity_users_v1',
@@ -124,6 +152,8 @@ export const STORAGE = {
   COMMENTS: 'unity_comments_v1',
   CHATS: 'unity_chats_v1',
   MESSAGES: 'unity_messages_v1',
+  NOTIFICATIONS: 'unity_notifications_v1',
+  ACTIVITIES: 'unity_activities_v1',
   THEME: 'unity_theme_v1',
   CURRENT_USER: 'unity_current_user_v1',
 };
@@ -159,6 +189,10 @@ export const initializeData = () => {
         trustScore: 85,
         followers: 124,
         following: 89,
+        followersList: ['u2', 'u4'],
+        followingList: ['u3'],
+        friendRequests: [],
+        savedPosts: [],
         achievements: ['trusted_member', 'top_contributor'],
         isOnline: true,
         isVerified: true,
@@ -174,6 +208,10 @@ export const initializeData = () => {
         trustScore: 72,
         followers: 67,
         following: 45,
+        followersList: ['u3'],
+        followingList: ['u1'],
+        friendRequests: [],
+        savedPosts: [],
         achievements: ['early_adopter'],
         isOnline: false,
         isVerified: true,
@@ -189,6 +227,10 @@ export const initializeData = () => {
         trustScore: 90,
         followers: 201,
         following: 156,
+        followersList: ['u1', 'u4'],
+        followingList: ['u2'],
+        friendRequests: [],
+        savedPosts: [],
         achievements: ['verified_educator', 'popular_creator', 'community_leader'],
         isOnline: true,
         isVerified: true,
@@ -204,6 +246,10 @@ export const initializeData = () => {
         trustScore: 68,
         followers: 23,
         following: 12,
+        followersList: [],
+        followingList: ['u1', 'u3'],
+        friendRequests: [],
+        savedPosts: [],
         achievements: ['helpful_member'],
         isOnline: false,
         isVerified: false,
