@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, Bell, User, MessageCircle, Search, Users, Settings } from "lucide-react";
+import { Home, Bell, User, MessageCircle, Search, Users, Settings, Coins } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export const BottomNavigation = () => {
@@ -8,12 +8,10 @@ export const BottomNavigation = () => {
 
   const navItems = [
     { path: "/", icon: Home, labelEn: "Home", labelBn: "হোম" },
+    { path: "/explore", icon: Search, labelEn: "Explore", labelBn: "এক্সপ্লোর" },
+    { path: "/unity-note", icon: Coins, labelEn: "Unity Note", labelBn: "ঐক্য নোট" },
     { path: "/notifications", icon: Bell, labelEn: "Notifications", labelBn: "নোটিফিকেশন" },
     { path: "/messages", icon: MessageCircle, labelEn: "Messages", labelBn: "মেসেজ" },
-    { path: "/explore", icon: Search, labelEn: "Explore", labelBn: "এক্সপ্লোর" },
-    { path: "/profile", icon: User, labelEn: "Profile", labelBn: "প্রোফাইল" },
-    { path: "/groups", icon: Users, labelEn: "Groups", labelBn: "গ্রুপ" },
-    { path: "/settings", icon: Settings, labelEn: "Settings", labelBn: "সেটিংস" },
   ];
 
   return (

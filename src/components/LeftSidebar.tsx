@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, Bell, User, MessageCircle, Search, Users, Settings, Plus } from "lucide-react";
+import { Home, Bell, User, MessageCircle, Search, Users, Settings, Plus, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -17,6 +17,7 @@ export const LeftSidebar = ({ onCreatePost }: LeftSidebarProps) => {
     { path: "/explore", icon: Search, labelEn: "Explore", labelBn: "এক্সপ্লোর" },
     { path: "/notifications", icon: Bell, labelEn: "Notifications", labelBn: "নোটিফিকেশন" },
     { path: "/messages", icon: MessageCircle, labelEn: "Messages", labelBn: "মেসেজ" },
+    { path: "/unity-note", icon: Coins, labelEn: "Unity Note", labelBn: "ঐক্য নোট" },
     { path: "/groups", icon: Users, labelEn: "Groups", labelBn: "গ্রুপ" },
     { path: "/profile", icon: User, labelEn: "Profile", labelBn: "প্রোফাইল" },
     { path: "/settings", icon: Settings, labelEn: "Settings", labelBn: "সেটিংস" },

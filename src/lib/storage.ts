@@ -25,6 +25,9 @@ export interface User {
   isVerified: boolean;
   joinDate: string;
   privacySettings?: PrivacySettings;
+  unityBalance?: number;
+  unityEarned?: number;
+  unitySpent?: number;
 }
 
 export interface PortfolioItem {
@@ -145,6 +148,31 @@ export interface Activity {
   createdAt: string;
 }
 
+export interface UnityNoteTransaction {
+  id: string;
+  fromUserId: string;
+  toUserId: string;
+  amount: number;
+  serviceType: string;
+  description: string;
+  duration: number; // in hours
+  rating?: number;
+  status: 'pending' | 'completed' | 'cancelled';
+  createdAt: string;
+  completedAt?: string;
+}
+
+export interface ServiceOffer {
+  id: string;
+  userId: string;
+  title: string;
+  description: string;
+  category: string;
+  ratePerHour: number; // in Unity Notes
+  availability: string[];
+  createdAt: string;
+}
+
 // Storage keys
 export const STORAGE = {
   USERS: 'unity_users_v1',
@@ -156,6 +184,8 @@ export const STORAGE = {
   ACTIVITIES: 'unity_activities_v1',
   THEME: 'unity_theme_v1',
   CURRENT_USER: 'unity_current_user_v1',
+  UNITY_TRANSACTIONS: 'unity_transactions_v1',
+  SERVICE_OFFERS: 'unity_service_offers_v1',
 };
 
 // Storage utilities
@@ -196,7 +226,10 @@ export const initializeData = () => {
         achievements: ['trusted_member', 'top_contributor'],
         isOnline: true,
         isVerified: true,
-        joinDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+        joinDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        unityBalance: 5,
+        unityEarned: 0,
+        unitySpent: 0
       },
       { 
         id: 'u2', 
@@ -215,7 +248,10 @@ export const initializeData = () => {
         achievements: ['early_adopter'],
         isOnline: false,
         isVerified: true,
-        joinDate: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString()
+        joinDate: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
+        unityBalance: 5,
+        unityEarned: 0,
+        unitySpent: 0
       },
       { 
         id: 'u3', 
@@ -234,7 +270,10 @@ export const initializeData = () => {
         achievements: ['verified_educator', 'popular_creator', 'community_leader'],
         isOnline: true,
         isVerified: true,
-        joinDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString()
+        joinDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+        unityBalance: 5,
+        unityEarned: 0,
+        unitySpent: 0
       },
       { 
         id: 'u4', 
@@ -253,7 +292,10 @@ export const initializeData = () => {
         achievements: ['helpful_member'],
         isOnline: false,
         isVerified: false,
-        joinDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString()
+        joinDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+        unityBalance: 5,
+        unityEarned: 0,
+        unitySpent: 0
       }
     ];
     save(STORAGE.USERS, sampleUsers);
