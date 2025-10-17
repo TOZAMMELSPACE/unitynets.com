@@ -24,8 +24,8 @@ export const LeftSidebar = ({ onCreatePost }: LeftSidebarProps) => {
   ];
 
   return (
-    <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-card border-r border-border z-40 flex-col">
-      <div className="p-6">
+    <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-card border-r border-border z-40 flex-col overflow-y-auto">
+      <div className="p-6 flex-1 flex flex-col">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-8 h-8 bg-gradient-hero rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">U</span>

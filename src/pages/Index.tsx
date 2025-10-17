@@ -79,7 +79,7 @@ const Index = ({
   };
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
+      <div className="container mx-auto px-3 sm:px-4 py-4 lg:py-6 max-w-7xl">
         <Header 
           currentUser={currentUser} 
           onSignOut={onSignOut}
@@ -88,24 +88,24 @@ const Index = ({
         />
 
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 lg:gap-6">
           {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="xl:col-span-3 space-y-4 lg:space-y-6">
             {/* Welcome Card */}
-            <div className="card-enhanced p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl font-semibold mb-2">
+            <div className="card-enhanced p-4 lg:p-6">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-lg lg:text-xl font-semibold mb-2">
                     Welcome to UnityNet
                   </h2>
-                  <p className="text-muted-foreground text-bengali">
+                  <p className="text-sm lg:text-base text-muted-foreground text-bengali">
                     এই প্ল্যাটফর্মে আপনি স্থানীয় কমিউনিটির সাথে যুক্ত হতে পারেন, 
                     জ্ঞান শেয়ার করতে পারেন এবং নতুন কিছু শিখতে পারেন।
                   </p>
                 </div>
                 {currentUser && (
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">
+                  <div className="text-right flex-shrink-0">
+                    <div className="text-xl lg:text-2xl font-bold text-primary">
                       {Math.round(currentUser.trustScore)}
                     </div>
                     <div className="text-xs text-muted-foreground">ট্রাস্ট স্কোর</div>
@@ -142,7 +142,7 @@ const Index = ({
           </div>
 
           {/* Enhanced Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 lg:space-y-6">
             {/* Gamification Panel */}
             {currentUser && (
               <GamificationPanel 

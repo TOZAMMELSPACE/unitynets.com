@@ -202,29 +202,31 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   }
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen w-full bg-background">
       <LeftSidebar onCreatePost={handleCreatePost} />
       
       {/* Main content area */}
-      <div className="lg:ml-64 min-h-screen pb-20 lg:pb-0">
-        {children({
-          currentUser,
-          users,
-          posts,
-          comments,
-          onSignOut: handleSignOut,
-          onLogin: handleLogin,
-          onRegister: handleRegister,
-          onPostCreated: handlePostCreated,
-          onLikePost: handleLikePost,
-          onAddComment: handleAddComment,
-          onLikeComment: handleLikeComment,
-          onUpdateProfile: handleUpdateProfile,
-          onCreatePost: handleCreatePost,
-          registerCreatePostTrigger,
-          socialActions,
-          setUsers,
-        })}
+      <div className="w-full lg:ml-64 min-h-screen pb-24 lg:pb-6">
+        <div className="container mx-auto px-4 py-4 max-w-7xl">
+          {children({
+            currentUser,
+            users,
+            posts,
+            comments,
+            onSignOut: handleSignOut,
+            onLogin: handleLogin,
+            onRegister: handleRegister,
+            onPostCreated: handlePostCreated,
+            onLikePost: handleLikePost,
+            onAddComment: handleAddComment,
+            onLikeComment: handleLikeComment,
+            onUpdateProfile: handleUpdateProfile,
+            onCreatePost: handleCreatePost,
+            registerCreatePostTrigger,
+            socialActions,
+            setUsers,
+          })}
+        </div>
       </div>
       
       {/* Mobile bottom navigation */}
