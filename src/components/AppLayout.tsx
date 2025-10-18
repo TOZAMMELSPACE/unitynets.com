@@ -206,9 +206,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       <LeftSidebar onCreatePost={handleCreatePost} />
       
       {/* Main content area */}
-      <div className="w-full lg:ml-64 min-h-screen pb-24 lg:pb-6">
-        <div className="container mx-auto px-4 py-4 max-w-7xl">
-          {children({
+      <div className="w-full lg:pl-64 min-h-screen pb-20 lg:pb-0">
+        {children({
             currentUser,
             users,
             posts,
@@ -226,7 +225,6 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
             socialActions,
             setUsers,
           })}
-        </div>
       </div>
       
       {/* Mobile bottom navigation */}
