@@ -15,6 +15,7 @@ import Groups from "./pages/Groups";
 import Settings from "./pages/Settings";
 import UnityNote from "./pages/UnityNote";
 import UnityGovernment from "./pages/UnityGovernment";
+import ImpactReport from "./pages/ImpactReport";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
                 <Route path="/messages" element={<Messages currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} />} />
                 <Route path="/explore" element={<Explore currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} socialActions={props.socialActions} setUsers={props.setUsers} />} />
                 <Route path="/unity-note" element={<UnityNote currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} />} />
+                <Route path="/impact-report" element={<ImpactReport currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} />} />
                 <Route path="/profile" element={<Profile currentUser={props.currentUser} onSignOut={props.onSignOut} posts={props.posts} onUpdateProfile={props.onUpdateProfile} />} />
                 <Route path="/groups" element={<Groups currentUser={props.currentUser} onSignOut={props.onSignOut} />} />
                 <Route path="/settings" element={<Settings currentUser={props.currentUser} onSignOut={props.onSignOut} />} />
