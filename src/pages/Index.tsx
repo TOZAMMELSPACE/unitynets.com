@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
-import { FeedFilter } from "@/components/FeedFilter";
 import { EnhancedPostForm } from "@/components/EnhancedPostForm";
 import { EnhancedFeed } from "@/components/EnhancedFeed";
 import { UsersList } from "@/components/UsersList";
@@ -89,9 +88,8 @@ const Index = ({
           currentUser={currentUser} 
           onSignOut={onSignOut}
           onCreatePost={() => handleCreatePost('text')}
+          onFilterChange={handleFilterChange}
         />
-
-        <FeedFilter onFilterChange={handleFilterChange} />
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 mt-4 sm:mt-6">
           {/* Main Content */}
