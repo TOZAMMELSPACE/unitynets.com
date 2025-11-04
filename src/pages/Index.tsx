@@ -78,8 +78,8 @@ const Index = ({
     // For now, we can show filtered results
   };
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-4 max-w-7xl">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-background">
+      <div className="container mx-auto px-3 sm:px-4 py-4 max-w-7xl">
         <Header 
           currentUser={currentUser} 
           onSignOut={onSignOut}
@@ -87,35 +87,40 @@ const Index = ({
           onSearch={handleSearch}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 mt-4 sm:mt-6">
           {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-3 space-y-4 sm:space-y-6">
             {/* Welcome Card */}
-            <div className="card-enhanced p-6">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex-1">
-                  <h2 className="text-xl font-semibold mb-2">
-                    Welcome to UnityNet
-                  </h2>
-                  <p className="text-muted-foreground text-bengali">
-                    এই প্ল্যাটফর্মে আপনি স্থানীয় কমিউনিটির সাথে যুক্ত হতে পারেন, 
-                    জ্ঞান শেয়ার করতে পারেন এবং নতুন কিছু শিখতে পারেন।
-                  </p>
-                </div>
-                {currentUser && (
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">
-                      {Math.round(currentUser.trustScore)}
-                    </div>
-                    <div className="text-xs text-muted-foreground">ট্রাস্ট স্কোর</div>
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/5 via-background to-accent/5 border border-primary/10">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 opacity-50" />
+              <div className="relative p-6 sm:p-8">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex-1">
+                    <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      Welcome to UnityNet
+                    </h1>
+                    <p className="text-muted-foreground text-bengali text-sm sm:text-base leading-relaxed">
+                      এই প্ল্যাটফর্মে আপনি স্থানীয় কমিউনিটির সাথে যুক্ত হতে পারেন, 
+                      জ্ঞান শেয়ার করতে পারেন এবং নতুন কিছু শিখতে পারেন।
+                    </p>
                   </div>
-                )}
+                  {currentUser && (
+                    <div className="flex items-center gap-4 bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl p-4 border border-primary/20">
+                      <div className="text-center">
+                        <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                          {Math.round(currentUser.trustScore)}
+                        </div>
+                        <div className="text-xs sm:text-sm text-muted-foreground font-medium text-bengali mt-1">ট্রাস্ট স্কোর</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Post Form */}
             {showPostForm && currentUser && (
-              <div id="post-form">
+              <div id="post-form" className="animate-fade-in">
                 <EnhancedPostForm 
                   user={currentUser}
                   initialPostType={selectedPostType}
@@ -128,21 +133,23 @@ const Index = ({
             )}
 
             {/* Enhanced Feed */}
-            <EnhancedFeed 
-              posts={posts} 
-              currentUser={currentUser!}
-              onLikePost={onLikePost}
-              onDislikePost={handleDislikePost}
-              onAddComment={onAddComment}
-              onLikeComment={onLikeComment}
-              onVotePoll={handleVotePoll}
-              onSavePost={socialActions.toggleSavePost}
-              isPostSaved={socialActions.isPostSaved}
-            />
+            <div className="animate-fade-in">
+              <EnhancedFeed 
+                posts={posts} 
+                currentUser={currentUser!}
+                onLikePost={onLikePost}
+                onDislikePost={handleDislikePost}
+                onAddComment={onAddComment}
+                onLikeComment={onLikeComment}
+                onVotePoll={handleVotePoll}
+                onSavePost={socialActions.toggleSavePost}
+                isPostSaved={socialActions.isPostSaved}
+              />
+            </div>
           </div>
 
           {/* Enhanced Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Gamification Panel */}
             {currentUser && (
               <GamificationPanel 
