@@ -16,7 +16,7 @@ export const BottomNavigation = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 lg:hidden">
-      <div className="flex justify-around items-center py-2 px-2 pb-safe">
+      <div className="flex justify-around items-center py-1.5 px-1 pb-safe">
         {navItems.map(({ path, icon: Icon, labelEn, labelBn }) => {
           const isActive = location.pathname === path;
           
@@ -24,19 +24,19 @@ export const BottomNavigation = () => {
             <NavLink
               key={path}
               to={path}
-              className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors min-w-[50px] ${
+              className={`flex flex-col items-center justify-center p-1.5 rounded-lg transition-colors flex-1 max-w-[70px] ${
                 isActive
                   ? "text-primary bg-primary/10"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               }`}
             >
-              <Icon size={20} />
-              <span className="text-xs mt-1 font-medium">
+              <Icon size={18} className="shrink-0" />
+              <span className="text-[10px] mt-0.5 font-medium truncate w-full text-center leading-tight">
                 {t(labelEn, labelBn)}
               </span>
               {/* Notification indicator for Bell icon */}
               {path === "/notifications" && (
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full"></div>
+                <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-destructive rounded-full"></div>
               )}
             </NavLink>
           );
