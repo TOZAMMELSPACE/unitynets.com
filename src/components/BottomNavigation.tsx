@@ -30,10 +30,10 @@ export const BottomNavigation = () => {
     }
   };
 
-  // Calculate position for each item in a 180-degree arc
+  // Calculate position for each item in a 90-degree arc
   const getItemPosition = (index: number) => {
     const totalItems = navItems.length;
-    const angle = (180 / (totalItems + 1)) * (index + 1) - 90; // -90 to start from bottom
+    const angle = (90 / (totalItems + 1)) * (index + 1) - 45; // -45 to +45 degrees
     const radius = 100; // Distance from center
     const x = Math.cos((angle * Math.PI) / 180) * radius;
     const y = Math.sin((angle * Math.PI) / 180) * radius;
