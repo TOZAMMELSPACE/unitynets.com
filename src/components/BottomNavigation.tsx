@@ -1,46 +1,97 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Home, Bell, User, MessageCircle, Search, Users, Settings, Coins, Building2, BarChart3 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useState } from "react";
 
 export const BottomNavigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useLanguage();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const navItems = [
-    { path: "/", icon: Home, labelEn: "Home", labelBn: "হোম" },
     { path: "/explore", icon: Search, labelEn: "Explore", labelBn: "এক্সপ্লোর" },
     { path: "/unity-note", icon: Coins, labelEn: "Note", labelBn: "নোট" },
     { path: "/impact-report", icon: BarChart3, labelEn: "Impact", labelBn: "প্রভাব" },
     { path: "/notifications", icon: Bell, labelEn: "Alerts", labelBn: "সতর্কতা" },
   ];
 
+  const handleHomeClick = () => {
+    if (location.pathname === "/") {
+      setIsExpanded(!isExpanded);
+    } else {
+      navigate("/");
+      setIsExpanded(false);
+    }
+  };
+
+  // Calculate position for each item in a 180-degree arc
+  const getItemPosition = (index: number) => {
+    const totalItems = navItems.length;
+    const angle = (180 / (totalItems + 1)) * (index + 1) - 90; // -90 to start from bottom
+    const radius = 100; // Distance from center
+    const x = Math.cos((angle * Math.PI) / 180) * radius;
+    const y = Math.sin((angle * Math.PI) / 180) * radius;
+    return { x, y };
+  };
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 lg:hidden">
-      <div className="flex justify-around items-center py-1.5 px-1 pb-safe">
-        {navItems.map(({ path, icon: Icon, labelEn, labelBn }) => {
+    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden pointer-events-none">
+      <div className="relative h-24 flex items-end justify-center pb-4">
+        {/* Floating menu items */}
+        {navItems.map(({ path, icon: Icon, labelEn, labelBn }, index) => {
           const isActive = location.pathname === path;
+          const { x, y } = getItemPosition(index);
           
           return (
             <NavLink
               key={path}
               to={path}
-              className={`flex flex-col items-center justify-center p-1.5 rounded-lg transition-colors flex-1 max-w-[70px] ${
-                isActive
-                  ? "text-primary bg-primary/10"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              onClick={() => setIsExpanded(false)}
+              className={`absolute pointer-events-auto transition-all duration-500 ease-out ${
+                isExpanded 
+                  ? "opacity-100 scale-100" 
+                  : "opacity-0 scale-0 pointer-events-none"
               }`}
+              style={{
+                transform: isExpanded 
+                  ? `translate(${x}px, ${y}px)` 
+                  : "translate(0, 0)",
+                bottom: "80px",
+                left: "50%",
+                marginLeft: "-20px",
+              }}
             >
-              <Icon size={18} className="shrink-0" />
-              <span className="text-[10px] mt-0.5 font-medium truncate w-full text-center leading-tight">
-                {t(labelEn, labelBn)}
-              </span>
-              {/* Notification indicator for Bell icon */}
-              {path === "/notifications" && (
-                <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-destructive rounded-full"></div>
-              )}
+              <div
+                className={`flex flex-col items-center justify-center w-14 h-14 rounded-full shadow-lg transition-colors ${
+                  isActive
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                <Icon size={20} />
+                <span className="text-[8px] mt-0.5 font-medium truncate max-w-[50px] text-center">
+                  {t(labelEn, labelBn)}
+                </span>
+                {path === "/notifications" && (
+                  <div className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full"></div>
+                )}
+              </div>
             </NavLink>
           );
         })}
+
+        {/* Home FAB button */}
+        <button
+          onClick={handleHomeClick}
+          className={`pointer-events-auto w-16 h-16 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 ${
+            location.pathname === "/"
+              ? "bg-primary text-primary-foreground scale-110"
+              : "bg-card text-foreground hover:scale-105"
+          } ${isExpanded ? "rotate-45" : "rotate-0"}`}
+        >
+          <Home size={28} />
+        </button>
       </div>
     </nav>
   );
