@@ -30,11 +30,11 @@ export const BottomNavigation = () => {
     }
   };
 
-  // Calculate position for each item in a 90-degree arc
+  // Calculate position for each item in a 360-degree circle
   const getItemPosition = (index: number) => {
     const totalItems = navItems.length;
-    const angle = (90 / (totalItems + 1)) * (index + 1) - 45; // -45 to +45 degrees
-    const radius = 100; // Distance from center
+    const angle = (360 / totalItems) * index - 90; // Start from top and distribute evenly
+    const radius = 80; // Distance from center (closer to home button)
     const x = Math.cos((angle * Math.PI) / 180) * radius;
     const y = Math.sin((angle * Math.PI) / 180) * radius;
     return { x, y };
@@ -68,18 +68,18 @@ export const BottomNavigation = () => {
               }}
             >
               <div
-                className={`flex flex-col items-center justify-center w-14 h-14 rounded-full shadow-lg transition-colors ${
+                className={`flex flex-col items-center justify-center w-12 h-12 rounded-full shadow-xl backdrop-blur-sm transition-all duration-300 ${
                   isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card text-muted-foreground hover:bg-muted"
+                    ? "bg-primary text-primary-foreground scale-110"
+                    : "bg-card/90 text-muted-foreground hover:bg-primary/80 hover:text-primary-foreground hover:scale-105"
                 }`}
               >
-                <Icon size={20} />
-                <span className="text-[8px] mt-0.5 font-medium truncate max-w-[50px] text-center">
+                <Icon size={18} />
+                <span className="text-[7px] mt-0.5 font-medium truncate max-w-[45px] text-center">
                   {t(labelEn, labelBn)}
                 </span>
                 {path === "/notifications" && (
-                  <div className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full"></div>
+                  <div className="absolute top-0.5 right-0.5 w-2 h-2 bg-destructive rounded-full animate-pulse"></div>
                 )}
               </div>
             </NavLink>
@@ -89,13 +89,13 @@ export const BottomNavigation = () => {
         {/* Home FAB button */}
         <button
           onClick={handleHomeClick}
-          className={`pointer-events-auto w-16 h-16 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 ${
+          className={`pointer-events-auto w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500 backdrop-blur-sm ${
             location.pathname === "/"
-              ? "bg-primary text-primary-foreground scale-110"
-              : "bg-card text-foreground hover:scale-105"
-          } ${isExpanded ? "rotate-45" : "rotate-0"}`}
+              ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground scale-110 shadow-primary/50"
+              : "bg-card text-foreground hover:scale-105 hover:shadow-primary/30"
+          } ${isExpanded ? "rotate-180 scale-105" : "rotate-0"}`}
         >
-          <Home size={28} />
+          <Home size={28} className={isExpanded ? "scale-90" : "scale-100"} />
         </button>
       </div>
     </nav>
