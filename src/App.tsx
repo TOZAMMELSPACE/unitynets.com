@@ -53,3 +53,13 @@ const App = () => (
 );
 
 export default App;
+
+/**
+ * UnityNet - A modern web platform
+ * 
+ * @author Tozammel Haque
+ * @copyright 2025 Tozammel Haque. All rights reserved.
+ * @license MIT - See LICENSE file
+ * 
+ * এই কোডটি শিক্ষামূলক উদ্দেশ্যে পাবলিক। বাণিজ্যিক ব্যবহারের জন্য যোগাযোগ করুন।
+ */
