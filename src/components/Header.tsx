@@ -79,16 +79,16 @@ export const Header = ({ currentUser, onSignOut, onCreatePost, onFilterChange }:
   ].filter(Boolean).length;
 
   return (
-    <header className="card-enhanced p-3 lg:p-4 mb-4 lg:mb-6">
+    <header className="card-enhanced p-2 lg:p-4 mb-4 lg:mb-6">
       <div className="flex flex-col gap-3 lg:gap-4">
         {/* Top Row: Logo + Create Post + Theme + Profile + Sign Out */}
-        <div className="flex flex-wrap items-center gap-2 lg:gap-3">
+        <div className="flex flex-nowrap items-center gap-1 lg:gap-3">
           {/* UnityNet Logo with Slogan */}
-          <div className="flex flex-col mr-2 lg:mr-4 flex-shrink-0">
-            <h1 className="text-lg lg:text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <div className="flex flex-col mr-1 lg:mr-4 flex-shrink-0">
+            <h1 className="text-sm lg:text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent whitespace-nowrap">
               UnityNet
             </h1>
-            <p className="text-[10px] lg:text-xs text-muted-foreground text-bengali -mt-1">
+            <p className="hidden lg:block text-xs text-muted-foreground text-bengali -mt-1">
               একত্রে শক্তিশালী
             </p>
           </div>
@@ -97,11 +97,11 @@ export const Header = ({ currentUser, onSignOut, onCreatePost, onFilterChange }:
           {currentUser && onCreatePost && (
             <Button
               onClick={onCreatePost}
-              className="btn-hero flex items-center gap-2 px-3 py-2 lg:px-4 shadow-elegant hover:shadow-glow transition-all duration-300 flex-shrink-0"
+              className="btn-hero flex items-center gap-1 px-2 py-1 lg:px-4 lg:py-2 shadow-elegant hover:shadow-glow transition-all duration-300 flex-shrink-0"
               size="sm"
             >
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline text-sm lg:text-base">
+              <Plus className="h-3 w-3 lg:h-4 lg:w-4" />
+              <span className="hidden sm:inline text-xs lg:text-base">
                 {t("New Post", "নতুন পোস্ট")}
               </span>
             </Button>
@@ -117,40 +117,40 @@ export const Header = ({ currentUser, onSignOut, onCreatePost, onFilterChange }:
             </p>
           </div>
           
-          <div className="flex items-center gap-2 lg:gap-3 ml-auto">
+          <div className="flex items-center gap-1 lg:gap-3 ml-auto flex-shrink-0">
             {/* Dark Mode Toggle */}
             <Button
               variant="ghost"
               size="sm"
               onClick={toggleTheme}
-              className="h-8 w-8 p-0 hover:bg-primary/10 bg-gradient-to-r from-primary/5 to-accent/10 border border-primary/20 shadow-sm hover:shadow-md transition-all duration-300 flex-shrink-0"
+              className="h-6 w-6 lg:h-8 lg:w-8 p-0 hover:bg-primary/10 bg-gradient-to-r from-primary/5 to-accent/10 border border-primary/20 shadow-sm hover:shadow-md transition-all duration-300 flex-shrink-0"
             >
-              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-primary" />
-              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-primary" />
+              <Sun className="h-3 w-3 lg:h-4 lg:w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-primary" />
+              <Moon className="absolute h-3 w-3 lg:h-4 lg:w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-primary" />
               <span className="sr-only">Toggle theme</span>
             </Button>
             
             {/* Profile and Sign Out */}
             {currentUser ? (
               <>
-                <div className="text-right bg-gradient-to-r from-primary/15 to-accent/20 px-2 py-2 lg:px-4 lg:py-3 rounded-xl border border-primary/30 shadow-elegant hover:shadow-glow transition-all duration-300 backdrop-blur-sm">
-                  <div className="font-bold text-primary text-sm lg:text-lg truncate max-w-[100px] lg:max-w-none">{currentUser.name}</div>
-                  <div className="trust-score text-xs lg:text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent whitespace-nowrap">
-                    {t("Trust", "ট্রাস্ট")}: {Math.round(currentUser.trustScore)}
+                <div className="text-right bg-gradient-to-r from-primary/15 to-accent/20 px-1.5 py-1 lg:px-4 lg:py-3 rounded-lg lg:rounded-xl border border-primary/30 shadow-elegant hover:shadow-glow transition-all duration-300 backdrop-blur-sm flex-shrink-0">
+                  <div className="font-bold text-primary text-[10px] lg:text-lg truncate max-w-[60px] lg:max-w-none">{currentUser.name}</div>
+                  <div className="trust-score text-[8px] lg:text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent whitespace-nowrap">
+                    {Math.round(currentUser.trustScore)}
                   </div>
                 </div>
                 <Button
                   onClick={onSignOut}
                   variant="outline"
                   size="sm"
-                  className="border-primary/30 text-primary hover:bg-primary/20 hover:text-primary font-semibold shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-r from-primary/5 to-accent/10 text-xs lg:text-sm flex-shrink-0"
+                  className="border-primary/30 text-primary hover:bg-primary/20 hover:text-primary font-semibold shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-r from-primary/5 to-accent/10 text-[10px] lg:text-sm px-2 py-1 lg:px-4 lg:py-2 flex-shrink-0 h-6 lg:h-9"
                 >
-                  {t("Sign Out", "সাইন আউট")}
+                  {t("Sign Out", "আউট")}
                 </Button>
               </>
             ) : (
-              <div className="text-muted-foreground text-sm">
-                {t("Sign In", "সাইন ইন করুন")}
+              <div className="text-muted-foreground text-xs lg:text-sm">
+                {t("Sign In", "সাইন ইন")}
               </div>
             )}
           </div>
