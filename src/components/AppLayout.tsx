@@ -4,6 +4,7 @@ import { BottomNavigation } from "@/components/BottomNavigation";
 import { LeftSidebar } from "@/components/LeftSidebar";
 import { Login } from "@/components/Login";
 import { useSocial } from "@/hooks/useSocial";
+import { GlobalHeader } from "@/components/GlobalHeader";
 
 interface AppLayoutProps {
   children: (props: {
@@ -207,6 +208,14 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       
       {/* Main content area */}
       <div className="w-full lg:pl-64 min-h-screen pb-20 lg:pb-0">
+        {/* Global Header - same on all pages */}
+        <GlobalHeader 
+          currentUser={currentUser} 
+          onSignOut={handleSignOut}
+          onCreatePost={handleCreatePost}
+        />
+        
+        {/* Page Content */}
         {children({
             currentUser,
             users,

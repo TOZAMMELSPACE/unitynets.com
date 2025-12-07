@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Header } from "@/components/Header";
 import { EnhancedPostForm } from "@/components/EnhancedPostForm";
 import { EnhancedFeed } from "@/components/EnhancedFeed";
 import { UsersList } from "@/components/UsersList";
@@ -9,6 +8,7 @@ import { FloatingActionButton } from "@/components/FloatingActionButton";
 import { LocalEvents } from "@/components/LocalEvents";
 import { JobBoard } from "@/components/JobBoard";
 import { GamificationPanel } from "@/components/GamificationPanel";
+import { FeedFilter } from "@/components/FeedFilter";
 import { User, Post } from "@/lib/storage";
 
 interface IndexProps {
@@ -78,14 +78,11 @@ const Index = ({
 
   return (
     <div className="min-h-screen bg-background">
-      <Header 
-        currentUser={currentUser} 
-        onSignOut={onSignOut}
-        onCreatePost={() => handleCreatePost('text')}
-        onFilterChange={handleFilterChange}
-      />
-      
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+        {/* Feed Filter */}
+        <div className="mb-6">
+          <FeedFilter onFilterChange={handleFilterChange} />
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-8 space-y-6">
