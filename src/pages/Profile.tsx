@@ -1,4 +1,3 @@
-import { Header } from "@/components/Header";
 import { ProfileEdit } from "@/components/ProfileEdit";
 import { ProfileBadges } from "@/components/ProfileBadges";
 import { PortfolioSection } from "@/components/PortfolioSection";
@@ -79,10 +78,7 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <Header currentUser={currentUser} onSignOut={onSignOut} />
-      
-      <main className="container mx-auto px-4 max-w-4xl">
+    <main className="container mx-auto px-4 py-6 max-w-4xl">
 
         {/* Cover Image & Profile Header */}
         <div className="relative mb-6">
@@ -416,7 +412,6 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+    </main>
   );
 }

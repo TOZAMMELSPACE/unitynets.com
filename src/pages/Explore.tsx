@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { Header } from "@/components/Header";
 import { User } from "@/lib/storage";
 import { Search, TrendingUp, Hash, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -49,10 +48,7 @@ export default function Explore({ currentUser, users, onSignOut, socialActions, 
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <Header currentUser={currentUser} onSignOut={onSignOut} />
-      
-      <main className="container mx-auto px-4 max-w-2xl">
+    <main className="container mx-auto px-4 py-6 max-w-2xl">
         <div className="mb-6">
           <div className="relative mb-6">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -158,7 +154,6 @@ export default function Explore({ currentUser, users, onSignOut, socialActions, 
             </div>
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+    </main>
   );
 }

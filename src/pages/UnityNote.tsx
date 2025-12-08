@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -88,10 +87,7 @@ const UnityNote = ({ currentUser, users, onSignOut }: UnityNoteProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header currentUser={currentUser} onSignOut={onSignOut} />
-      
-      <main className="container mx-auto px-4 py-6 max-w-7xl">
+    <main className="container mx-auto px-4 py-6 max-w-5xl">
         {/* Hero Section */}
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
@@ -391,21 +387,20 @@ const UnityNote = ({ currentUser, users, onSignOut }: UnityNoteProps) => {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
 
-      <ServiceRequestDialog 
-        open={requestDialogOpen}
-        onOpenChange={setRequestDialogOpen}
-        onSubmit={handleServiceRequest}
-        users={users.filter(u => u.id !== currentUser.id)}
-      />
+        <ServiceRequestDialog 
+          open={requestDialogOpen}
+          onOpenChange={setRequestDialogOpen}
+          onSubmit={handleServiceRequest}
+          users={users.filter(u => u.id !== currentUser.id)}
+        />
 
-      <ServiceOfferDialog 
-        open={offerDialogOpen}
-        onOpenChange={setOfferDialogOpen}
-        onSubmit={handleServiceOffer}
-      />
-    </div>
+        <ServiceOfferDialog 
+          open={offerDialogOpen}
+          onOpenChange={setOfferDialogOpen}
+          onSubmit={handleServiceOffer}
+        />
+    </main>
   );
 };
 

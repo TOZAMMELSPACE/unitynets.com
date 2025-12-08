@@ -75,8 +75,7 @@ export default function ImpactReport({ currentUser }: ImpactReportProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <main className="container max-w-5xl mx-auto px-4 py-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
@@ -475,7 +474,6 @@ export default function ImpactReport({ currentUser }: ImpactReportProps) {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
-    </div>
+    </main>
   );
 }

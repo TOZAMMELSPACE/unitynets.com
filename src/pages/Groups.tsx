@@ -1,4 +1,3 @@
-import { Header } from "@/components/Header";
 import { User } from "@/lib/storage";
 import { Users, Plus, Lock, Globe, Crown, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -59,10 +58,7 @@ const suggestedGroups = [
 
 export default function Groups({ currentUser, onSignOut }: GroupsProps) {
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <Header currentUser={currentUser} onSignOut={onSignOut} />
-      
-      <main className="container mx-auto px-4 max-w-2xl">
+    <main className="container mx-auto px-4 py-6 max-w-2xl">
 
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -182,7 +178,6 @@ export default function Groups({ currentUser, onSignOut }: GroupsProps) {
             ))}
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+    </main>
   );
 }

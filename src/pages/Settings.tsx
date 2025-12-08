@@ -1,4 +1,3 @@
-import { Header } from "@/components/Header";
 import { User } from "@/lib/storage";
 import { 
   Settings as SettingsIcon, 
@@ -60,10 +59,7 @@ const settingsCategories = [
 
 export default function Settings({ currentUser, onSignOut }: SettingsProps) {
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <Header currentUser={currentUser} onSignOut={onSignOut} />
-      
-      <main className="container mx-auto px-4 max-w-2xl">
+    <main className="container mx-auto px-4 py-6 max-w-2xl">
 
         {/* User Info Card */}
         <div className="card-enhanced p-4 mb-6">
@@ -139,7 +135,6 @@ export default function Settings({ currentUser, onSignOut }: SettingsProps) {
           <p className="text-bengali">UnityNet v1.0.0</p>
           <p className="text-bengali">© ২০২৪ UnityNet. সকল অধিকার সংরক্ষিত।</p>
         </div>
-      </main>
-    </div>
+    </main>
   );
 }

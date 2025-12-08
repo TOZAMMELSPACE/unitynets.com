@@ -232,8 +232,7 @@ export default function UnityGovernment({ currentUser, users, onSignOut }: Unity
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
+    <main className="container mx-auto px-4 py-6 max-w-5xl">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
@@ -401,18 +400,17 @@ export default function UnityGovernment({ currentUser, users, onSignOut }: Unity
             </p>
           </div>
         </Card>
-      </div>
 
-      <ProposalDialog 
-        open={showProposalDialog} 
-        onOpenChange={setShowProposalDialog} 
-      />
-      
-      <FeedbackDialog
-        open={showFeedbackDialog}
-        onOpenChange={setShowFeedbackDialog}
-        guideline={selectedGuideline}
-      />
-    </div>
+        <ProposalDialog 
+          open={showProposalDialog} 
+          onOpenChange={setShowProposalDialog} 
+        />
+        
+        <FeedbackDialog
+          open={showFeedbackDialog}
+          onOpenChange={setShowFeedbackDialog}
+          guideline={selectedGuideline}
+        />
+    </main>
   );
 }
