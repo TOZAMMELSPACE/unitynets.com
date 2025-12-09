@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { EnhancedPostForm } from "@/components/EnhancedPostForm";
 import { EnhancedFeed } from "@/components/EnhancedFeed";
 import { FloatingActionButton } from "@/components/FloatingActionButton";
+import { FeedFilter } from "@/components/FeedFilter";
 import { GamificationPanel } from "@/components/GamificationPanel";
 import { UsersList } from "@/components/UsersList";
 import { LocalEvents } from "@/components/LocalEvents";
@@ -43,6 +44,11 @@ const Index = ({
 }: IndexProps) => {
   const [showPostForm, setShowPostForm] = useState(false);
   const [selectedPostType, setSelectedPostType] = useState<'text' | 'image' | 'video' | 'poll' | 'event' | 'job'>('text');
+  const [filteredPosts, setFilteredPosts] = useState(posts);
+
+  useEffect(() => {
+    setFilteredPosts(posts);
+  }, [posts]);
 
   useEffect(() => {
     if (registerCreatePostTrigger) {
@@ -66,19 +72,49 @@ const Index = ({
     console.log('Vote on poll:', postId, 'option:', optionIndex);
   };
 
-  return (
-    <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Sidebar */}
-        <aside className="hidden lg:block lg:col-span-3 space-y-6">
-          {currentUser && (
-            <GamificationPanel user={currentUser} users={users} />
-          )}
-          <UsersList users={users} currentUserId={currentUser?.id} />
-        </aside>
+  const handleFilterChange = (filters: { search: string; community: string; postType: string; sortBy: string }) => {
+    let result = [...posts];
+    
+    // Search filter
+    if (filters.search) {
+      result = result.filter(post => 
+        post.content.toLowerCase().includes(filters.search.toLowerCase()) ||
+        post.author.name.toLowerCase().includes(filters.search.toLowerCase())
+      );
+    }
+    
+    // Community filter
+    if (filters.community !== "all") {
+      result = result.filter(post => post.community === filters.community);
+    }
+    
+    // Post type filter
+    if (filters.postType !== "all") {
+      result = result.filter(post => post.postType === filters.postType);
+    }
+    
+    // Sort
+    if (filters.sortBy === "trending" || filters.sortBy === "popular") {
+      result.sort((a, b) => b.likes - a.likes);
+    } else if (filters.sortBy === "most_commented") {
+      result.sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0));
+    } else {
+      result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+    
+    setFilteredPosts(result);
+  };
 
+  return (
+    <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Feed Filter - Below Header */}
+      <div className="mb-6">
+        <FeedFilter onFilterChange={handleFilterChange} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Main Feed */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-8 space-y-6">
           {/* Post Form */}
           {showPostForm && currentUser && (
             <div id="post-form" className="animate-fade-in">
@@ -96,7 +132,7 @@ const Index = ({
           {/* Feed */}
           <div className="animate-fade-in">
             <EnhancedFeed
-              posts={posts} 
+              posts={filteredPosts} 
               currentUser={currentUser!}
               onLikePost={onLikePost}
               onDislikePost={handleDislikePost}
@@ -109,11 +145,15 @@ const Index = ({
           </div>
         </div>
 
-        {/* Right Sidebar */}
-        <aside className="hidden lg:block lg:col-span-3 space-y-6">
+        {/* Right Sidebar - All Widgets */}
+        <aside className="hidden lg:block lg:col-span-4 space-y-6">
+          {currentUser && (
+            <GamificationPanel user={currentUser} users={users} />
+          )}
           {currentUser && (
             <LearningZone user={currentUser} />
           )}
+          <UsersList users={users} currentUserId={currentUser?.id} />
           <LocalEvents posts={posts} onCreateEvent={() => handleCreatePost('event')} />
           <JobBoard posts={posts} onCreateJob={() => handleCreatePost('job')} />
           <LocalCommunity posts={posts} />
