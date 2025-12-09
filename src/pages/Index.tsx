@@ -106,9 +106,9 @@ const Index = ({
   };
 
   return (
-    <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
       {/* Feed Filter - Below Header */}
-      <div className="mb-6">
+      <div className="mb-4">
         <FeedFilter onFilterChange={handleFilterChange} />
       </div>
 
