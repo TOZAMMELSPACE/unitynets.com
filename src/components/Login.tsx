@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Link } from "react-router-dom";
 import { User } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -266,7 +267,7 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
 
                 <p className="text-xs text-center text-muted-foreground mt-4">
                   নিবন্ধন করে আপনি আমাদের{" "}
-                  <span className="text-primary cursor-pointer">শর্তাবলী</span> মেনে নিচ্ছেন
+                  <Link to="/terms" className="text-primary hover:underline">শর্তাবলী</Link> মেনে নিচ্ছেন
                 </p>
               </form>
             ) : (
