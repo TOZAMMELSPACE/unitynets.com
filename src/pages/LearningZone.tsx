@@ -232,29 +232,13 @@ export default function LearningZone({ currentUser, onSignOut }: LearningZonePro
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="card-enhanced p-4 lg:p-6 mb-6">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
-              {t("Learning Zone", "লার্নিং জোন")}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {t("Enhance your skills and grow with the community", "আপনার দক্ষতা বৃদ্ধি করুন এবং কমিউনিটির সাথে বেড়ে উঠুন")}
-            </p>
-          </div>
-          
-          {currentUser && (
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <div className="font-bold text-lg">{currentUser.name}</div>
-                <div className="text-sm text-muted-foreground">
-                  {t("Trust", "ট্রাস্ট")}: <span className="text-primary font-semibold">{Math.round(currentUser.trustScore)}</span>
-                </div>
-              </div>
-              <Button onClick={onSignOut} variant="outline" size="sm">
-                {t("Sign Out", "সাইন আউট")}
-              </Button>
-            </div>
-          )}
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+            {t("Learning Zone", "লার্নিং জোন")}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {t("Enhance your skills and grow with the community", "আপনার দক্ষতা বৃদ্ধি করুন এবং কমিউনিটির সাথে বেড়ে উঠুন")}
+          </p>
         </div>
       </header>
 
