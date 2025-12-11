@@ -403,7 +403,7 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                       <UserPlus className="w-4 h-4 text-accent" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm text-bengali">UnityNet কমিউনিটিতে যোগদান করেছেন</p>
+                      <p className="text-sm text-bengali">UnityNets কমিউনিটিতে যোগদান করেছেন</p>
                       <p className="text-xs text-muted-foreground text-bengali mt-1">{formatDate(user.joinDate)}</p>
                     </div>
                   </div>

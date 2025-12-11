@@ -312,7 +312,7 @@ export default function Settings({ currentUser, onSignOut }: SettingsProps) {
           icon: MessageCircle, 
           label: t("Contact Us", "যোগাযোগ করুন"), 
           description: t("Get in touch with support", "সাপোর্ট টিমের সাথে যোগাযোগ"),
-          onClick: () => window.open("mailto:support@unitynet.app", "_blank")
+          onClick: () => window.open("mailto:support@unitynets.app", "_blank")
         },
       ]
     },
@@ -452,8 +452,8 @@ export default function Settings({ currentUser, onSignOut }: SettingsProps) {
 
       {/* App Info */}
       <div className="mt-6 text-center text-sm text-muted-foreground space-y-1">
-        <p>UnityNet v1.0.0</p>
-        <p>© {t("2025 UnityNet. All rights reserved.", "২০২৫ UnityNet। সর্বস্বত্ব সংরক্ষিত।")}</p>
+        <p>UnityNets v1.0.0</p>
+        <p>© {t("2025 UnityNets. All rights reserved.", "২০২৫ UnityNets। সর্বস্বত্ব সংরক্ষিত।")}</p>
       </div>
 
       {/* Edit Profile Sheet */}

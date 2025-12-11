@@ -11,13 +11,13 @@ const TermsAndConditions = () => {
       icon: Shield,
       titleBn: "১. সেবা গ্রহণের শর্তাবলী",
       titleEn: "1. Terms of Service",
-      contentBn: `UnityNet প্ল্যাটফর্ম ব্যবহার করতে হলে আপনাকে অবশ্যই:
+      contentBn: `UnityNets প্ল্যাটফর্ম ব্যবহার করতে হলে আপনাকে অবশ্যই:
 • কমপক্ষে ১৮ বছর বয়স হতে হবে
 • বাংলাদেশের নাগরিক হতে হবে অথবা বৈধ ভিসাধারী হতে হবে
 • সঠিক ও সত্য তথ্য প্রদান করতে হবে
 • একটি মাত্র অ্যাকাউন্ট রাখতে পারবেন
 • আপনার অ্যাকাউন্টের নিরাপত্তা বজায় রাখতে হবে`,
-      contentEn: `To use the UnityNet platform, you must:
+      contentEn: `To use the UnityNets platform, you must:
 • Be at least 18 years of age
 • Be a citizen of Bangladesh or hold a valid visa
 • Provide accurate and truthful information
@@ -92,13 +92,13 @@ const TermsAndConditions = () => {
 • Unity Note আসল টাকায় রূপান্তরযোগ্য নয়
 • জালিয়াতি বা অপব্যবহার করলে অ্যাকাউন্ট বন্ধ হবে
 • সেবার মান নিয়ন্ত্রণ আপনার দায়িত্ব
-• বিরোধ নিষ্পত্তিতে UnityNet চূড়ান্ত সিদ্ধান্ত নেবে`,
+• বিরোধ নিষ্পত্তিতে UnityNets চূড়ান্ত সিদ্ধান্ত নেবে`,
       contentEn: `Unity Note is our time-based currency system:
 • 1 hour of service = 1 Unity Note
 • Unity Notes cannot be converted to real money
 • Fraud or misuse will result in account suspension
 • Quality of service is your responsibility
-• UnityNet will make final decisions in disputes`
+• UnityNets will make final decisions in disputes`
     },
     {
       icon: AlertTriangle,
@@ -127,13 +127,13 @@ const TermsAndConditions = () => {
       titleEn: "7. Legal Matters",
       contentBn: `• এই শর্তাবলী বাংলাদেশের আইন দ্বারা পরিচালিত
 • যেকোনো বিরোধ ঢাকার আদালতে নিষ্পত্তি হবে
-• UnityNet যেকোনো সময় শর্তাবলী পরিবর্তন করতে পারে
+• UnityNets যেকোনো সময় শর্তাবলী পরিবর্তন করতে পারে
 • গুরুত্বপূর্ণ পরিবর্তন হলে আপনাকে জানানো হবে
 • শর্তাবলী ভঙ্গ করলে অ্যাকাউন্ট স্থগিত বা বন্ধ হতে পারে
 • আমরা কোনো পূর্ব নোটিশ ছাড়াই সেবা বন্ধ করার অধিকার রাখি`,
       contentEn: `• These terms are governed by the laws of Bangladesh
 • Any disputes will be resolved in Dhaka courts
-• UnityNet may modify terms at any time
+• UnityNets may modify terms at any time
 • You will be notified of significant changes
 • Violation of terms may result in account suspension
 • We reserve the right to discontinue service without notice`
@@ -142,13 +142,13 @@ const TermsAndConditions = () => {
       icon: Shield,
       titleBn: "৮. দায়বদ্ধতার সীমাবদ্ধতা",
       titleEn: "8. Limitation of Liability",
-      contentBn: `• UnityNet কোনো প্রত্যক্ষ বা পরোক্ষ ক্ষতির জন্য দায়ী নয়
-• ব্যবহারকারীদের মধ্যে লেনদেনের দায় UnityNet বহন করে না
+      contentBn: `• UnityNets কোনো প্রত্যক্ষ বা পরোক্ষ ক্ষতির জন্য দায়ী নয়
+• ব্যবহারকারীদের মধ্যে লেনদেনের দায় UnityNets বহন করে না
 • প্ল্যাটফর্ম "যেমন আছে" ভিত্তিতে প্রদান করা হয়
 • আমরা নিরবচ্ছিন্ন সেবার নিশ্চয়তা দিই না
 • তৃতীয় পক্ষের লিংক বা কনটেন্টের জন্য আমরা দায়ী নই`,
-      contentEn: `• UnityNet is not liable for any direct or indirect damages
-• UnityNet does not bear responsibility for user transactions
+      contentEn: `• UnityNets is not liable for any direct or indirect damages
+• UnityNets does not bear responsibility for user transactions
 • The platform is provided on an "as is" basis
 • We do not guarantee uninterrupted service
 • We are not responsible for third-party links or content`
@@ -179,13 +179,13 @@ const TermsAndConditions = () => {
           {/* Introduction */}
           <div className="mb-8 p-4 bg-primary/5 rounded-xl border border-primary/10">
             <h2 className="text-lg font-semibold mb-2">
-              🤝 UnityNet-এ স্বাগতম
+              🤝 UnityNets-এ স্বাগতম
             </h2>
             <p className="text-sm text-muted-foreground mb-3">
-              UnityNet হলো বাংলাদেশের একটি বিশ্বস্ত সামাজিক প্ল্যাটফর্ম যেখানে মানুষ একে অপরকে সাহায্য করে, শেখে এবং একত্রে শক্তিশালী হয়।
+              UnityNets হলো বাংলাদেশের একটি বিশ্বস্ত সামাজিক প্ল্যাটফর্ম যেখানে মানুষ একে অপরকে সাহায্য করে, শেখে এবং একত্রে শক্তিশালী হয়।
             </p>
             <p className="text-sm text-muted-foreground">
-              Welcome to UnityNet - a trusted social platform of Bangladesh where people help each other, learn together, and grow stronger as a community.
+              Welcome to UnityNets - a trusted social platform of Bangladesh where people help each other, learn together, and grow stronger as a community.
             </p>
             <div className="mt-4 pt-4 border-t border-primary/10">
               <p className="text-xs text-muted-foreground">
@@ -239,10 +239,10 @@ const TermsAndConditions = () => {
             <Shield className="w-10 h-10 mx-auto text-primary mb-3" />
             <h3 className="font-semibold mb-2">সম্মতি প্রদান</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              UnityNet-এ নিবন্ধন করার মাধ্যমে আপনি উপরের সকল শর্তাবলী পড়েছেন এবং মেনে নিতে সম্মত হয়েছেন বলে গণ্য হবে।
+              UnityNets-এ নিবন্ধন করার মাধ্যমে আপনি উপরের সকল শর্তাবলী পড়েছেন এবং মেনে নিতে সম্মত হয়েছেন বলে গণ্য হবে।
             </p>
             <p className="text-xs text-muted-foreground mb-4">
-              By registering on UnityNet, you acknowledge that you have read and agree to all the terms and conditions stated above.
+              By registering on UnityNets, you acknowledge that you have read and agree to all the terms and conditions stated above.
             </p>
             <Button onClick={() => navigate(-1)} className="w-full sm:w-auto">
               আমি সম্মত আছি / I Agree
@@ -252,7 +252,7 @@ const TermsAndConditions = () => {
           {/* Contact */}
           <div className="mt-6 text-center text-sm text-muted-foreground">
             <p>প্রশ্ন থাকলে যোগাযোগ করুন:</p>
-            <p className="text-primary">support@unitynet.com.bd</p>
+            <p className="text-primary">support@unitynets.com.bd</p>
           </div>
         </main>
       </ScrollArea>
