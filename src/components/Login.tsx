@@ -279,12 +279,13 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
                   <p className="text-xs text-center text-muted-foreground mb-2">
                     নিবন্ধনের আগে অনুগ্রহ করে আমাদের শর্তাবলী পড়ুন
                   </p>
-                  <Link 
-                    to="/terms" 
-                    className="flex items-center justify-center gap-2 text-sm font-medium text-primary hover:underline"
+                  <button 
+                    type="button"
+                    onClick={() => setShowTerms(true)}
+                    className="flex items-center justify-center gap-2 text-sm font-medium text-primary hover:underline w-full"
                   >
                     📜 শর্তাবলী দেখুন / View Terms & Conditions
-                  </Link>
+                  </button>
                 </div>
 
                 <Button type="submit" className="w-full h-11" size="lg">
