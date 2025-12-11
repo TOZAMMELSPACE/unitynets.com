@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Header } from "@/components/Header";
+
 import { User } from "@/lib/storage";
 import { Bell, Heart, MessageCircle, UserPlus, UserCheck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -67,9 +67,7 @@ export default function Notifications({
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <Header currentUser={currentUser} onSignOut={onSignOut} />
-      
-      <main className="container mx-auto px-4 max-w-2xl">
+      <main className="container mx-auto px-4 max-w-2xl pt-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-bengali">বিজ্ঞপ্তি</h2>
           {unreadCount > 0 && (
