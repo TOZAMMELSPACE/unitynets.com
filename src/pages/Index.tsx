@@ -8,7 +8,7 @@ import { UsersList } from "@/components/UsersList";
 import { LocalEvents } from "@/components/LocalEvents";
 import { JobBoard } from "@/components/JobBoard";
 import { LocalCommunity } from "@/components/LocalCommunity";
-import { LearningZone } from "@/components/LearningZone";
+
 import { User, Post } from "@/lib/storage";
 
 interface IndexProps {
@@ -106,7 +106,7 @@ const Index = ({
   };
 
   return (
-    <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-4">
       {/* Feed Filter - Below Header */}
       <div className="mb-4">
         <FeedFilter onFilterChange={handleFilterChange} />
@@ -149,9 +149,6 @@ const Index = ({
         <aside className="hidden lg:block lg:col-span-4 space-y-6">
           {currentUser && (
             <GamificationPanel user={currentUser} users={users} />
-          )}
-          {currentUser && (
-            <LearningZone user={currentUser} />
           )}
           <UsersList users={users} currentUserId={currentUser?.id} />
           <LocalEvents posts={posts} onCreateEvent={() => handleCreatePost('event')} />
