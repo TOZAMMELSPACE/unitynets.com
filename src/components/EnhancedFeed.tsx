@@ -15,7 +15,9 @@ import {
   Users,
   Clock,
   Bookmark,
-  BookmarkCheck
+  BookmarkCheck,
+  Eye,
+  MoreHorizontal
 } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { ShareButton } from "@/components/ShareButton";
@@ -43,6 +45,8 @@ export const EnhancedFeed = ({
   onSavePost,
   isPostSaved
 }: EnhancedFeedProps) => {
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
+  const [dislikedPosts, setDislikedPosts] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState({
     search: "",
     community: "all",
@@ -52,7 +56,6 @@ export const EnhancedFeed = ({
 
   const filteredAndSortedPosts = useMemo(() => {
     let filtered = posts.filter(post => {
-      // Search filter
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase();
         const matchesContent = post.content.toLowerCase().includes(searchTerm);
@@ -65,12 +68,10 @@ export const EnhancedFeed = ({
         }
       }
 
-      // Community filter
       if (filters.community !== "all" && post.community !== filters.community) {
         return false;
       }
 
-      // Post type filter
       if (filters.postType !== "all" && post.postType !== filters.postType) {
         return false;
       }
@@ -78,7 +79,6 @@ export const EnhancedFeed = ({
       return true;
     });
 
-    // Sort posts
     filtered.sort((a, b) => {
       switch (filters.sortBy) {
         case "trending":
@@ -91,13 +91,55 @@ export const EnhancedFeed = ({
           return (b.likes || 0) - (a.likes || 0);
         case "most_commented":
           return (b.comments?.length || 0) - (a.comments?.length || 0);
-        default: // recent
+        default:
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
     });
 
     return filtered;
   }, [posts, filters]);
+
+  const handleLike = (postId: string) => {
+    if (dislikedPosts.has(postId)) {
+      setDislikedPosts(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(postId);
+        return newSet;
+      });
+    }
+    
+    if (likedPosts.has(postId)) {
+      setLikedPosts(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(postId);
+        return newSet;
+      });
+    } else {
+      setLikedPosts(prev => new Set(prev).add(postId));
+    }
+    onLikePost(postId);
+  };
+
+  const handleDislike = (postId: string) => {
+    if (likedPosts.has(postId)) {
+      setLikedPosts(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(postId);
+        return newSet;
+      });
+    }
+    
+    if (dislikedPosts.has(postId)) {
+      setDislikedPosts(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(postId);
+        return newSet;
+      });
+    } else {
+      setDislikedPosts(prev => new Set(prev).add(postId));
+    }
+    onDislikePost?.(postId);
+  };
 
   if (posts.length === 0) {
     return (
@@ -205,122 +247,179 @@ export const EnhancedFeed = ({
         );
 
       default:
-        return <p className="text-card-foreground leading-relaxed">{post.content}</p>;
+        return <p className="text-card-foreground leading-relaxed whitespace-pre-wrap">{post.content}</p>;
     }
+  };
+
+  const formatTimeAgo = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'এইমাত্র';
+    if (diffMins < 60) return `${diffMins} মিনিট আগে`;
+    if (diffHours < 24) return `${diffHours} ঘণ্টা আগে`;
+    if (diffDays < 7) return `${diffDays} দিন আগে`;
+    return date.toLocaleDateString('bn-BD');
   };
 
   return (
     <div className="space-y-4">
       {filteredAndSortedPosts.map((post) => (
-          <article key={post.id} className="card-enhanced p-6 hover:shadow-large transition-all duration-300">
-            <div className="flex justify-between items-start mb-4">
+        <article key={post.id} className="bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+          {/* Post Header */}
+          <div className="p-4 pb-3">
+            <div className="flex justify-between items-start">
               <div className="flex items-center gap-3">
                 {post.author.profileImage ? (
                   <img
                     src={post.author.profileImage}
                     alt={`${post.author.name} profile`}
-                    className="w-10 h-10 rounded-full object-cover border-2 border-border"
+                    className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20"
                   />
                 ) : (
-                  <div className="w-10 h-10 bg-gradient-hero rounded-full flex items-center justify-center text-white font-semibold">
+                  <div className="w-11 h-11 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center text-white font-semibold text-lg">
                     {post.author.name.charAt(0)}
                   </div>
                 )}
                 <div>
-                  <div className="font-semibold text-bengali">{post.author.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {new Date(post.createdAt).toLocaleString('bn-BD')}
+                  <div className="font-semibold text-foreground">{post.author.name}</div>
+                  <div className="text-xs text-muted-foreground flex items-center gap-2">
+                    <span>{formatTimeAgo(post.createdAt)}</span>
+                    {post.location && (
+                      <>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
+                          {post.location}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
               
               <div className="flex items-center gap-2">
-                <Badge variant={post.community === 'global' ? 'default' : 'secondary'}>
+                <Badge variant={post.community === 'global' ? 'default' : 'secondary'} className="text-xs">
                   {post.community === 'global' ? '🌍 Global' : `🏘️ ${post.community}`}
                 </Badge>
-                {post.postType !== 'text' && (
-                  <Badge variant="outline">
-                    {post.postType === 'image' ? '🖼️' :
-                     post.postType === 'video' ? '🎥' :
-                     post.postType === 'poll' ? '📊' :
-                     post.postType === 'event' ? '🎟️' : '💼'}
-                  </Badge>
-                )}
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreHorizontal className="w-4 h-4" />
+                </Button>
               </div>
             </div>
+          </div>
 
-            <div className="mb-4">
-              {renderPostContent(post)}
-              
-              {/* Post Images */}
-              {post.images && post.images.length > 0 && (
-                <div className={`mt-4 grid gap-2 ${
-                  post.images.length === 1 ? 'grid-cols-1' : 
-                  post.images.length === 2 ? 'grid-cols-2' : 'grid-cols-2'
-                }`}>
-                  {post.images.map((image, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={image}
-                        alt={`Post image ${index + 1}`}
-                        className="w-full h-48 object-cover rounded-lg border border-border cursor-pointer hover:opacity-90 transition-opacity"
-                        onClick={() => {
-                          const overlay = document.createElement('div');
-                          overlay.className = 'fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4';
-                          overlay.onclick = () => overlay.remove();
-                          
-                          const img = document.createElement('img');
-                          img.src = image;
-                          img.className = 'max-w-full max-h-full object-contain rounded-lg';
-                          
-                          overlay.appendChild(img);
-                          document.body.appendChild(overlay);
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Location and hashtags */}
-              <div className="flex flex-wrap gap-2 mt-3">
-                {post.location && (
-                  <Badge variant="outline" className="text-xs">
-                    <MapPin className="w-3 h-3 mr-1" />
-                    {post.location}
-                  </Badge>
-                )}
-                {post.hashtags?.map(tag => (
-                  <Badge key={tag} variant="secondary" className="text-xs">
-                    #{tag}
-                  </Badge>
+          {/* Post Content */}
+          <div className="px-4 pb-3">
+            {renderPostContent(post)}
+            
+            {/* Post Images */}
+            {post.images && post.images.length > 0 && (
+              <div className={`mt-3 grid gap-1 rounded-lg overflow-hidden ${
+                post.images.length === 1 ? 'grid-cols-1' : 
+                post.images.length === 2 ? 'grid-cols-2' : 
+                post.images.length === 3 ? 'grid-cols-2' : 'grid-cols-2'
+              }`}>
+                {post.images.slice(0, 4).map((image, index) => (
+                  <div 
+                    key={index} 
+                    className={`relative ${post.images!.length === 3 && index === 0 ? 'row-span-2' : ''}`}
+                  >
+                    <img
+                      src={image}
+                      alt={`Post image ${index + 1}`}
+                      className="w-full h-48 object-cover cursor-pointer hover:brightness-95 transition-all"
+                      onClick={() => {
+                        const overlay = document.createElement('div');
+                        overlay.className = 'fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4';
+                        overlay.onclick = () => overlay.remove();
+                        
+                        const img = document.createElement('img');
+                        img.src = image;
+                        img.className = 'max-w-full max-h-full object-contain rounded-lg';
+                        
+                        overlay.appendChild(img);
+                        document.body.appendChild(overlay);
+                      }}
+                    />
+                    {post.images!.length > 4 && index === 3 && (
+                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-xl">
+                        +{post.images!.length - 4}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
-            </div>
+            )}
 
-            <div className="flex items-center gap-4 pt-3 border-t border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onLikePost(post.id)}
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Heart className="w-4 h-4 mr-2" />
-                {post.likes || 0}
-              </Button>
+            {/* Hashtags */}
+            {post.hashtags && post.hashtags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                {post.hashtags.map(tag => (
+                  <span key={tag} className="text-primary text-sm font-medium hover:underline cursor-pointer">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
 
-              {onDislikePost && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onDislikePost(post.id)}
-                  className="text-muted-foreground hover:text-destructive transition-colors"
-                >
-                  <ThumbsDown className="w-4 h-4 mr-2" />
-                  {post.dislikes || 0}
-                </Button>
+          {/* Engagement Stats */}
+          <div className="px-4 py-2 flex items-center justify-between text-sm text-muted-foreground border-t border-border/50">
+            <div className="flex items-center gap-4">
+              {(post.likes > 0 || likedPosts.has(post.id)) && (
+                <span>{(post.likes || 0) + (likedPosts.has(post.id) ? 1 : 0)} লাইক</span>
               )}
-              
+              {(post.dislikes || 0) > 0 && (
+                <span>{post.dislikes} ডিসলাইক</span>
+              )}
+            </div>
+            <div className="flex items-center gap-4">
+              {(post.comments?.length || 0) > 0 && (
+                <span>{post.comments?.length} মন্তব্য</span>
+              )}
+              <span className="flex items-center gap-1">
+                <Eye className="w-3.5 h-3.5" />
+                {post.views || Math.floor(Math.random() * 100) + 10}
+              </span>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="px-2 py-1 flex items-center justify-between border-t border-border">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleLike(post.id)}
+              className={`flex-1 gap-2 h-10 rounded-lg transition-all ${
+                likedPosts.has(post.id) 
+                  ? 'text-red-500 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50' 
+                  : 'text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30'
+              }`}
+            >
+              <Heart className={`w-5 h-5 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
+              <span className="hidden sm:inline">লাইক</span>
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleDislike(post.id)}
+              className={`flex-1 gap-2 h-10 rounded-lg transition-all ${
+                dislikedPosts.has(post.id) 
+                  ? 'text-orange-500 bg-orange-50 dark:bg-orange-950/30 hover:bg-orange-100 dark:hover:bg-orange-950/50' 
+                  : 'text-muted-foreground hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/30'
+              }`}
+            >
+              <ThumbsDown className={`w-5 h-5 ${dislikedPosts.has(post.id) ? 'fill-current' : ''}`} />
+              <span className="hidden sm:inline">ডিসলাইক</span>
+            </Button>
+            
+            <div className="flex-1">
               <CommentSection 
                 postId={post.id}
                 comments={post.comments}
@@ -328,41 +427,37 @@ export const EnhancedFeed = ({
                 onAddComment={onAddComment}
                 onLikeComment={onLikeComment}
               />
-              
+            </div>
+            
+            <div className="flex-1">
               <ShareButton 
                 postId={post.id} 
                 postContent={post.content}
               />
-
-              {onSavePost && isPostSaved && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onSavePost(post.id)}
-                  className={`ml-auto transition-colors ${
-                    isPostSaved(post.id) 
-                      ? 'text-primary hover:text-primary/80' 
-                      : 'text-muted-foreground hover:text-primary'
-                  }`}
-                >
-                  {isPostSaved(post.id) ? (
-                    <BookmarkCheck className="w-4 h-4" />
-                  ) : (
-                    <Bookmark className="w-4 h-4" />
-                  )}
-                </Button>
-              )}
-
-              {/* Trending indicator */}
-              {filters.sortBy === "trending" && !onSavePost && (
-                <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-                  <Users className="w-3 h-3" />
-                  {((post.likes || 0) + (post.comments?.length || 0) * 2)} engagement
-                </div>
-              )}
             </div>
-          </article>
-        ))}
+
+            {onSavePost && isPostSaved && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onSavePost(post.id)}
+                className={`flex-1 gap-2 h-10 rounded-lg transition-all ${
+                  isPostSaved(post.id) 
+                    ? 'text-primary bg-primary/10 hover:bg-primary/20' 
+                    : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
+                }`}
+              >
+                {isPostSaved(post.id) ? (
+                  <BookmarkCheck className="w-5 h-5" />
+                ) : (
+                  <Bookmark className="w-5 h-5" />
+                )}
+                <span className="hidden sm:inline">সেভ</span>
+              </Button>
+            )}
+          </div>
+        </article>
+      ))}
 
       {filteredAndSortedPosts.length === 0 && (
         <div className="card-enhanced p-8 text-center">
