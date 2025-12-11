@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { UserPlus, LogIn, Eye, EyeOff } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { UserPlus, LogIn, Eye, EyeOff, FileText, Shield, Users, Scale, Lock, Heart, AlertTriangle, Phone } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface LoginProps {
@@ -41,6 +43,18 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+
+  const termsContent = [
+    { icon: FileText, title: "সেবার শর্তাবলী", titleEn: "Terms of Service", content: "UnityNets প্ল্যাটফর্ম ব্যবহার করে আপনি এই শর্তাবলী মেনে নিচ্ছেন। এটি একটি সম্প্রদায়-ভিত্তিক প্ল্যাটফর্ম যেখানে সদস্যরা পারস্পরিক সহযোগিতার মাধ্যমে সেবা আদান-প্রদান করে।" },
+    { icon: Shield, title: "গোপনীয়তা নীতি", titleEn: "Privacy Policy", content: "আপনার ব্যক্তিগত তথ্য সুরক্ষিত থাকবে। আমরা আপনার তথ্য তৃতীয় পক্ষের কাছে বিক্রি করি না। শুধুমাত্র প্ল্যাটফর্ম পরিচালনার জন্য প্রয়োজনীয় তথ্য সংগ্রহ করা হয়।" },
+    { icon: Users, title: "সম্প্রদায় নির্দেশিকা", titleEn: "Community Guidelines", content: "সকল সদস্যকে সম্মান করুন। হয়রানি, ঘৃণামূলক বক্তব্য, বা অবৈধ কার্যকলাপ সম্পূর্ণ নিষিদ্ধ। ইতিবাচক এবং সহায়ক পরিবেশ বজায় রাখুন।" },
+    { icon: Scale, title: "Unity Note নীতি", titleEn: "Unity Note Policy", content: "১ ঘণ্টা সেবা = ১ Unity Note। এই সময়-ভিত্তিক মুদ্রা ব্যবস্থা সকলের সময়ের সমান মূল্য নিশ্চিত করে। Unity Note শুধুমাত্র প্ল্যাটফর্মের মধ্যে ব্যবহারযোগ্য।" },
+    { icon: Lock, title: "নিরাপত্তা", titleEn: "Security", content: "আপনার অ্যাকাউন্টের নিরাপত্তা নিশ্চিত করতে শক্তিশালী পাসওয়ার্ড ব্যবহার করুন। সন্দেহজনক কার্যকলাপ রিপোর্ট করুন। অন্যের সাথে পাসওয়ার্ড শেয়ার করবেন না।" },
+    { icon: Heart, title: "সেবা মান", titleEn: "Service Quality", content: "প্রতিশ্রুত সেবা সততার সাথে প্রদান করুন। মানসম্মত কাজ করুন। সময়মতো সেবা দিন এবং প্রয়োজনে যোগাযোগ বজায় রাখুন।" },
+    { icon: AlertTriangle, title: "বিরোধ নিষ্পত্তি", titleEn: "Dispute Resolution", content: "কোনো সমস্যা হলে প্রথমে পারস্পরিক আলোচনায় সমাধান করুন। সমাধান না হলে প্ল্যাটফর্ম সহায়তা টিমের সাথে যোগাযোগ করুন।" },
+    { icon: Phone, title: "যোগাযোগ", titleEn: "Contact", content: "যেকোনো প্রশ্ন বা সমস্যায় আমাদের সাথে যোগাযোগ করুন: support@unitynets.com। আমরা ২৪-৪৮ ঘণ্টার মধ্যে উত্তর দেওয়ার চেষ্টা করি।" },
+  ];
 
   const signupForm = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -280,7 +294,14 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
 
                 <p className="text-xs text-center text-muted-foreground mt-3">
                   নিবন্ধন করে আপনি আমাদের{" "}
-                  <Link to="/terms" className="text-primary hover:underline font-medium">শর্তাবলী</Link> মেনে নিচ্ছেন
+                  <button 
+                    type="button"
+                    onClick={() => setShowTerms(true)}
+                    className="text-primary hover:underline font-medium"
+                  >
+                    শর্তাবলী
+                  </button>{" "}
+                  মেনে নিচ্ছেন
                 </p>
               </form>
             ) : (
@@ -388,6 +409,67 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
           © ২০২৪ UnityNets • Trust • Learn • Unite
         </p>
       </div>
+
+      {/* Terms Dialog */}
+      <Dialog open={showTerms} onOpenChange={setShowTerms}>
+        <DialogContent className="max-w-2xl max-h-[85vh]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-display flex items-center gap-2">
+              <FileText className="w-5 h-5 text-primary" />
+              শর্তাবলী / Terms & Conditions
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-[60vh] pr-4">
+            <div className="space-y-4">
+              <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                <p className="text-sm text-center font-medium">
+                  UnityNets - একত্রে শক্তিশালী
+                </p>
+                <p className="text-xs text-center text-muted-foreground mt-1">
+                  সর্বশেষ আপডেট: ডিসেম্বর ২০২৪
+                </p>
+              </div>
+
+              {termsContent.map((section, index) => (
+                <div key={index} className="p-4 bg-muted/50 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <section.icon className="w-4 h-4 text-primary" />
+                    <h3 className="font-semibold text-sm">
+                      {section.title} <span className="text-muted-foreground font-normal">/ {section.titleEn}</span>
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {section.content}
+                  </p>
+                </div>
+              ))}
+
+              <div className="p-4 bg-accent/50 rounded-lg border border-accent">
+                <p className="text-sm text-center">
+                  ✅ উপরের শর্তাবলী পড়ে বুঝে নিবন্ধন করুন
+                </p>
+                <p className="text-xs text-center text-muted-foreground mt-1">
+                  By registering, you agree to all terms above
+                </p>
+              </div>
+            </div>
+          </ScrollArea>
+          <div className="flex gap-2 pt-2">
+            <Button 
+              variant="outline" 
+              className="flex-1"
+              onClick={() => setShowTerms(false)}
+            >
+              বন্ধ করুন
+            </Button>
+            <Link to="/terms" className="flex-1">
+              <Button className="w-full" onClick={() => setShowTerms(false)}>
+                সম্পূর্ণ পড়ুন
+              </Button>
+            </Link>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
