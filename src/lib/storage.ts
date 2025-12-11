@@ -75,6 +75,7 @@ export interface Post {
   createdAt: string;
   likes: number;
   dislikes?: number;
+  views?: number;
   comments: Comment[];
   isEvent?: boolean;
   eventDetails?: {

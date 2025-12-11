@@ -156,6 +156,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
         createdAt: new Date().toISOString(),
         likes: 0,
         dislikes: 0,
+        views: Math.floor(Math.random() * 10) + 1,
         comments: [],
         isDraft: saveAsDraft,
         isEvent: postType === 'event',
