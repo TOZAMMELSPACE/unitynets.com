@@ -22,7 +22,7 @@ export const GlobalHeader = ({ currentUser, onSignOut }: GlobalHeaderProps) => {
           {/* Logo & Tagline */}
           <div className="flex flex-col">
             <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground tracking-tight">
-              Unity<span className="text-primary">Net</span>
+              Unity<span className="text-primary">Nets</span>
             </h1>
             <span className="text-xs sm:text-sm text-muted-foreground font-medium tracking-wide">
               Trust • Learn • Unite

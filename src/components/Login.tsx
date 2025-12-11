@@ -141,7 +141,7 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
             <span className="text-3xl font-bold text-primary">U</span>
           </div>
           <h1 className="text-3xl font-display font-bold text-foreground mb-1">
-            UnityNet
+            UnityNets
           </h1>
           <p className="text-sm text-muted-foreground">
             একত্রে শক্তিশালী
@@ -372,7 +372,7 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
 
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground mt-6">
-          © ২০২৪ UnityNet • Trust • Learn • Unite
+          © ২০২৪ UnityNets • Trust • Learn • Unite
         </p>
       </div>
     </div>
