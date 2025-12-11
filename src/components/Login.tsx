@@ -274,19 +274,6 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
                   )}
                 </div>
 
-                {/* Terms Link - View before signup */}
-                <div className="p-3 bg-muted/50 rounded-lg border border-border/50 mb-2">
-                  <p className="text-xs text-center text-muted-foreground mb-2">
-                    নিবন্ধনের আগে অনুগ্রহ করে আমাদের শর্তাবলী পড়ুন
-                  </p>
-                  <button 
-                    type="button"
-                    onClick={() => setShowTerms(true)}
-                    className="flex items-center justify-center gap-2 text-sm font-medium text-primary hover:underline w-full"
-                  >
-                    📜 শর্তাবলী দেখুন / View Terms & Conditions
-                  </button>
-                </div>
 
                 <Button type="submit" className="w-full h-11" size="lg">
                   <UserPlus className="w-4 h-4 mr-2" />
