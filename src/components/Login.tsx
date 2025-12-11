@@ -260,14 +260,27 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full h-11 mt-2" size="lg">
+                {/* Terms Link - View before signup */}
+                <div className="p-3 bg-muted/50 rounded-lg border border-border/50 mb-2">
+                  <p className="text-xs text-center text-muted-foreground mb-2">
+                    নিবন্ধনের আগে অনুগ্রহ করে আমাদের শর্তাবলী পড়ুন
+                  </p>
+                  <Link 
+                    to="/terms" 
+                    className="flex items-center justify-center gap-2 text-sm font-medium text-primary hover:underline"
+                  >
+                    📜 শর্তাবলী দেখুন / View Terms & Conditions
+                  </Link>
+                </div>
+
+                <Button type="submit" className="w-full h-11" size="lg">
                   <UserPlus className="w-4 h-4 mr-2" />
                   নিবন্ধন করুন
                 </Button>
 
-                <p className="text-xs text-center text-muted-foreground mt-4">
+                <p className="text-xs text-center text-muted-foreground mt-3">
                   নিবন্ধন করে আপনি আমাদের{" "}
-                  <Link to="/terms" className="text-primary hover:underline">শর্তাবলী</Link> মেনে নিচ্ছেন
+                  <Link to="/terms" className="text-primary hover:underline font-medium">শর্তাবলী</Link> মেনে নিচ্ছেন
                 </p>
               </form>
             ) : (
