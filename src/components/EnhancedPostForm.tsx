@@ -21,9 +21,12 @@ import {
   AtSign,
   Eye,
   Save,
-  Plus
+  Plus,
+  Loader2
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { uploadPostImage } from "@/lib/imageUpload";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EnhancedPostFormProps {
   user: User;
@@ -35,11 +38,12 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
   const [content, setContent] = useState("");
   const [community, setCommunity] = useState("global");
   const [postType, setPostType] = useState<'text' | 'image' | 'video' | 'poll' | 'event' | 'job'>(initialPostType);
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
   const [location, setLocation] = useState("");
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [hashtagInput, setHashtagInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [isDraft, setIsDraft] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   
@@ -83,12 +87,9 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        setImages(prev => [...prev, result]);
-      };
-      reader.readAsDataURL(file);
+      // Create preview URL (temporary, for display only)
+      const preview = URL.createObjectURL(file);
+      setImages(prev => [...prev, { file, preview }]);
     });
 
     if (fileInputRef.current) {
@@ -140,6 +141,24 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
     setIsSubmitting(true);
 
     try {
+      // Upload images to storage if any
+      let uploadedImageUrls: string[] = [];
+      if (images.length > 0) {
+        setIsUploading(true);
+        const uploadPromises = images.map(img => uploadPostImage(img.file, user.id));
+        const results = await Promise.all(uploadPromises);
+        uploadedImageUrls = results.filter((url): url is string => url !== null);
+        setIsUploading(false);
+
+        if (uploadedImageUrls.length < images.length) {
+          toast({
+            title: "সতর্কতা",
+            description: "কিছু ছবি আপলোড করতে সমস্যা হয়েছে",
+            variant: "destructive"
+          });
+        }
+      }
+
       const newPost: Post = {
         id: Date.now().toString(),
         author: { 
@@ -148,7 +167,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
           profileImage: user.profileImage 
         },
         content: content.trim(),
-        images: images.length > 0 ? images : undefined,
+        images: uploadedImageUrls.length > 0 ? uploadedImageUrls : undefined,
         community,
         postType,
         location: location || undefined,
@@ -182,6 +201,9 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
 
       onPostCreated(newPost);
       
+      // Cleanup preview URLs
+      images.forEach(img => URL.revokeObjectURL(img.preview));
+      
       // Reset form
       setContent("");
       setImages([]);
@@ -210,6 +232,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
       });
     } finally {
       setIsSubmitting(false);
+      setIsUploading(false);
     }
   };
 
@@ -426,20 +449,30 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
             {/* Image preview */}
             {images.length > 0 && (
               <div className="grid grid-cols-2 gap-2">
-                {images.map((image, index) => (
+                {images.map((img, index) => (
                   <div key={index} className="relative">
-                    <img src={image} alt={`Preview ${index + 1}`} className="w-full h-32 object-cover rounded-lg" />
+                    <img src={img.preview} alt={`Preview ${index + 1}`} className="w-full h-32 object-cover rounded-lg" />
                     <Button
                       type="button"
                       variant="destructive"
                       size="sm"
                       className="absolute top-2 right-2 w-6 h-6 rounded-full p-0"
-                      onClick={() => setImages(images.filter((_, i) => i !== index))}
+                      onClick={() => {
+                        URL.revokeObjectURL(img.preview);
+                        setImages(images.filter((_, i) => i !== index));
+                      }}
                     >
                       <X size={12} />
                     </Button>
                   </div>
                 ))}
+              </div>
+            )}
+            
+            {isUploading && (
+              <div className="flex items-center justify-center gap-2 p-3 bg-muted rounded-lg">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">ছবি আপলোড হচ্ছে...</span>
               </div>
             )}
 
@@ -510,8 +543,13 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
                   <Save className="w-4 h-4 mr-2" />
                   ড্রাফট
                 </Button>
-                <Button type="submit" disabled={isSubmitting} className="btn-trust">
-                  {isSubmitting ? "পোস্ট করছি..." : "পোস্ট করুন"}
+                <Button type="submit" disabled={isSubmitting || isUploading} className="btn-trust">
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {isUploading ? "আপলোড হচ্ছে..." : "পোস্ট করছি..."}
+                    </>
+                  ) : "পোস্ট করুন"}
                 </Button>
               </div>
             </div>
