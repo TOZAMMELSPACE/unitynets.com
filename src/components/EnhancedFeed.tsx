@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { ShareButton } from "@/components/ShareButton";
+import { useNavigate } from "react-router-dom";
 
 interface EnhancedFeedProps {
   posts: Post[];
@@ -45,6 +46,7 @@ export const EnhancedFeed = ({
   onSavePost,
   isPostSaved
 }: EnhancedFeedProps) => {
+  const navigate = useNavigate();
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [dislikedPosts, setDislikedPosts] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState({
@@ -273,20 +275,29 @@ export const EnhancedFeed = ({
           {/* Post Header */}
           <div className="p-4 pb-3">
             <div className="flex justify-between items-start">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
                 {post.author.profileImage ? (
                   <img
                     src={post.author.profileImage}
                     alt={`${post.author.name} profile`}
-                    className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20"
+                    className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20 cursor-pointer hover:ring-primary/50 transition-all"
+                    onClick={() => navigate('/profile', { state: { userId: post.author.id } })}
                   />
                 ) : (
-                  <div className="w-11 h-11 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center text-white font-semibold text-lg">
+                  <div 
+                    className="w-11 h-11 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center text-white font-semibold text-lg cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
+                    onClick={() => navigate('/profile', { state: { userId: post.author.id } })}
+                  >
                     {post.author.name.charAt(0)}
                   </div>
                 )}
                 <div>
-                  <div className="font-semibold text-foreground">{post.author.name}</div>
+                  <div 
+                    className="font-semibold text-foreground cursor-pointer hover:text-primary hover:underline transition-colors"
+                    onClick={() => navigate('/profile', { state: { userId: post.author.id } })}
+                  >
+                    {post.author.name}
+                  </div>
                   <div className="text-xs text-muted-foreground flex items-center gap-2">
                     <span>{formatTimeAgo(post.createdAt)}</span>
                     {post.location && (

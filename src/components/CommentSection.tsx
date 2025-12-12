@@ -3,6 +3,7 @@ import { Comment, User } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle, Heart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface CommentSectionProps {
   postId: string;
@@ -19,6 +20,7 @@ export const CommentSection = ({
   onAddComment, 
   onLikeComment 
 }: CommentSectionProps) => {
+  const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,11 +75,17 @@ export const CommentSection = ({
             {comments.map((comment) => (
               <div key={comment.id} className="bg-muted/20 rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 bg-gradient-hero rounded-full flex items-center justify-center text-xs text-white font-semibold">
+                  <div 
+                    className="w-6 h-6 bg-gradient-hero rounded-full flex items-center justify-center text-xs text-white font-semibold cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
+                    onClick={() => navigate('/profile', { state: { userId: comment.author.id } })}
+                  >
                     {comment.author.name.charAt(0)}
                   </div>
                   <div className="flex-1">
-                    <div className="text-sm font-medium text-bengali">
+                    <div 
+                      className="text-sm font-medium text-bengali cursor-pointer hover:text-primary hover:underline transition-colors"
+                      onClick={() => navigate('/profile', { state: { userId: comment.author.id } })}
+                    >
                       {comment.author.name}
                     </div>
                     <div className="text-xs text-muted-foreground">

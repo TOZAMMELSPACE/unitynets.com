@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { ShareButton } from "@/components/ShareButton";
+import { useNavigate } from "react-router-dom";
 
 interface FeedProps {
   posts: Post[];
@@ -13,6 +14,12 @@ interface FeedProps {
 }
 
 export const Feed = ({ posts, currentUser, onLikePost, onAddComment, onLikeComment }: FeedProps) => {
+  const navigate = useNavigate();
+
+  const handleUserClick = (userId: string) => {
+    navigate('/profile', { state: { userId } });
+  };
+
   if (posts.length === 0) {
     return (
       <div className="card-enhanced p-8 text-center">
@@ -35,15 +42,24 @@ export const Feed = ({ posts, currentUser, onLikePost, onAddComment, onLikeComme
                 <img
                   src={post.author.profileImage}
                   alt={`${post.author.name} profile`}
-                  className="w-10 h-10 rounded-full object-cover border-2 border-border"
+                  className="w-10 h-10 rounded-full object-cover border-2 border-border cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
+                  onClick={() => handleUserClick(post.author.id)}
                 />
               ) : (
-                <div className="w-10 h-10 bg-gradient-hero rounded-full flex items-center justify-center text-white font-semibold">
+                <div 
+                  className="w-10 h-10 bg-gradient-hero rounded-full flex items-center justify-center text-white font-semibold cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
+                  onClick={() => handleUserClick(post.author.id)}
+                >
                   {post.author.name.charAt(0)}
                 </div>
               )}
               <div>
-                <div className="font-semibold text-bengali">{post.author.name}</div>
+                <div 
+                  className="font-semibold text-bengali cursor-pointer hover:text-primary hover:underline transition-colors"
+                  onClick={() => handleUserClick(post.author.id)}
+                >
+                  {post.author.name}
+                </div>
                 <div className="text-sm text-muted-foreground">
                   {new Date(post.createdAt).toLocaleString('bn-BD')}
                 </div>
