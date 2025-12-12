@@ -1,13 +1,12 @@
 import { useEffect } from "react";
-
 import { User } from "@/lib/storage";
 import { Bell, Heart, MessageCircle, UserPlus, UserCheck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotificationsDB } from "@/hooks/useNotificationsDB";
 import { useSocial } from "@/hooks/useSocial";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import { useSocialDB } from "@/hooks/useSocialDB";
+import { useNavigate } from "react-router-dom";
 
 interface NotificationsProps {
   currentUser: User | null;
@@ -44,23 +43,23 @@ export default function Notifications({
   setUsers 
 }: NotificationsProps) {
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = 
-    useNotifications(currentUser?.id || null);
+    useNotificationsDB(currentUser?.id || null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Mark notifications as read when viewed
     const timer = setTimeout(() => {
       notifications.forEach(n => {
-        if (!n.isRead) {
+        if (!n.is_read) {
           markAsRead(n.id);
         }
       });
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [notifications]);
+  }, [notifications, markAsRead]);
 
   const handleAcceptRequest = async (fromUserId: string, notificationId: string) => {
-    // Find the friend request ID from socialDB
     const request = socialDB.friendRequests.find(r => r.sender_id === fromUserId);
     if (request) {
       await socialDB.acceptFriendRequest(request.id, fromUserId);
@@ -74,6 +73,10 @@ export default function Notifications({
       await socialDB.rejectFriendRequest(request.id);
     }
     deleteNotification(notificationId);
+  };
+
+  const handleUserClick = (userId: string) => {
+    navigate('/profile', { state: { userId } });
   };
 
   return (
@@ -107,11 +110,14 @@ export default function Notifications({
               <div
                 key={notification.id}
                 className={`card-enhanced p-4 transition-all ${
-                  !notification.isRead ? "bg-primary/5 border-primary/20" : ""
+                  !notification.is_read ? "bg-primary/5 border-primary/20" : ""
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <Avatar className="w-10 h-10 flex-shrink-0">
+                  <Avatar 
+                    className="w-10 h-10 flex-shrink-0 cursor-pointer hover:ring-2 ring-primary transition-all"
+                    onClick={() => handleUserClick(notification.from_user_id)}
+                  >
                     <AvatarImage src={notification.fromUserImage} />
                     <AvatarFallback>{notification.fromUserName.charAt(0)}</AvatarFallback>
                   </Avatar>
@@ -123,10 +129,13 @@ export default function Notifications({
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-bengali">
+                          <span 
+                            className="font-semibold text-bengali cursor-pointer hover:text-primary transition-colors"
+                            onClick={() => handleUserClick(notification.from_user_id)}
+                          >
                             {notification.fromUserName}
                           </span>
-                          {!notification.isRead && (
+                          {!notification.is_read && (
                             <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
                           )}
                         </div>
@@ -134,7 +143,7 @@ export default function Notifications({
                           {notification.content}
                         </p>
                         <p className="text-xs text-muted-foreground text-bengali">
-                          {new Date(notification.createdAt).toLocaleDateString('bn-BD', {
+                          {new Date(notification.created_at).toLocaleDateString('bn-BD', {
                             day: 'numeric',
                             month: 'long',
                             hour: '2-digit',
@@ -147,7 +156,7 @@ export default function Notifications({
                             <Button
                               size="sm"
                               variant="default"
-                              onClick={() => handleAcceptRequest(notification.fromUserId, notification.id)}
+                              onClick={() => handleAcceptRequest(notification.from_user_id, notification.id)}
                               className="text-bengali"
                             >
                               গ্রহণ করুন
@@ -155,7 +164,7 @@ export default function Notifications({
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleRejectRequest(notification.fromUserId, notification.id)}
+                              onClick={() => handleRejectRequest(notification.from_user_id, notification.id)}
                               className="text-bengali"
                             >
                               প্রত্যাখ্যান
