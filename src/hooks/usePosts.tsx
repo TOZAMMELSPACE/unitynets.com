@@ -7,6 +7,7 @@ export interface DbPost {
   user_id: string;
   content: string;
   image_urls: string[] | null;
+  video_url: string | null;
   community_tag: string | null;
   likes_count: number;
   dislikes_count: number;
@@ -42,6 +43,7 @@ export interface PostWithAuthor {
   id: string;
   content: string;
   images?: string[];
+  videoUrl?: string;
   community: string;
   postType: 'text' | 'image' | 'video' | 'poll' | 'event' | 'job';
   createdAt: string;
@@ -176,8 +178,9 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
           id: post.id,
           content: post.content,
           images: post.image_urls || undefined,
+          videoUrl: post.video_url || undefined,
           community: post.community_tag || 'global',
-          postType: 'text' as const,
+          postType: post.video_url ? 'video' as const : (post.image_urls && post.image_urls.length > 0 ? 'image' as const : 'text' as const),
           createdAt: post.created_at,
           likes: post.likes_count,
           dislikes: post.dislikes_count,
@@ -219,7 +222,8 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
   const createPost = useCallback(async (
     content: string,
     imageUrls?: string[],
-    communityTag?: string
+    communityTag?: string,
+    videoUrl?: string
   ) => {
     if (!userId) {
       toast({
@@ -237,6 +241,7 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
           user_id: userId,
           content,
           image_urls: imageUrls || null,
+          video_url: videoUrl || null,
           community_tag: communityTag || 'global',
         })
         .select()

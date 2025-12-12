@@ -163,7 +163,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       await createPost(
         post.content,
         post.images,
-        post.community
+        post.community,
+        post.videoUrl
       );
     } else {
       // Fallback to local storage

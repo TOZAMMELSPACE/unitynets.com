@@ -230,6 +230,7 @@ export type Database = {
           likes_count: number | null
           updated_at: string
           user_id: string
+          video_url: string | null
           views_count: number | null
         }
         Insert: {
@@ -242,6 +243,7 @@ export type Database = {
           likes_count?: number | null
           updated_at?: string
           user_id: string
+          video_url?: string | null
           views_count?: number | null
         }
         Update: {
@@ -254,6 +256,7 @@ export type Database = {
           likes_count?: number | null
           updated_at?: string
           user_id?: string
+          video_url?: string | null
           views_count?: number | null
         }
         Relationships: []
