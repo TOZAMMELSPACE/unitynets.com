@@ -249,8 +249,44 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
 
       if (error) throw error;
 
-      // Refresh posts to get the new post with author info
-      await fetchPosts();
+      // Get user profile for immediate display
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      // Optimistic update - add new post immediately to UI
+      const newPost: PostWithAuthor = {
+        id: data.id,
+        content: data.content,
+        images: data.image_urls || undefined,
+        videoUrl: data.video_url || undefined,
+        community: data.community_tag || 'global',
+        postType: data.video_url ? 'video' : (data.image_urls && data.image_urls.length > 0 ? 'image' : 'text'),
+        createdAt: data.created_at,
+        likes: 0,
+        dislikes: 0,
+        views: 0,
+        author: {
+          id: userId,
+          name: profileData?.full_name || 'Unknown User',
+          profileImage: profileData?.avatar_url || undefined,
+        },
+        comments: [],
+      };
+
+      // Add to start of posts array immediately
+      setPosts(prev => {
+        const updated = [newPost, ...prev];
+        postsRef.current = updated;
+        return updated;
+      });
+
+      toast({
+        title: 'সফল!',
+        description: 'পোস্ট তৈরি হয়েছে',
+      });
       
       return data;
     } catch (err) {
