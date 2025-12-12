@@ -17,7 +17,10 @@ import {
   Bookmark,
   BookmarkCheck,
   Eye,
-  MoreHorizontal
+  MoreHorizontal,
+  Play,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { ShareButton } from "@/components/ShareButton";
@@ -334,9 +337,28 @@ export const EnhancedFeed = ({
           <div className="px-4 pb-3">
             {renderPostContent(post)}
             
+            {/* Post Video */}
+            {post.videoUrl && (
+              <div className="mt-3 rounded-xl overflow-hidden bg-black relative group">
+                <video 
+                  src={post.videoUrl}
+                  className="w-full max-h-[500px] object-contain"
+                  controls
+                  preload="metadata"
+                  poster={post.videoThumbnail}
+                >
+                  আপনার ব্রাউজার ভিডিও সাপোর্ট করে না।
+                </video>
+                <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                  <Play className="w-3 h-3" />
+                  ভিডিও
+                </div>
+              </div>
+            )}
+
             {/* Post Images */}
             {post.images && post.images.length > 0 && (
-              <div className={`mt-3 grid gap-1 rounded-lg overflow-hidden ${
+              <div className={`mt-3 grid gap-1 rounded-xl overflow-hidden ${
                 post.images.length === 1 ? 'grid-cols-1' : 
                 post.images.length === 2 ? 'grid-cols-2' : 
                 post.images.length === 3 ? 'grid-cols-2' : 'grid-cols-2'
@@ -349,22 +371,24 @@ export const EnhancedFeed = ({
                     <img
                       src={image}
                       alt={`Post image ${index + 1}`}
-                      className="w-full h-48 object-cover cursor-pointer hover:brightness-95 transition-all"
+                      className={`w-full object-cover cursor-pointer hover:brightness-95 transition-all ${
+                        post.images!.length === 1 ? 'max-h-[400px]' : 'h-48'
+                      }`}
                       onClick={() => {
                         const overlay = document.createElement('div');
-                        overlay.className = 'fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4';
+                        overlay.className = 'fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4 backdrop-blur-sm';
                         overlay.onclick = () => overlay.remove();
                         
                         const img = document.createElement('img');
                         img.src = image;
-                        img.className = 'max-w-full max-h-full object-contain rounded-lg';
+                        img.className = 'max-w-full max-h-full object-contain rounded-lg shadow-2xl';
                         
                         overlay.appendChild(img);
                         document.body.appendChild(overlay);
                       }}
                     />
                     {post.images!.length > 4 && index === 3 && (
-                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-xl">
+                      <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-white font-bold text-2xl backdrop-blur-sm">
                         +{post.images!.length - 4}
                       </div>
                     )}

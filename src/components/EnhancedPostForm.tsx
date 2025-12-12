@@ -18,14 +18,15 @@ import {
   Briefcase,
   MapPin,
   Hash,
-  AtSign,
   Eye,
   Save,
   Plus,
-  Loader2
+  Loader2,
+  Play
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { uploadPostImage } from "@/lib/imageUpload";
+import { uploadPostVideo } from "@/lib/videoUpload";
 import { supabase } from "@/integrations/supabase/client";
 
 interface EnhancedPostFormProps {
@@ -39,11 +40,13 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
   const [community, setCommunity] = useState("global");
   const [postType, setPostType] = useState<'text' | 'image' | 'video' | 'poll' | 'event' | 'job'>(initialPostType);
   const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
+  const [video, setVideo] = useState<{ file: File; preview: string } | null>(null);
   const [location, setLocation] = useState("");
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [hashtagInput, setHashtagInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState("");
   const [isDraft, setIsDraft] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   
@@ -64,6 +67,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
   const [pollOptions, setPollOptions] = useState<string[]>(["", ""]);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -87,13 +91,52 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
         return;
       }
 
-      // Create preview URL (temporary, for display only)
       const preview = URL.createObjectURL(file);
       setImages(prev => [...prev, { file, preview }]);
     });
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
+    }
+  };
+
+  const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate video size (max 50MB)
+    if (file.size > 50 * 1024 * 1024) {
+      toast({
+        title: "ত্রুটি",
+        description: "ভিডিওর সাইজ ৫০ MB এর বেশি হতে পারে না",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate video type
+    const validTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "ত্রুটি",
+        description: "শুধুমাত্র MP4, WebM, OGG বা MOV ভিডিও গ্রহণযোগ্য",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const preview = URL.createObjectURL(file);
+    setVideo({ file, preview });
+
+    if (videoInputRef.current) {
+      videoInputRef.current.value = "";
+    }
+  };
+
+  const removeVideo = () => {
+    if (video) {
+      URL.revokeObjectURL(video.preview);
+      setVideo(null);
     }
   };
 
@@ -138,6 +181,15 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
       return;
     }
 
+    if (postType === 'video' && !video && !content.trim()) {
+      toast({
+        title: "ত্রুটি",
+        description: "ভিডিও যুক্ত করুন অথবা কিছু লিখুন",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -145,10 +197,10 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
       let uploadedImageUrls: string[] = [];
       if (images.length > 0) {
         setIsUploading(true);
+        setUploadProgress("ছবি আপলোড হচ্ছে...");
         const uploadPromises = images.map(img => uploadPostImage(img.file, user.id));
         const results = await Promise.all(uploadPromises);
         uploadedImageUrls = results.filter((url): url is string => url !== null);
-        setIsUploading(false);
 
         if (uploadedImageUrls.length < images.length) {
           toast({
@@ -159,6 +211,26 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
         }
       }
 
+      // Upload video if any
+      let uploadedVideoUrl: string | undefined;
+      if (video) {
+        setIsUploading(true);
+        setUploadProgress("ভিডিও আপলোড হচ্ছে...");
+        const result = await uploadPostVideo(video.file, user.id);
+        if (result) {
+          uploadedVideoUrl = result;
+        } else {
+          toast({
+            title: "ত্রুটি",
+            description: "ভিডিও আপলোড করতে সমস্যা হয়েছে",
+            variant: "destructive"
+          });
+        }
+      }
+
+      setIsUploading(false);
+      setUploadProgress("");
+
       const newPost: Post = {
         id: Date.now().toString(),
         author: { 
@@ -168,6 +240,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
         },
         content: content.trim(),
         images: uploadedImageUrls.length > 0 ? uploadedImageUrls : undefined,
+        videoUrl: uploadedVideoUrl,
         community,
         postType,
         location: location || undefined,
@@ -203,10 +276,12 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
       
       // Cleanup preview URLs
       images.forEach(img => URL.revokeObjectURL(img.preview));
+      if (video) URL.revokeObjectURL(video.preview);
       
       // Reset form
       setContent("");
       setImages([]);
+      setVideo(null);
       setLocation("");
       setHashtags([]);
       setEventTitle("");
@@ -357,6 +432,45 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
                 <Camera className="w-4 h-4 mr-2" />
                 ছবি যুক্ত করুন
               </Button>
+            </TabsContent>
+
+            <TabsContent value="video" className="space-y-4">
+              <Textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="ভিডিওর সাথে বর্ণনা লিখুন..."
+                className="min-h-[80px]"
+              />
+              
+              {!video ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => videoInputRef.current?.click()}
+                  className="w-full h-32 border-2 border-dashed border-primary/30 hover:border-primary/50 flex flex-col items-center justify-center gap-2"
+                >
+                  <Video className="w-8 h-8 text-primary/60" />
+                  <span className="text-muted-foreground">ভিডিও যুক্ত করুন (সর্বোচ্চ ৫০MB)</span>
+                  <span className="text-xs text-muted-foreground">MP4, WebM, OGG, MOV</span>
+                </Button>
+              ) : (
+                <div className="relative rounded-xl overflow-hidden bg-black">
+                  <video 
+                    src={video.preview} 
+                    className="w-full max-h-64 object-contain"
+                    controls
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute top-2 right-2"
+                    onClick={removeVideo}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="poll" className="space-y-4">
@@ -547,7 +661,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {isUploading ? "আপলোড হচ্ছে..." : "পোস্ট করছি..."}
+                      {uploadProgress || "পোস্ট করছি..."}
                     </>
                   ) : "পোস্ট করুন"}
                 </Button>
@@ -560,6 +674,13 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
               accept="image/*"
               multiple
               onChange={handleImageSelect}
+              className="hidden"
+            />
+            <input
+              ref={videoInputRef}
+              type="file"
+              accept="video/mp4,video/webm,video/ogg,video/quicktime"
+              onChange={handleVideoSelect}
               className="hidden"
             />
           </form>

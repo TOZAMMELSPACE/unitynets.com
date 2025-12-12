@@ -67,6 +67,8 @@ export interface Post {
   };
   content: string;
   images?: string[];
+  videoUrl?: string;
+  videoThumbnail?: string;
   community: string;
   postType: 'text' | 'image' | 'video' | 'poll' | 'event' | 'job';
   location?: string;
