@@ -82,9 +82,9 @@ const transformToUser = (profile: LegacyUser): User => ({
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const { user, appUser, loading: authLoading, signOut } = useAuth();
-  const { posts: dbPosts, createPost, likePost, addComment, likeComment, loading: postsLoading } = usePosts(user?.id);
-  const { users: dbUsers, setUsers: setDbUsers, loading: usersLoading } = useProfiles();
   const socialDB = useSocialDB(user?.id || null);
+  const { posts: dbPosts, createPost, likePost, addComment, likeComment, loading: postsLoading } = usePosts(user?.id, socialDB.createNotification);
+  const { users: dbUsers, setUsers: setDbUsers, loading: usersLoading } = useProfiles();
   
   const [createPostTrigger, setCreatePostTrigger] = useState<(() => void) | null>(null);
   

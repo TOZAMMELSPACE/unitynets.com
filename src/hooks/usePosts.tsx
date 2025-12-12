@@ -68,7 +68,7 @@ export interface CommentWithAuthor {
   };
 }
 
-export const usePosts = (userId?: string) => {
+export const usePosts = (userId?: string, createNotification?: (userId: string, type: string, content: string, postId?: string) => Promise<void>) => {
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -283,6 +283,11 @@ export const usePosts = (userId?: string) => {
           .from('posts')
           .update({ likes_count: (currentPost?.likes || 0) + 1 })
           .eq('id', postId);
+
+        // Create notification for post owner (if not self)
+        if (currentPost && currentPost.author.id !== userId && createNotification) {
+          await createNotification(currentPost.author.id, 'like', 'আপনার পোস্টে লাইক দিয়েছেন', postId);
+        }
       }
 
       // Optimistic update
@@ -331,6 +336,12 @@ export const usePosts = (userId?: string) => {
         },
       };
 
+      // Create notification for post owner (if not self)
+      const post = posts.find(p => p.id === postId);
+      if (post && post.author.id !== userId && createNotification) {
+        await createNotification(post.author.id, 'comment', 'আপনার পোস্টে কমেন্ট করেছেন', postId);
+      }
+
       // Optimistic update
       setPosts(prev => prev.map(post => 
         post.id === postId 
@@ -343,7 +354,7 @@ export const usePosts = (userId?: string) => {
       console.error('Error adding comment:', err);
       return null;
     }
-  }, [userId]);
+  }, [userId, posts, createNotification]);
 
   const likeComment = useCallback(async (commentId: string) => {
     try {
