@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -77,16 +77,17 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const postsRef = useRef<PostWithAuthor[]>([]);
+  
   const fetchPosts = useCallback(async (reset = true) => {
     try {
       if (reset) {
         setLoading(true);
-        setPosts([]);
       } else {
         setLoadingMore(true);
       }
 
-      const offset = reset ? 0 : posts.length;
+      const offset = reset ? 0 : postsRef.current.length;
       
       // Fetch posts with pagination
       const { data: postsData, error: postsError } = await supabase
@@ -101,7 +102,10 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
       setHasMore(postsData?.length === POSTS_PER_PAGE);
 
       if (!postsData || postsData.length === 0) {
-        if (reset) setPosts([]);
+        if (reset) {
+          setPosts([]);
+          postsRef.current = [];
+        }
         return;
       }
 
@@ -189,8 +193,13 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
 
       if (reset) {
         setPosts(transformedPosts);
+        postsRef.current = transformedPosts;
       } else {
-        setPosts(prev => [...prev, ...transformedPosts]);
+        setPosts(prev => {
+          const newPosts = [...prev, ...transformedPosts];
+          postsRef.current = newPosts;
+          return newPosts;
+        });
       }
     } catch (err) {
       console.error('Error fetching posts:', err);
@@ -199,7 +208,7 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [posts.length]);
+  }, []);
 
   const loadMore = useCallback(() => {
     if (!loadingMore && hasMore) {
@@ -413,8 +422,9 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
   }, []);
 
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    fetchPosts(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     posts,

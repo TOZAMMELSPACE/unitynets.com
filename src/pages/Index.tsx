@@ -1,15 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { EnhancedPostForm } from "@/components/EnhancedPostForm";
 import { EnhancedFeed } from "@/components/EnhancedFeed";
 import { FloatingActionButton } from "@/components/FloatingActionButton";
 import { FeedFilter } from "@/components/FeedFilter";
-import { GamificationPanel } from "@/components/GamificationPanel";
-import { UsersList } from "@/components/UsersList";
-import { LocalEvents } from "@/components/LocalEvents";
-import { JobBoard } from "@/components/JobBoard";
-import { LocalCommunity } from "@/components/LocalCommunity";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { User, Post } from "@/lib/storage";
+
+// Lazy load sidebar widgets
+const GamificationPanel = lazy(() => import("@/components/GamificationPanel").then(m => ({ default: m.GamificationPanel })));
+const UsersList = lazy(() => import("@/components/UsersList").then(m => ({ default: m.UsersList })));
+const LocalEvents = lazy(() => import("@/components/LocalEvents").then(m => ({ default: m.LocalEvents })));
+const JobBoard = lazy(() => import("@/components/JobBoard").then(m => ({ default: m.JobBoard })));
+const LocalCommunity = lazy(() => import("@/components/LocalCommunity").then(m => ({ default: m.LocalCommunity })));
 
 interface IndexProps {
   currentUser: User | null;
@@ -154,15 +157,25 @@ const Index = ({
           </div>
         </div>
 
-        {/* Right Sidebar - All Widgets */}
+        {/* Right Sidebar - All Widgets (Lazy Loaded) */}
         <aside className="hidden lg:block lg:col-span-4 space-y-6">
-          {currentUser && (
-            <GamificationPanel user={currentUser} users={users} />
-          )}
-          <UsersList users={users} currentUserId={currentUser?.id} />
-          <LocalEvents posts={posts} onCreateEvent={() => handleCreatePost('event')} />
-          <JobBoard posts={posts} onCreateJob={() => handleCreatePost('job')} />
-          <LocalCommunity posts={posts} />
+          <Suspense fallback={<Skeleton className="h-48 w-full rounded-xl" />}>
+            {currentUser && (
+              <GamificationPanel user={currentUser} users={users} />
+            )}
+          </Suspense>
+          <Suspense fallback={<Skeleton className="h-64 w-full rounded-xl" />}>
+            <UsersList users={users} currentUserId={currentUser?.id} />
+          </Suspense>
+          <Suspense fallback={<Skeleton className="h-48 w-full rounded-xl" />}>
+            <LocalEvents posts={posts} onCreateEvent={() => handleCreatePost('event')} />
+          </Suspense>
+          <Suspense fallback={<Skeleton className="h-48 w-full rounded-xl" />}>
+            <JobBoard posts={posts} onCreateJob={() => handleCreatePost('job')} />
+          </Suspense>
+          <Suspense fallback={<Skeleton className="h-48 w-full rounded-xl" />}>
+            <LocalCommunity posts={posts} />
+          </Suspense>
         </aside>
       </div>
 
