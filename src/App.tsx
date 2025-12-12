@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/hooks/useTheme";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Notifications from "./pages/Notifications";
-import Messages from "./pages/Messages";
+import MessagesDB from "./pages/MessagesDB";
 import Explore from "./pages/Explore";
 import Profile from "./pages/Profile";
 import Groups from "./pages/Groups";
@@ -32,9 +32,9 @@ const App = () => (
             {(props) => (
               <Routes>
                 <Route path="/" element={<Index {...props} />} />
-                <Route path="/notifications" element={<Notifications currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} socialActions={props.socialActions} setUsers={props.setUsers} />} />
-                <Route path="/messages" element={<Messages currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} />} />
-                <Route path="/explore" element={<Explore currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} socialActions={props.socialActions} setUsers={props.setUsers} />} />
+                <Route path="/notifications" element={<Notifications currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} socialActions={props.socialActions} socialDB={props.socialDB} setUsers={props.setUsers} />} />
+                <Route path="/messages" element={<MessagesDB currentUserId={props.currentUserId} />} />
+                <Route path="/explore" element={<Explore currentUser={props.currentUser} currentUserId={props.currentUserId} users={props.users} onSignOut={props.onSignOut} socialActions={props.socialActions} socialDB={props.socialDB} setUsers={props.setUsers} />} />
                 <Route path="/unity-note" element={<UnityNote currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} />} />
                 <Route path="/impact-report" element={<ImpactReport currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} />} />
                 <Route path="/profile" element={<Profile currentUser={props.currentUser} onSignOut={props.onSignOut} posts={props.posts} onUpdateProfile={props.onUpdateProfile} />} />

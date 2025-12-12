@@ -8,10 +8,12 @@ import { GlobalHeader } from "@/components/GlobalHeader";
 import { useAuth } from "@/hooks/useAuth";
 import { usePosts, PostWithAuthor } from "@/hooks/usePosts";
 import { useProfiles, LegacyUser } from "@/hooks/useProfiles";
+import { useSocialDB } from "@/hooks/useSocialDB";
 
 interface AppLayoutProps {
   children: (props: {
     currentUser: User | null;
+    currentUserId: string | null;
     users: User[];
     posts: Post[];
     comments: Comment[];
@@ -26,6 +28,7 @@ interface AppLayoutProps {
     onCreatePost?: () => void;
     registerCreatePostTrigger?: (trigger: () => void) => void;
     socialActions: ReturnType<typeof useSocial>;
+    socialDB: ReturnType<typeof useSocialDB>;
     setUsers: (users: User[]) => void;
   }) => React.ReactNode;
 }
@@ -81,6 +84,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const { user, appUser, loading: authLoading, signOut } = useAuth();
   const { posts: dbPosts, createPost, likePost, addComment, likeComment, loading: postsLoading } = usePosts(user?.id);
   const { users: dbUsers, setUsers: setDbUsers, loading: usersLoading } = useProfiles();
+  const socialDB = useSocialDB(user?.id || null);
   
   const [createPostTrigger, setCreatePostTrigger] = useState<(() => void) | null>(null);
   
@@ -285,6 +289,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         {/* Page Content */}
         {children({
             currentUser,
+            currentUserId: user?.id || null,
             users,
             posts,
             comments,
@@ -299,6 +304,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
             onCreatePost: handleCreatePost,
             registerCreatePostTrigger,
             socialActions,
+            socialDB,
             setUsers: setLocalUsers,
           })}
       </div>

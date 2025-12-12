@@ -5,16 +5,19 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserCard } from "@/components/UserCard";
 import { useSocial } from "@/hooks/useSocial";
+import { useSocialDB } from "@/hooks/useSocialDB";
 
 interface ExploreProps {
   currentUser: User | null;
+  currentUserId: string | null;
   users: User[];
   onSignOut: () => void;
   socialActions: ReturnType<typeof useSocial>;
+  socialDB: ReturnType<typeof useSocialDB>;
   setUsers: (users: User[]) => void;
 }
 
-export default function Explore({ currentUser, users, onSignOut, socialActions, setUsers }: ExploreProps) {
+export default function Explore({ currentUser, currentUserId, users, onSignOut, socialActions, socialDB, setUsers }: ExploreProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Filter users based on search query
@@ -29,14 +32,14 @@ export default function Explore({ currentUser, users, onSignOut, socialActions, 
     );
   }, [users, searchQuery]);
 
-  // Get suggested users (not following)
+  // Get suggested users (not following) - use DB if authenticated
   const suggestedUsers = useMemo(() => {
     if (!currentUser) return users;
     return users
-      .filter(u => u.id !== currentUser.id && !socialActions.isFollowing(u.id))
+      .filter(u => u.id !== currentUser.id && !socialDB.isFollowing(u.id))
       .sort((a, b) => b.trustScore - a.trustScore)
       .slice(0, 10);
-  }, [users, currentUser, socialActions]);
+  }, [users, currentUser, socialDB]);
 
   // Get trending hashtags (mock data for now)
   const trendingTags = [
@@ -91,11 +94,11 @@ export default function Explore({ currentUser, users, onSignOut, socialActions, 
                     key={user.id}
                     user={user}
                     currentUserId={currentUser?.id}
-                    isFollowing={socialActions.isFollowing(user.id)}
-                    hasSentRequest={socialActions.hasSentFriendRequest(user.id)}
-                    onFollow={() => socialActions.followUser(user.id)}
-                    onUnfollow={() => socialActions.unfollowUser(user.id)}
-                    onSendRequest={() => socialActions.sendFriendRequest(user.id)}
+                    isFollowing={socialDB.isFollowing(user.id)}
+                    hasSentRequest={socialDB.hasSentFriendRequest(user.id)}
+                    onFollow={() => socialDB.followUser(user.id)}
+                    onUnfollow={() => socialDB.unfollowUser(user.id)}
+                    onSendRequest={() => socialDB.sendFriendRequest(user.id)}
                   />
                 ))}
               </div>
@@ -124,10 +127,10 @@ export default function Explore({ currentUser, users, onSignOut, socialActions, 
                     user={user}
                     currentUserId={currentUser?.id}
                     isFollowing={false}
-                    hasSentRequest={socialActions.hasSentFriendRequest(user.id)}
-                    onFollow={() => socialActions.followUser(user.id)}
-                    onUnfollow={() => socialActions.unfollowUser(user.id)}
-                    onSendRequest={() => socialActions.sendFriendRequest(user.id)}
+                    hasSentRequest={socialDB.hasSentFriendRequest(user.id)}
+                    onFollow={() => socialDB.followUser(user.id)}
+                    onUnfollow={() => socialDB.unfollowUser(user.id)}
+                    onSendRequest={() => socialDB.sendFriendRequest(user.id)}
                   />
                 ))}
               </div>

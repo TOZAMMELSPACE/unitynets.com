@@ -7,11 +7,14 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { useSocial } from "@/hooks/useSocial";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+import { useSocialDB } from "@/hooks/useSocialDB";
+
 interface NotificationsProps {
   currentUser: User | null;
   users: User[];
   onSignOut: () => void;
   socialActions: ReturnType<typeof useSocial>;
+  socialDB: ReturnType<typeof useSocialDB>;
   setUsers: (users: User[]) => void;
 }
 
@@ -37,6 +40,7 @@ export default function Notifications({
   users, 
   onSignOut, 
   socialActions,
+  socialDB,
   setUsers 
 }: NotificationsProps) {
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = 
@@ -55,13 +59,20 @@ export default function Notifications({
     return () => clearTimeout(timer);
   }, [notifications]);
 
-  const handleAcceptRequest = (fromUserId: string, notificationId: string) => {
-    socialActions.acceptFriendRequest(fromUserId);
+  const handleAcceptRequest = async (fromUserId: string, notificationId: string) => {
+    // Find the friend request ID from socialDB
+    const request = socialDB.friendRequests.find(r => r.sender_id === fromUserId);
+    if (request) {
+      await socialDB.acceptFriendRequest(request.id, fromUserId);
+    }
     deleteNotification(notificationId);
   };
 
-  const handleRejectRequest = (fromUserId: string, notificationId: string) => {
-    socialActions.rejectFriendRequest(fromUserId);
+  const handleRejectRequest = async (fromUserId: string, notificationId: string) => {
+    const request = socialDB.friendRequests.find(r => r.sender_id === fromUserId);
+    if (request) {
+      await socialDB.rejectFriendRequest(request.id);
+    }
     deleteNotification(notificationId);
   };
 
