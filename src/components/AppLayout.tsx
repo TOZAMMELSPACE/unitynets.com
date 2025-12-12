@@ -114,13 +114,13 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     unityBalance: appUser.unityNotes,
   } : null;
 
-  // Combine DB users with local users
-  const users: User[] = dbUsers.length > 0 
+  // Use DB users when logged in (user exists), otherwise use local users
+  const users: User[] = user 
     ? dbUsers.map(transformToUser)
     : localUsers;
 
-  // Combine DB posts with local posts
-  const posts: Post[] = dbPosts.length > 0 
+  // Use DB posts when logged in (user exists), otherwise use local posts
+  const posts: Post[] = user 
     ? dbPosts.map(transformToLegacyPost)
     : localPosts;
 
@@ -129,15 +129,18 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   });
 
   useEffect(() => {
-    initializeData();
-    
-    const savedUsers = load<User[]>(STORAGE.USERS, []);
-    const savedPosts = load<Post[]>(STORAGE.POSTS, []);
-    const savedComments = load<Comment[]>(STORAGE.COMMENTS, []);
-    setLocalUsers(savedUsers);
-    setLocalPosts(savedPosts);
-    setComments(savedComments);
-  }, []);
+    // Only initialize local data when not logged in (for demo purposes)
+    if (!user) {
+      initializeData();
+      
+      const savedUsers = load<User[]>(STORAGE.USERS, []);
+      const savedPosts = load<Post[]>(STORAGE.POSTS, []);
+      const savedComments = load<Comment[]>(STORAGE.COMMENTS, []);
+      setLocalUsers(savedUsers);
+      setLocalPosts(savedPosts);
+      setComments(savedComments);
+    }
+  }, [user]);
 
   const handleLogin = (user: User) => {
     // This is now handled by useAuth
