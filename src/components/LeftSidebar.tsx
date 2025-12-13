@@ -69,8 +69,8 @@ export const LeftSidebar = ({ onCreatePost }: LeftSidebarProps) => {
           })}
         </nav>
 
-        {/* Create Post Button */}
-        {onCreatePost && (
+        {/* Create Post Button - Only on Home page */}
+        {onCreatePost && location.pathname === "/" && (
           <div className="mt-8">
             <Button
               onClick={onCreatePost}

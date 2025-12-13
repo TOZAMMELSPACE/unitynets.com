@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Moon, Sun, PenSquare } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useLocation } from "react-router-dom";
 
 interface GlobalHeaderProps {
   currentUser: User | null;
@@ -13,6 +14,8 @@ interface GlobalHeaderProps {
 export const GlobalHeader = ({ currentUser, onSignOut, onCreatePost }: GlobalHeaderProps) => {
   const { theme, setTheme } = useTheme();
   const { t } = useLanguage();
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -35,7 +38,7 @@ export const GlobalHeader = ({ currentUser, onSignOut, onCreatePost }: GlobalHea
           {/* Right Actions */}
           <div className="flex items-center gap-3 sm:gap-5">
             {/* New Post Button - Desktop only */}
-            {currentUser && onCreatePost && (
+            {currentUser && onCreatePost && isHomePage && (
               <Button
                 onClick={onCreatePost}
                 variant="default"
