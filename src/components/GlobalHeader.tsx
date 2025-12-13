@@ -1,15 +1,16 @@
 import { User } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, PenSquare } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface GlobalHeaderProps {
   currentUser: User | null;
   onSignOut: () => void;
+  onCreatePost?: () => void;
 }
 
-export const GlobalHeader = ({ currentUser, onSignOut }: GlobalHeaderProps) => {
+export const GlobalHeader = ({ currentUser, onSignOut, onCreatePost }: GlobalHeaderProps) => {
   const { theme, setTheme } = useTheme();
   const { t } = useLanguage();
 
@@ -33,6 +34,19 @@ export const GlobalHeader = ({ currentUser, onSignOut }: GlobalHeaderProps) => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-3 sm:gap-5">
+            {/* New Post Button - Desktop only */}
+            {currentUser && onCreatePost && (
+              <Button
+                onClick={onCreatePost}
+                variant="default"
+                size="sm"
+                className="hidden lg:flex items-center gap-2 font-medium"
+              >
+                <PenSquare className="h-4 w-4" />
+                {t("New Post", "নতুন পোস্ট")}
+              </Button>
+            )}
+
             {/* Theme Toggle */}
             <Button
               variant="ghost"
