@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Edit, Camera, X, Image } from "lucide-react";
+import { Edit, Camera, X, Image, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { uploadProfileImage } from "@/lib/profileImageUpload";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProfileEditProps {
   user: User;
@@ -16,6 +18,7 @@ interface ProfileEditProps {
 
 export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [name, setName] = useState(user.name);
   const [username, setUsername] = useState(user.username || "");
   const [email, setEmail] = useState(user.email || "");
@@ -27,6 +30,8 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
   const [coverImage, setCoverImage] = useState(user.coverImage || "");
   const [imagePreview, setImagePreview] = useState(user.profileImage || "");
   const [coverPreview, setCoverPreview] = useState(user.coverImage || "");
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -43,14 +48,20 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
         return;
       }
 
+      // Store file for upload later
+      if (type === 'profile') {
+        setProfileFile(file);
+      } else {
+        setCoverFile(file);
+      }
+
+      // Create preview
       const reader = new FileReader();
       reader.onload = () => {
         const result = reader.result as string;
         if (type === 'profile') {
-          setProfileImage(result);
           setImagePreview(result);
         } else {
-          setCoverImage(result);
           setCoverPreview(result);
         }
       };
@@ -62,19 +73,21 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
     if (type === 'profile') {
       setProfileImage("");
       setImagePreview("");
+      setProfileFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     } else {
       setCoverImage("");
       setCoverPreview("");
+      setCoverFile(null);
       if (coverInputRef.current) {
         coverInputRef.current.value = "";
       }
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim()) {
       toast({
         title: "ত্রুটি",
@@ -93,25 +106,100 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
       return;
     }
 
-    const updatedUser: User = {
-      ...user,
-      name: name.trim(),
-      username: username.trim() || undefined,
-      email: email.trim() || undefined,
-      bio: bio.trim() || undefined,
-      location: location.trim() || undefined,
-      role,
-      nidMasked: nidMasked.trim() || user.nidMasked,
-      profileImage: profileImage || undefined,
-      coverImage: coverImage || undefined,
-    };
+    setIsSaving(true);
 
-    onUpdateProfile(updatedUser);
-    setIsOpen(false);
-    toast({
-      title: "সফল",
-      description: "প্রোফাইল আপডেট করা হয়েছে",
-    });
+    try {
+      let avatarUrl = profileImage;
+      let coverUrl = coverImage;
+
+      // Upload profile image if changed
+      if (profileFile) {
+        const uploadedUrl = await uploadProfileImage(profileFile, user.id, 'avatar');
+        if (uploadedUrl) {
+          avatarUrl = uploadedUrl;
+        } else {
+          toast({
+            title: "ত্রুটি",
+            description: "প্রোফাইল ছবি আপলোড করতে সমস্যা হয়েছে",
+            variant: "destructive",
+          });
+        }
+      }
+
+      // Upload cover image if changed
+      if (coverFile) {
+        const uploadedUrl = await uploadProfileImage(coverFile, user.id, 'cover');
+        if (uploadedUrl) {
+          coverUrl = uploadedUrl;
+        } else {
+          toast({
+            title: "ত্রুটি",
+            description: "কভার ছবি আপলোড করতে সমস্যা হয়েছে",
+            variant: "destructive",
+          });
+        }
+      }
+
+      // Update profile in Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: name.trim(),
+          username: username.trim() || null,
+          email: email.trim() || null,
+          bio: bio.trim() || null,
+          location: location.trim() || null,
+          role: role,
+          avatar_url: avatarUrl || null,
+          cover_url: coverUrl || null,
+        })
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error updating profile:', error);
+        toast({
+          title: "ত্রুটি",
+          description: "প্রোফাইল আপডেট করতে সমস্যা হয়েছে",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update local state
+      const updatedUser: User = {
+        ...user,
+        name: name.trim(),
+        username: username.trim() || undefined,
+        email: email.trim() || undefined,
+        bio: bio.trim() || undefined,
+        location: location.trim() || undefined,
+        role: role as User['role'],
+        nidMasked: nidMasked.trim() || user.nidMasked,
+        profileImage: avatarUrl || undefined,
+        coverImage: coverUrl || undefined,
+      };
+
+      onUpdateProfile(updatedUser);
+      setProfileImage(avatarUrl);
+      setCoverImage(coverUrl);
+      setProfileFile(null);
+      setCoverFile(null);
+      setIsOpen(false);
+      
+      toast({
+        title: "সফল",
+        description: "প্রোফাইল আপডেট করা হয়েছে",
+      });
+    } catch (err) {
+      console.error('Error saving profile:', err);
+      toast({
+        title: "ত্রুটি",
+        description: "প্রোফাইল আপডেট করতে সমস্যা হয়েছে",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -145,6 +233,7 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
                       size="sm"
                       className="absolute top-2 right-2 w-6 h-6 rounded-full p-0"
                       onClick={() => removeImage('cover')}
+                      disabled={isSaving}
                     >
                       <X size={12} />
                     </Button>
@@ -164,6 +253,7 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
                 size="sm"
                 onClick={() => coverInputRef.current?.click()}
                 className="gap-2"
+                disabled={isSaving}
               >
                 <Camera size={16} />
                 কভার ছবি নির্বাচন
@@ -196,6 +286,7 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
                       size="sm"
                       className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0"
                       onClick={() => removeImage('profile')}
+                      disabled={isSaving}
                     >
                       <X size={12} />
                     </Button>
@@ -213,6 +304,7 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
                   size="sm"
                   onClick={() => fileInputRef.current?.click()}
                   className="gap-2"
+                  disabled={isSaving}
                 >
                   <Camera size={16} />
                   ছবি নির্বাচন
@@ -240,6 +332,7 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
               onChange={(e) => setName(e.target.value)}
               placeholder="আপনার নাম লিখুন"
               className="text-bengali"
+              disabled={isSaving}
             />
           </div>
 
@@ -252,6 +345,7 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
               onChange={(e) => setUsername(e.target.value)}
               placeholder="@username"
               className="text-bengali"
+              disabled={isSaving}
             />
           </div>
 
@@ -265,6 +359,7 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
               placeholder="নিজের সম্পর্কে কিছু লিখুন..."
               className="text-bengali min-h-[80px]"
               maxLength={200}
+              disabled={isSaving}
             />
             <p className="text-xs text-muted-foreground text-right">
               {bio.length}/200
@@ -280,13 +375,14 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
               onChange={(e) => setLocation(e.target.value)}
               placeholder="ঢাকা, বাংলাদেশ"
               className="text-bengali"
+              disabled={isSaving}
             />
           </div>
 
           {/* Role */}
           <div className="space-y-2">
             <Label className="text-bengali">ভূমিকা</Label>
-            <Select value={role} onValueChange={(value: any) => setRole(value)}>
+            <Select value={role} onValueChange={(value: any) => setRole(value)} disabled={isSaving}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -308,6 +404,7 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
+              disabled={isSaving}
             />
           </div>
 
@@ -320,15 +417,23 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
               onChange={(e) => setNidMasked(e.target.value)}
               placeholder="****1234"
               maxLength={8}
+              disabled={isSaving}
             />
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsOpen(false)}>
+            <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isSaving}>
               বাতিল
             </Button>
-            <Button onClick={handleSave}>
-              সংরক্ষণ
+            <Button onClick={handleSave} disabled={isSaving}>
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  সংরক্ষণ হচ্ছে...
+                </>
+              ) : (
+                'সংরক্ষণ'
+              )}
             </Button>
           </div>
         </div>

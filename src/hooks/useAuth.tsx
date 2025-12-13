@@ -8,9 +8,13 @@ export interface UserProfile {
   user_id: string;
   full_name: string;
   phone: string | null;
+  email: string | null;
   avatar_url: string | null;
+  cover_url: string | null;
   bio: string | null;
   location: string | null;
+  role: string | null;
+  username: string | null;
   trust_score: number;
   unity_notes: number;
   created_at: string;
@@ -24,8 +28,10 @@ export interface AppUser {
   phone: string;
   email?: string;
   profileImage?: string;
+  coverImage?: string;
   bio?: string;
   location?: string;
+  role?: string;
   trustScore: number;
   unityNotes: number;
   isVerified: boolean;
@@ -62,12 +68,14 @@ export const useAuth = () => {
       const transformedUser: AppUser = {
         id: data.user_id,
         name: data.full_name,
-        username: data.full_name.toLowerCase().replace(/\s+/g, ''),
+        username: data.username || data.full_name.toLowerCase().replace(/\s+/g, ''),
         phone: data.phone || '',
-        email: user?.email,
+        email: data.email || user?.email,
         profileImage: data.avatar_url || undefined,
+        coverImage: data.cover_url || undefined,
         bio: data.bio || undefined,
         location: data.location || undefined,
+        role: data.role || 'user',
         trustScore: data.trust_score,
         unityNotes: data.unity_notes,
         isVerified: true,
@@ -222,10 +230,14 @@ export const useAuth = () => {
       setAppUser({
         ...appUser,
         name: data.full_name,
+        username: data.username || data.full_name.toLowerCase().replace(/\s+/g, ''),
         phone: data.phone || '',
+        email: data.email || appUser.email,
         profileImage: data.avatar_url || undefined,
+        coverImage: data.cover_url || undefined,
         bio: data.bio || undefined,
         location: data.location || undefined,
+        role: data.role || 'user',
         trustScore: data.trust_score,
         unityNotes: data.unity_notes,
       });
