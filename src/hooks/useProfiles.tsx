@@ -6,9 +6,13 @@ export interface UserProfile {
   user_id: string;
   full_name: string;
   phone: string | null;
+  email: string | null;
   avatar_url: string | null;
+  cover_url: string | null;
   bio: string | null;
   location: string | null;
+  role: string | null;
+  username: string | null;
   trust_score: number;
   unity_notes: number;
   created_at: string;
@@ -24,8 +28,10 @@ export interface LegacyUser {
   email?: string;
   nidMasked: string;
   profileImage?: string;
+  coverImage?: string;
   bio?: string;
   location?: string;
+  role?: string;
   trustScore: number;
   followers: number;
   following: number;
@@ -61,12 +67,15 @@ export const useProfiles = () => {
       const legacyUsers: LegacyUser[] = (data || []).map(profile => ({
         id: profile.user_id,
         name: profile.full_name,
-        username: profile.full_name.toLowerCase().replace(/\s+/g, ''),
+        username: profile.username || profile.full_name.toLowerCase().replace(/\s+/g, ''),
         phone: profile.phone || '',
+        email: profile.email || undefined,
         nidMasked: '****',
         profileImage: profile.avatar_url || undefined,
+        coverImage: profile.cover_url || undefined,
         bio: profile.bio || undefined,
         location: profile.location || undefined,
+        role: profile.role || 'user',
         trustScore: profile.trust_score,
         followers: 0,
         following: 0,
