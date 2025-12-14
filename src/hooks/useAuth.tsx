@@ -187,7 +187,15 @@ export const useAuth = () => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     
-    if (error) {
+    // Clear local state regardless of API response
+    // "Session not found" means already logged out, which is fine
+    setUser(null);
+    setSession(null);
+    setProfile(null);
+    setAppUser(null);
+    
+    // Only show error for actual failures, not "session not found"
+    if (error && !error.message.includes('Session not found')) {
       toast({
         title: 'Sign out failed',
         description: error.message,
@@ -195,11 +203,6 @@ export const useAuth = () => {
       });
       return { error };
     }
-
-    setUser(null);
-    setSession(null);
-    setProfile(null);
-    setAppUser(null);
 
     return { error: null };
   };
