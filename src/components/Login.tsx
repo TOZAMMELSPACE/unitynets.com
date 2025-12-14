@@ -197,15 +197,60 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
       {/* Right Panel - Form */}
       <div className="w-full md:w-3/5 lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 min-h-screen md:min-h-0">
         <div className="w-full max-w-sm sm:max-w-md animate-fade-in">
-          {/* Mobile Logo */}
-          <div className="md:hidden text-center mb-6 sm:mb-8">
-            <div className="inline-flex items-center gap-2 mb-3">
-              <div className="w-10 sm:w-12 h-10 sm:h-12 bg-[hsl(174,55%,45%)] rounded-xl flex items-center justify-center">
-                <span className="text-lg sm:text-xl font-bold text-[hsl(220,18%,10%)]">U</span>
+          {/* Mobile Logo & Features */}
+          <div className="md:hidden mb-6 sm:mb-8">
+            <div className="text-center mb-5">
+              <div className="inline-flex items-center gap-2 mb-3">
+                <div className="w-10 sm:w-12 h-10 sm:h-12 bg-[hsl(174,55%,45%)] rounded-xl flex items-center justify-center">
+                  <span className="text-lg sm:text-xl font-bold text-[hsl(220,18%,10%)]">U</span>
+                </div>
+                <div className="text-left">
+                  <h1 className="text-xl sm:text-2xl font-display font-bold text-[hsl(220,10%,95%)]">UnityNets</h1>
+                  <p className="text-xs text-[hsl(174,55%,50%)]">Trust • Learn • Unite</p>
+                </div>
               </div>
-              <div className="text-left">
-                <h1 className="text-xl sm:text-2xl font-display font-bold text-[hsl(220,10%,95%)]">UnityNets</h1>
-                <p className="text-xs text-[hsl(174,55%,50%)]">Trust • Learn • Unite</p>
+            </div>
+            
+            {/* Mobile Tagline */}
+            <div className="text-center mb-4">
+              <h2 className="text-lg sm:text-xl font-display font-bold text-[hsl(220,10%,95%)] leading-tight">
+                {t("Build Together,", "একসাথে গড়ি,")} <span className="text-[hsl(174,55%,55%)]">{t("Grow Together", "একসাথে বাড়ি")}</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-[hsl(220,10%,55%)] mt-1 max-w-xs mx-auto">
+                {t("Join Bangladesh's largest community platform for mutual growth and skill sharing.", "পারস্পরিক বৃদ্ধি ও দক্ষতা শেয়ারিংয়ের জন্য বাংলাদেশের বৃহত্তম কমিউনিটি প্ল্যাটফর্মে যোগ দিন।")}
+              </p>
+            </div>
+
+            {/* Mobile Features */}
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {features.map((feature, index) => (
+                <div key={index} className="bg-[hsl(220,15%,12%)] border border-[hsl(220,15%,18%)] rounded-lg p-2 text-center">
+                  <div className="w-7 h-7 mx-auto rounded-lg bg-[hsl(174,55%,45%)]/10 flex items-center justify-center mb-1">
+                    <feature.icon className="w-3.5 h-3.5 text-[hsl(174,55%,55%)]" />
+                  </div>
+                  <h3 className="font-medium text-[10px] text-[hsl(220,10%,90%)] leading-tight">{feature.title}</h3>
+                  <p className="text-[8px] text-[hsl(220,10%,50%)] leading-tight mt-0.5">{feature.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile Stats */}
+            <div className="flex justify-center gap-4 py-2 px-3 bg-[hsl(220,15%,10%)] rounded-lg border border-[hsl(220,15%,16%)]">
+              <div className="text-center">
+                <p className="text-sm font-bold text-[hsl(220,10%,95%)]">10K+</p>
+                <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Active Users", "সক্রিয় ব্যবহারকারী")}</p>
+              </div>
+              <div className="w-px bg-[hsl(220,15%,20%)]" />
+              <div className="text-center">
+                <p className="text-sm font-bold text-[hsl(220,10%,95%)]">50K+</p>
+                <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Unity Notes", "ইউনিটি নোট")}</p>
+              </div>
+              <div className="w-px bg-[hsl(220,15%,20%)]" />
+              <div className="text-center">
+                <p className="text-sm font-bold text-[hsl(220,10%,95%)] flex items-center gap-0.5 justify-center">
+                  4.9 <Star className="w-2.5 h-2.5 fill-[hsl(174,55%,55%)] text-[hsl(174,55%,55%)]" />
+                </p>
+                <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Rating", "রেটিং")}</p>
               </div>
             </div>
           </div>
