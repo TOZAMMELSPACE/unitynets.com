@@ -2,15 +2,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Link } from "react-router-dom";
 import { User } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { UserPlus, LogIn, Eye, EyeOff, FileText, Shield, Users, Scale, Lock, Heart, AlertTriangle, Phone, Globe, Mail } from "lucide-react";
+import { UserPlus, LogIn, Eye, EyeOff, FileText, Shield, Users, Scale, Lock, Heart, AlertTriangle, Phone, Globe, Mail, Sparkles, ArrowRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -165,179 +163,218 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
-        {/* Language Toggle */}
-        <div className="flex justify-end mb-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleLanguage}
-            className="gap-2"
-          >
-            <Globe className="w-4 h-4" />
-            <span className="text-xs font-medium">
-              {language === "en" ? "বাংলা" : "English"}
-            </span>
-          </Button>
-        </div>
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/5">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/2 -left-20 w-60 h-60 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute -bottom-20 right-1/4 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        
+        {/* Floating geometric shapes */}
+        <div className="absolute top-20 left-10 w-4 h-4 bg-primary/20 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }} />
+        <div className="absolute top-40 right-20 w-3 h-3 bg-accent/30 rounded-full animate-bounce" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-40 left-1/4 w-2 h-2 bg-primary/25 rounded-full animate-bounce" style={{ animationDelay: '1.5s' }} />
+      </div>
 
-        {/* Logo & Branding */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-            <span className="text-3xl font-bold text-primary">U</span>
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-md animate-fade-in">
+          {/* Language Toggle */}
+          <div className="flex justify-end mb-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleLanguage}
+              className="gap-2 bg-background/60 backdrop-blur-sm border border-border/50 hover:bg-background/80 rounded-full px-4"
+            >
+              <Globe className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">
+                {language === "en" ? "বাংলা" : "English"}
+              </span>
+            </Button>
           </div>
-          <h1 className="text-3xl font-display font-bold text-foreground mb-1">
-            UnityNets
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {t("Together We Are Strong", "একত্রে শক্তিশালী")}
-          </p>
-        </div>
 
-        <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
-          <CardContent className="p-6">
+          {/* Logo & Branding */}
+          <div className="text-center mb-8">
+            <div className="relative inline-block mb-6">
+              <div className="w-24 h-24 mx-auto bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                <span className="text-4xl font-bold text-primary-foreground">U</span>
+              </div>
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-accent rounded-full flex items-center justify-center shadow-md">
+                <Sparkles className="w-3.5 h-3.5 text-accent-foreground" />
+              </div>
+            </div>
+            <h1 className="text-4xl font-display font-bold bg-gradient-to-r from-foreground via-foreground to-foreground/70 bg-clip-text text-transparent mb-2">
+              UnityNets
+            </h1>
+            <p className="text-base text-muted-foreground font-medium">
+              {t("Together We Are Strong", "একত্রে শক্তিশালী")} ✨
+            </p>
+          </div>
+
+          {/* Main Card */}
+          <div className="bg-background/70 backdrop-blur-xl border border-border/50 rounded-3xl shadow-2xl shadow-primary/5 p-8">
             {/* Tab Switch */}
-            <div className="flex mb-6 bg-muted rounded-lg p-1">
+            <div className="flex mb-8 bg-muted/50 rounded-2xl p-1.5">
               <button
                 type="button"
                 onClick={() => setIsRegistering(false)}
-                className={`flex-1 py-2.5 text-sm font-medium rounded-md transition-all ${
+                className={`flex-1 py-3 text-sm font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${
                   !isRegistering 
-                    ? 'bg-background text-foreground shadow-sm' 
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
+                <LogIn className="w-4 h-4" />
                 {t("Login", "লগইন")}
               </button>
               <button
                 type="button"
                 onClick={() => setIsRegistering(true)}
-                className={`flex-1 py-2.5 text-sm font-medium rounded-md transition-all ${
+                className={`flex-1 py-3 text-sm font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${
                   isRegistering 
-                    ? 'bg-background text-foreground shadow-sm' 
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
+                <UserPlus className="w-4 h-4" />
                 {t("Register", "নিবন্ধন")}
               </button>
             </div>
 
             {isRegistering ? (
               /* Signup Form */
-              <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="fullName" className="text-sm font-medium">
+              <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName" className="text-sm font-semibold text-foreground">
                     {t("Your Name", "আপনার নাম")}
                   </Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder={t("Enter full name", "সম্পূর্ণ নাম লিখুন")}
-                    className="h-11"
-                    {...signupForm.register("fullName")}
-                  />
+                  <div className="relative group">
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder={t("Enter full name", "সম্পূর্ণ নাম লিখুন")}
+                      className="h-12 bg-muted/30 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all pl-4"
+                      {...signupForm.register("fullName")}
+                    />
+                  </div>
                   {signupForm.formState.errors.fullName && (
-                    <p className="text-xs text-destructive">
+                    <p className="text-xs text-destructive flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
                       {signupForm.formState.errors.fullName.message}
                     </p>
                   )}
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-sm font-medium">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-semibold text-foreground">
                     {t("Email", "ইমেইল")}
                   </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
                       id="email"
                       type="email"
                       placeholder={t("your@email.com", "আপনার@ইমেইল.com")}
-                      className="h-11 pl-10"
+                      className="h-12 bg-muted/30 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all pl-11"
                       {...signupForm.register("email")}
                     />
                   </div>
                   {signupForm.formState.errors.email && (
-                    <p className="text-xs text-destructive">
+                    <p className="text-xs text-destructive flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
                       {signupForm.formState.errors.email.message}
                     </p>
                   )}
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="phone" className="text-sm font-medium">
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-sm font-semibold text-foreground">
                     {t("Mobile Number (Optional)", "মোবাইল নম্বর (ঐচ্ছিক)")}
                   </Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="01XXXXXXXXX"
-                    className="h-11"
-                    {...signupForm.register("phone")}
-                  />
+                  <div className="relative group">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="01XXXXXXXXX"
+                      className="h-12 bg-muted/30 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all pl-11"
+                      {...signupForm.register("phone")}
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-sm font-medium">
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm font-semibold text-foreground">
                     {t("Password", "পাসওয়ার্ড")}
                   </Label>
-                  <div className="relative">
+                  <div className="relative group">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder={t("At least 6 characters", "কমপক্ষে ৬ অক্ষর")}
-                      className="h-11 pr-10"
+                      className="h-12 bg-muted/30 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all pl-11 pr-12"
                       {...signupForm.register("password")}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                   {signupForm.formState.errors.password && (
-                    <p className="text-xs text-destructive">
+                    <p className="text-xs text-destructive flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
                       {signupForm.formState.errors.password.message}
                     </p>
                   )}
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword" className="text-sm font-semibold text-foreground">
                     {t("Confirm Password", "পাসওয়ার্ড নিশ্চিত করুন")}
                   </Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder={t("Re-enter password", "আবার পাসওয়ার্ড লিখুন")}
-                    className="h-11"
-                    {...signupForm.register("confirmPassword")}
-                  />
+                  <div className="relative group">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      placeholder={t("Re-enter password", "আবার পাসওয়ার্ড লিখুন")}
+                      className="h-12 bg-muted/30 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all pl-11"
+                      {...signupForm.register("confirmPassword")}
+                    />
+                  </div>
                   {signupForm.formState.errors.confirmPassword && (
-                    <p className="text-xs text-destructive">
+                    <p className="text-xs text-destructive flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
                       {signupForm.formState.errors.confirmPassword.message}
                     </p>
                   )}
                 </div>
 
-                <Button type="submit" className="w-full h-11" size="lg" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 rounded-xl text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:-translate-y-0.5 group" 
+                  disabled={isLoading}
+                >
                   {isLoading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary-foreground border-t-transparent" />
                   ) : (
-                    <UserPlus className="w-4 h-4 mr-2" />
+                    <>
+                      {t("Create Account", "অ্যাকাউন্ট তৈরি করুন")}
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </>
                   )}
-                  {t("Register", "নিবন্ধন করুন")}
                 </Button>
 
-                <p className="text-xs text-center text-muted-foreground mt-3">
+                <p className="text-xs text-center text-muted-foreground pt-2">
                   {t("By registering you agree to our", "নিবন্ধন করে আপনি আমাদের")}{" "}
                   <button 
                     type="button"
                     onClick={() => setShowTerms(true)}
-                    className="text-primary hover:underline font-medium"
+                    className="text-primary hover:underline font-semibold"
                   >
                     {t("Terms & Conditions", "শর্তাবলী")}
                   </button>{" "}
@@ -346,50 +383,53 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
               </form>
             ) : (
               /* Login Form */
-              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="loginEmail" className="text-sm font-medium">
+              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="loginEmail" className="text-sm font-semibold text-foreground">
                     {t("Email", "ইমেইল")}
                   </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
                       id="loginEmail"
                       type="email"
                       placeholder={t("your@email.com", "আপনার@ইমেইল.com")}
-                      className="h-11 pl-10"
+                      className="h-12 bg-muted/30 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all pl-11"
                       {...loginForm.register("email")}
                     />
                   </div>
                   {loginForm.formState.errors.email && (
-                    <p className="text-xs text-destructive">
+                    <p className="text-xs text-destructive flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
                       {loginForm.formState.errors.email.message}
                     </p>
                   )}
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="loginPassword" className="text-sm font-medium">
+                <div className="space-y-2">
+                  <Label htmlFor="loginPassword" className="text-sm font-semibold text-foreground">
                     {t("Password", "পাসওয়ার্ড")}
                   </Label>
-                  <div className="relative">
+                  <div className="relative group">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
                       id="loginPassword"
                       type={showPassword ? "text" : "password"}
                       placeholder={t("Your password", "আপনার পাসওয়ার্ড")}
-                      className="h-11 pr-10"
+                      className="h-12 bg-muted/30 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all pl-11 pr-12"
                       {...loginForm.register("password")}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                   {loginForm.formState.errors.password && (
-                    <p className="text-xs text-destructive">
+                    <p className="text-xs text-destructive flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
                       {loginForm.formState.errors.password.message}
                     </p>
                   )}
@@ -398,61 +438,95 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
                 <div className="flex justify-end">
                   <button
                     type="button"
-                    className="text-xs text-primary hover:underline"
+                    className="text-sm text-primary hover:underline font-medium"
                     onClick={() => toast({ title: t("Coming Soon", "শীঘ্রই আসছে"), description: t("Password reset feature coming soon", "পাসওয়ার্ড রিসেট ফিচার শীঘ্রই আসছে") })}
                   >
                     {t("Forgot Password?", "পাসওয়ার্ড ভুলে গেছেন?")}
                   </button>
                 </div>
 
-                <Button type="submit" className="w-full h-11" size="lg" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 rounded-xl text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:-translate-y-0.5 group" 
+                  disabled={isLoading}
+                >
                   {isLoading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary-foreground border-t-transparent" />
                   ) : (
-                    <LogIn className="w-4 h-4 mr-2" />
+                    <>
+                      {t("Sign In", "সাইন ইন করুন")}
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </>
                   )}
-                  {t("Login", "লগইন করুন")}
                 </Button>
+
+                {/* Social Proof */}
+                <div className="pt-4 border-t border-border/50 mt-6">
+                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <Users className="w-4 h-4 text-primary" />
+                    <span>{t("Join 10,000+ members today", "আজই ১০,০০০+ সদস্যদের সাথে যোগ দিন")}</span>
+                  </div>
+                </div>
               </form>
             )}
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Terms Dialog */}
-        <Dialog open={showTerms} onOpenChange={setShowTerms}>
-          <DialogContent className="max-w-lg max-h-[80vh]">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold">
-                {t("Terms & Conditions", "শর্তাবলী")}
-              </DialogTitle>
-            </DialogHeader>
-            <ScrollArea className="h-[60vh] pr-4">
-              <div className="space-y-6">
-                {termsContent.map((section, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <section.icon className="w-5 h-5 text-primary" />
-                      <h3 className="font-semibold">
-                        {language === "en" ? section.titleEn : section.title}
-                      </h3>
-                    </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {section.content}
-                    </p>
-                  </div>
-                ))}
+          {/* Features Pills */}
+          <div className="flex flex-wrap justify-center gap-2 mt-6">
+            {[
+              { icon: Shield, label: t("Secure", "নিরাপদ") },
+              { icon: Heart, label: t("Community", "সম্প্রদায়") },
+              { icon: Sparkles, label: t("Free", "বিনামূল্যে") },
+            ].map((feature, index) => (
+              <div 
+                key={index}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-background/60 backdrop-blur-sm border border-border/50 rounded-full text-xs font-medium text-muted-foreground"
+              >
+                <feature.icon className="w-3 h-3 text-primary" />
+                {feature.label}
               </div>
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
+            ))}
+          </div>
 
-        {/* Footer */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-muted-foreground">
-            © 2025 UnityNets. {t("All rights reserved.", "সর্বস্বত্ব সংরক্ষিত।")}
-          </p>
+          {/* Footer */}
+          <div className="mt-8 text-center">
+            <p className="text-xs text-muted-foreground">
+              © 2025 UnityNets. {t("All rights reserved.", "সর্বস্বত্ব সংরক্ষিত।")}
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Terms Dialog */}
+      <Dialog open={showTerms} onOpenChange={setShowTerms}>
+        <DialogContent className="max-w-lg max-h-[80vh] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <FileText className="w-5 h-5 text-primary" />
+              {t("Terms & Conditions", "শর্তাবলী")}
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-[60vh] pr-4">
+            <div className="space-y-6">
+              {termsContent.map((section, index) => (
+                <div key={index} className="space-y-2 p-4 rounded-xl bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <section.icon className="w-4 h-4 text-primary" />
+                    </div>
+                    <h3 className="font-semibold">
+                      {language === "en" ? section.titleEn : section.title}
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed pl-10">
+                    {section.content}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
