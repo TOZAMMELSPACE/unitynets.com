@@ -55,39 +55,74 @@ export const useAuth = () => {
         .from('profiles')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching profile:', error);
         return null;
       }
 
-      setProfile(data);
-      
+      let profileRow = data;
+
+      // If profile row doesn't exist yet, create a minimal one so the app can load.
+      if (!profileRow) {
+        const { data: authData, error: authError } = await supabase.auth.getUser();
+
+        if (authError) {
+          console.error('Error fetching auth user:', authError);
+          return null;
+        }
+
+        const meta = (authData.user?.user_metadata ?? {}) as Record<string, unknown>;
+        const fullName = (meta['full_name'] as string) ?? '';
+        const phone = (meta['phone'] as string) ?? null;
+        const email = authData.user?.email ?? null;
+
+        const { data: created, error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: userId,
+            full_name: fullName,
+            phone,
+            email,
+          })
+          .select('*')
+          .single();
+
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+          return null;
+        }
+
+        profileRow = created;
+      }
+
+      setProfile(profileRow);
+
       // Transform to AppUser format for compatibility
       const transformedUser: AppUser = {
-        id: data.user_id,
-        name: data.full_name,
-        username: data.username || data.full_name.toLowerCase().replace(/\s+/g, ''),
-        phone: data.phone || '',
-        email: data.email || user?.email,
-        profileImage: data.avatar_url || undefined,
-        coverImage: data.cover_url || undefined,
-        bio: data.bio || undefined,
-        location: data.location || undefined,
-        role: data.role || 'user',
-        trustScore: data.trust_score,
-        unityNotes: data.unity_notes,
+        id: profileRow.user_id,
+        name: profileRow.full_name,
+        username: profileRow.username || profileRow.full_name.toLowerCase().replace(/\s+/g, ''),
+        phone: profileRow.phone || '',
+        email: profileRow.email || user?.email,
+        profileImage: profileRow.avatar_url || undefined,
+        coverImage: profileRow.cover_url || undefined,
+        bio: profileRow.bio || undefined,
+        location: profileRow.location || undefined,
+        role: profileRow.role || 'user',
+        trustScore: profileRow.trust_score ?? 0,
+        unityNotes: profileRow.unity_notes ?? 0,
         isVerified: true,
         isOnline: true,
         followers: 0,
         following: 0,
         achievements: [],
-        joinDate: data.created_at,
+        joinDate: profileRow.created_at,
       };
-      
+
       setAppUser(transformedUser);
-      return data;
+      return profileRow;
     } catch (err) {
       console.error('Error in fetchProfile:', err);
       return null;

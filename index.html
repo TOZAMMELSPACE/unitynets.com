@@ -143,22 +143,45 @@
     </div>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Monetag Service Worker Registration (Deferred) -->
+    <!-- Monetag Service Worker Registration (Safe) -->
     <script>
-      // Defer Monetag registration to not block page load
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          if ('serviceWorker' in navigator) {
+      (function () {
+        if (!('serviceWorker' in navigator)) return;
+
+        // Only enable Monetag SW on production domain to avoid preview/dev caching issues.
+        var isProductionHost = ['unitynets.com', 'www.unitynets.com'].includes(window.location.hostname);
+
+        if (!isProductionHost) {
+          // If a SW was previously registered on this host, unregister it to stop infinite loader.
+          navigator.serviceWorker.getRegistrations()
+            .then(function (regs) {
+              if (!regs.length) return;
+
+              return Promise.all(regs.map(function (r) { return r.unregister(); }))
+                .then(function () {
+                  if (!sessionStorage.getItem('sw_unreg_done')) {
+                    sessionStorage.setItem('sw_unreg_done', '1');
+                    window.location.reload();
+                  }
+                });
+            })
+            .catch(function () {});
+          return;
+        }
+
+        // Defer registration so it doesn't block initial load.
+        window.addEventListener('load', function () {
+          setTimeout(function () {
             navigator.serviceWorker.register('/sw.js')
-              .then(function(registration) {
+              .then(function () {
                 console.log('Monetag SW registered');
               })
-              .catch(function(error) {
+              .catch(function (error) {
                 console.log('Monetag SW registration failed:', error);
               });
-          }
-        }, 3000); // Wait 3 seconds after page load
-      });
+          }, 3000);
+        });
+      })();
     </script>
   </body>
 </html>

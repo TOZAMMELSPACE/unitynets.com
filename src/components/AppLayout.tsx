@@ -287,6 +287,18 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     );
   }
 
+  // Logged in but profile isn't ready yet
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="space-y-3 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="text-sm text-muted-foreground">Loading your profile…</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen w-full bg-background">
       <LeftSidebar onCreatePost={handleCreatePost} />
