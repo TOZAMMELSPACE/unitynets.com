@@ -142,5 +142,18 @@
       </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Monetag Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+          .then(function(registration) {
+            console.log('Monetag SW registered');
+          })
+          .catch(function(error) {
+            console.log('Monetag SW registration failed:', error);
+          });
+      }
+    </script>
   </body>
 </html>
