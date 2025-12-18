@@ -22,6 +22,7 @@ const ImpactReport = lazy(() => import("./pages/ImpactReport"));
 const LearningZone = lazy(() => import("./pages/LearningZone"));
 const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
 const Auth = lazy(() => import("./pages/Auth"));
+const PostView = lazy(() => import("./pages/PostView"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -44,6 +45,13 @@ const App = () => (
             <Route path="/auth" element={
               <Suspense fallback={<PageLoader />}>
                 <Auth />
+              </Suspense>
+            } />
+            
+            {/* Public post view route */}
+            <Route path="/post/:postId" element={
+              <Suspense fallback={<PageLoader />}>
+                <PostView />
               </Suspense>
             } />
             

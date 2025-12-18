@@ -13,7 +13,7 @@ export const ShareButton = ({ postId, postContent }: ShareButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
 
-  const shareUrl = `${window.location.origin}/?post=${postId}`;
+  const shareUrl = `${window.location.origin}/post/${postId}`;
   
   const handleCopyLink = async () => {
     try {
