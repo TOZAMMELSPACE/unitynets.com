@@ -71,7 +71,7 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
         email: data.email,
         password: data.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/home`,
           data: { full_name: data.fullName.trim(), phone: data.phone || '' },
         },
       });

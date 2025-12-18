@@ -23,10 +23,10 @@ export const BottomNavigation = () => {
   ];
 
   const handleHomeClick = () => {
-    if (location.pathname === "/") {
+    if (location.pathname === "/home") {
       setIsExpanded(!isExpanded);
     } else {
-      navigate("/");
+      navigate("/home");
       setIsExpanded(false);
     }
   };
@@ -92,7 +92,7 @@ export const BottomNavigation = () => {
         <button
           onClick={handleHomeClick}
           className={`pointer-events-auto w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500 backdrop-blur-sm ${
-            location.pathname === "/"
+            location.pathname === "/home"
               ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground scale-110 shadow-primary/50"
               : "bg-card text-foreground hover:scale-105 hover:shadow-primary/30"
           } ${isExpanded ? "rotate-180 scale-105" : "rotate-0"}`}

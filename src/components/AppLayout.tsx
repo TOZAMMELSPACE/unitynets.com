@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { User, Post, Comment, STORAGE, save, load, initializeData } from "@/lib/storage";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { LeftSidebar } from "@/components/LeftSidebar";
@@ -88,6 +89,7 @@ const transformToUser = (profile: LegacyUser): User => ({
 });
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
+  const navigate = useNavigate();
   const { user, appUser, loading: authLoading, signOut } = useAuth();
   const socialDB = useSocialDB(user?.id || null);
   // Always fetch posts from database, even for unauthenticated users
@@ -270,31 +272,21 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     );
   }
 
-  // Create a guest user for unauthenticated access
-  const guestUser: User | null = currentUser || {
-    id: 'guest',
-    name: 'অতিথি',
-    username: 'guest',
-    phone: '',
-    email: '',
-    nidMasked: '',
-    profileImage: '',
-    coverImage: '',
-    bio: '',
-    location: '',
-    role: 'user',
-    trustScore: 0,
-    followers: 0,
-    following: 0,
-    achievements: [],
-    isOnline: false,
-    isVerified: false,
-    joinDate: new Date().toISOString(),
-    unityBalance: 0,
-  };
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/');
+    }
+  }, [user, authLoading, navigate]);
 
-  const isAuthenticated = !!user && !!currentUser;
-
+  // Don't render if not authenticated
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
   return (
     <div className="relative min-h-screen w-full bg-background">
       <LeftSidebar onCreatePost={handleCreatePost} />
@@ -303,14 +295,14 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       <div className="w-full lg:pl-64 min-h-screen pb-20 lg:pb-0">
         {/* Global Header - same on all pages */}
         <GlobalHeader 
-          currentUser={isAuthenticated ? currentUser : null} 
+          currentUser={currentUser} 
           onSignOut={handleSignOut}
-          onCreatePost={isAuthenticated ? handleCreatePost : undefined}
+          onCreatePost={handleCreatePost}
         />
         
         {/* Page Content */}
         {children({
-            currentUser: isAuthenticated ? currentUser : null,
+            currentUser,
             currentUserId: user?.id || null,
             users,
             posts,
@@ -323,7 +315,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
             onAddComment: handleAddComment,
             onLikeComment: handleLikeComment,
             onUpdateProfile: handleUpdateProfile,
-            onCreatePost: isAuthenticated ? handleCreatePost : undefined,
+            onCreatePost: handleCreatePost,
             registerCreatePostTrigger,
             socialActions,
             socialDB,
@@ -331,7 +323,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
             onLoadMore: loadMore,
             hasMore,
             loadingMore,
-            onTrackView: isAuthenticated ? trackView : undefined,
+            onTrackView: trackView,
           })}
       </div>
       

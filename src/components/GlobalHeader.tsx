@@ -16,7 +16,7 @@ export const GlobalHeader = ({ currentUser, onSignOut, onCreatePost }: GlobalHea
   const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
-  const isHomePage = location.pathname === "/";
+  const isHomePage = location.pathname === "/home";
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -95,7 +95,7 @@ export const GlobalHeader = ({ currentUser, onSignOut, onCreatePost }: GlobalHea
               <Button 
                 variant="default" 
                 size="sm"
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/')}
                 className="flex items-center gap-2"
               >
                 <LogIn className="h-4 w-4" />

@@ -12,7 +12,7 @@ export const LeftSidebar = ({ onCreatePost }: LeftSidebarProps) => {
   const { t } = useLanguage();
 
   const navItems = [
-    { path: "/", icon: Home, labelEn: "Home", labelBn: "হোম" },
+    { path: "/home", icon: Home, labelEn: "Home", labelBn: "হোম" },
     { path: "/explore", icon: Search, labelEn: "Explore", labelBn: "এক্সপ্লোর" },
     { path: "/learning-zone", icon: BookOpen, labelEn: "Learning Zone", labelBn: "লার্নিং জোন" },
     { path: "/unity-note", icon: Coins, labelEn: "Unity Note", labelBn: "ঐক্য নোট" },
@@ -70,7 +70,7 @@ export const LeftSidebar = ({ onCreatePost }: LeftSidebarProps) => {
         </nav>
 
         {/* Create Post Button - Only on Home page */}
-        {onCreatePost && location.pathname === "/" && (
+        {onCreatePost && location.pathname === "/home" && (
           <div className="mt-8">
             <Button
               onClick={onCreatePost}

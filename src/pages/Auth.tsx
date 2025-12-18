@@ -8,10 +8,10 @@ const Auth = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect to home if already logged in
+  // Redirect to home feed if already logged in
   useEffect(() => {
     if (!loading && user) {
-      navigate('/');
+      navigate('/home');
     }
   }, [user, loading, navigate]);
 

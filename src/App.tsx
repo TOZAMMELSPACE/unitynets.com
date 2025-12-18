@@ -41,8 +41,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {/* Auth route outside AppLayout */}
-            <Route path="/auth" element={
+            {/* Landing page - Auth as main page */}
+            <Route path="/" element={
               <Suspense fallback={<PageLoader />}>
                 <Auth />
               </Suspense>
@@ -55,13 +55,20 @@ const App = () => (
               </Suspense>
             } />
             
-            {/* All other routes inside AppLayout */}
+            {/* Terms route outside AppLayout */}
+            <Route path="/terms" element={
+              <Suspense fallback={<PageLoader />}>
+                <TermsAndConditions />
+              </Suspense>
+            } />
+            
+            {/* All other routes inside AppLayout (require auth) */}
             <Route path="/*" element={
               <AppLayout>
                 {(props) => (
                   <Suspense fallback={<PageLoader />}>
                     <Routes>
-                      <Route path="/" element={<Index {...props} />} />
+                      <Route path="/home" element={<Index {...props} />} />
                       <Route path="/notifications" element={<Notifications currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} socialActions={props.socialActions} socialDB={props.socialDB} setUsers={props.setUsers} />} />
                       <Route path="/messages" element={<MessagesDB currentUserId={props.currentUserId} />} />
                       <Route path="/explore" element={<Explore currentUser={props.currentUser} currentUserId={props.currentUserId} users={props.users} onSignOut={props.onSignOut} socialActions={props.socialActions} socialDB={props.socialDB} setUsers={props.setUsers} />} />
@@ -72,7 +79,6 @@ const App = () => (
                       <Route path="/settings" element={<Settings currentUser={props.currentUser} onSignOut={props.onSignOut} />} />
                       <Route path="/unity-government" element={<UnityGovernment currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} />} />
                       <Route path="/learning-zone" element={<LearningZone currentUser={props.currentUser} onSignOut={props.onSignOut} />} />
-                      <Route path="/terms" element={<TermsAndConditions />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>

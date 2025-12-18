@@ -97,7 +97,7 @@ const PostView = () => {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">{error || "পোস্ট পাওয়া যায়নি"}</p>
-        <Link to="/">
+        <Link to="/home">
           <Button>
             <ArrowLeft className="w-4 h-4 mr-2" />
             হোমে ফিরে যান
@@ -197,7 +197,7 @@ const PostView = () => {
 
             {/* CTA */}
             <div className="pt-4 border-t border-border">
-              <Link to="/auth">
+              <Link to="/">
                 <Button className="w-full">
                   লাইক, কমেন্ট এবং আরো দেখতে সাইন ইন করুন
                 </Button>
