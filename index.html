@@ -131,11 +131,6 @@
       }
     </style>
     
-    <!-- Monetag Multitag Ads Script -->
-    <script async="async" data-cfasync="false" src="//pl26408498.profitablegatecpm.com/11fd39d8e7aa3a6a7e8c87af9f9890f8/invoke.js"></script>
-    
-    <!-- Monetag Additional Zone Script -->
-    <script src="https://quge5.com/88/tag.min.js" data-zone="193696" async data-cfasync="false"></script>
   </head>
 
   <body class="antialiased">
@@ -148,46 +143,5 @@
       </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Monetag Service Worker Registration (Safe) -->
-    <script>
-      (function () {
-        if (!('serviceWorker' in navigator)) return;
-
-        // Only enable Monetag SW on production domain to avoid preview/dev caching issues.
-        var isProductionHost = ['unitynets.com', 'www.unitynets.com'].includes(window.location.hostname);
-
-        if (!isProductionHost) {
-          // If a SW was previously registered on this host, unregister it to stop infinite loader.
-          navigator.serviceWorker.getRegistrations()
-            .then(function (regs) {
-              if (!regs.length) return;
-
-              return Promise.all(regs.map(function (r) { return r.unregister(); }))
-                .then(function () {
-                  if (!sessionStorage.getItem('sw_unreg_done')) {
-                    sessionStorage.setItem('sw_unreg_done', '1');
-                    window.location.reload();
-                  }
-                });
-            })
-            .catch(function () {});
-          return;
-        }
-
-        // Defer registration so it doesn't block initial load.
-        window.addEventListener('load', function () {
-          setTimeout(function () {
-            navigator.serviceWorker.register('/sw.js')
-              .then(function () {
-                console.log('Monetag SW registered');
-              })
-              .catch(function (error) {
-                console.log('Monetag SW registration failed:', error);
-              });
-          }, 3000);
-        });
-      })();
-    </script>
   </body>
 </html>
