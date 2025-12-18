@@ -263,8 +263,17 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     setCreatePostTrigger(() => trigger);
   };
 
-  // Show loading state only during initial auth check
-  if (authLoading) {
+  // Redirect to login if not authenticated (must not be conditional hook)
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/');
+    }
+  }, [user, authLoading, navigate]);
+
+  const showBlockingLoader = authLoading || (!!user && !appUser);
+
+  // Show loading state during initial auth check and profile bootstrap
+  if (showBlockingLoader) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -272,14 +281,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     );
   }
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/');
-    }
-  }, [user, authLoading, navigate]);
-
-  // Don't render if not authenticated
+  // If not authenticated, AppLayout is protected; render a lightweight placeholder while redirect happens
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
