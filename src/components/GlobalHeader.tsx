@@ -1,9 +1,9 @@
 import { User } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, PenSquare } from "lucide-react";
+import { Moon, Sun, PenSquare, LogIn } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface GlobalHeaderProps {
   currentUser: User | null;
@@ -15,6 +15,7 @@ export const GlobalHeader = ({ currentUser, onSignOut, onCreatePost }: GlobalHea
   const { theme, setTheme } = useTheme();
   const { t } = useLanguage();
   const location = useLocation();
+  const navigate = useNavigate();
   const isHomePage = location.pathname === "/";
 
   const toggleTheme = () => {
@@ -91,7 +92,13 @@ export const GlobalHeader = ({ currentUser, onSignOut, onCreatePost }: GlobalHea
                 </Button>
               </div>
             ) : (
-              <Button variant="default" size="sm">
+              <Button 
+                variant="default" 
+                size="sm"
+                onClick={() => navigate('/auth')}
+                className="flex items-center gap-2"
+              >
+                <LogIn className="h-4 w-4" />
                 {t("Sign In", "সাইন ইন")}
               </Button>
             )}

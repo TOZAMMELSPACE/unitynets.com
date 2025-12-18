@@ -90,6 +90,7 @@ const transformToUser = (profile: LegacyUser): User => ({
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const { user, appUser, loading: authLoading, signOut } = useAuth();
   const socialDB = useSocialDB(user?.id || null);
+  // Always fetch posts from database, even for unauthenticated users
   const { posts: dbPosts, createPost, likePost, addComment, likeComment, loadMore, hasMore, loadingMore, trackView, loading: postsLoading } = usePosts(user?.id, socialDB.createNotification);
   const { users: dbUsers, setUsers: setDbUsers, loading: usersLoading } = useProfiles();
   
@@ -123,33 +124,25 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     unityBalance: appUser.unityNotes,
   } : null;
 
-  // Use DB users when logged in (user exists), otherwise use local users
-  const users: User[] = user 
-    ? dbUsers.map(transformToUser)
-    : localUsers;
+  // Always use DB users and posts (for public access)
+  const users: User[] = dbUsers.map(transformToUser);
 
-  // Use DB posts when logged in (user exists), otherwise use local posts
-  const posts: Post[] = user 
-    ? dbPosts.map(transformToLegacyPost)
-    : localPosts;
+  // Always use DB posts (for public access)
+  const posts: Post[] = dbPosts.map(transformToLegacyPost);
 
   const socialActions = useSocial(currentUser, users, (updatedUsers) => {
     setLocalUsers(updatedUsers);
   });
 
   useEffect(() => {
-    // Only initialize local data when not logged in (for demo purposes)
-    if (!user) {
-      initializeData();
-      
-      const savedUsers = load<User[]>(STORAGE.USERS, []);
-      const savedPosts = load<Post[]>(STORAGE.POSTS, []);
-      const savedComments = load<Comment[]>(STORAGE.COMMENTS, []);
-      setLocalUsers(savedUsers);
-      setLocalPosts(savedPosts);
-      setComments(savedComments);
-    }
-  }, [user]);
+    // Initialize local data for fallback
+    initializeData();
+    
+    const savedUsers = load<User[]>(STORAGE.USERS, []);
+    const savedComments = load<Comment[]>(STORAGE.COMMENTS, []);
+    setLocalUsers(savedUsers);
+    setComments(savedComments);
+  }, []);
 
   const handleLogin = (user: User) => {
     // This is now handled by useAuth
@@ -268,7 +261,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     setCreatePostTrigger(() => trigger);
   };
 
-  // Show loading state
+  // Show loading state only during initial auth check
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -277,27 +270,30 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     );
   }
 
-  if (!user) {
-    return (
-      <Login 
-        onLogin={handleLogin}
-        onRegister={handleRegister}
-        users={localUsers}
-      />
-    );
-  }
+  // Create a guest user for unauthenticated access
+  const guestUser: User | null = currentUser || {
+    id: 'guest',
+    name: 'অতিথি',
+    username: 'guest',
+    phone: '',
+    email: '',
+    nidMasked: '',
+    profileImage: '',
+    coverImage: '',
+    bio: '',
+    location: '',
+    role: 'user',
+    trustScore: 0,
+    followers: 0,
+    following: 0,
+    achievements: [],
+    isOnline: false,
+    isVerified: false,
+    joinDate: new Date().toISOString(),
+    unityBalance: 0,
+  };
 
-  // Logged in but profile isn't ready yet
-  if (!currentUser) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="space-y-3 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="text-sm text-muted-foreground">Loading your profile…</p>
-        </div>
-      </div>
-    );
-  }
+  const isAuthenticated = !!user && !!currentUser;
 
   return (
     <div className="relative min-h-screen w-full bg-background">
@@ -307,14 +303,14 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       <div className="w-full lg:pl-64 min-h-screen pb-20 lg:pb-0">
         {/* Global Header - same on all pages */}
         <GlobalHeader 
-          currentUser={currentUser!} 
+          currentUser={isAuthenticated ? currentUser : null} 
           onSignOut={handleSignOut}
-          onCreatePost={handleCreatePost}
+          onCreatePost={isAuthenticated ? handleCreatePost : undefined}
         />
         
         {/* Page Content */}
         {children({
-            currentUser,
+            currentUser: isAuthenticated ? currentUser : null,
             currentUserId: user?.id || null,
             users,
             posts,
@@ -327,15 +323,15 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
             onAddComment: handleAddComment,
             onLikeComment: handleLikeComment,
             onUpdateProfile: handleUpdateProfile,
-            onCreatePost: handleCreatePost,
+            onCreatePost: isAuthenticated ? handleCreatePost : undefined,
             registerCreatePostTrigger,
             socialActions,
             socialDB,
             setUsers: setLocalUsers,
             onLoadMore: loadMore,
-            hasMore: user ? hasMore : false,
-            loadingMore: user ? loadingMore : false,
-            onTrackView: user ? trackView : undefined,
+            hasMore,
+            loadingMore,
+            onTrackView: isAuthenticated ? trackView : undefined,
           })}
       </div>
       
