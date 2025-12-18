@@ -45,7 +45,7 @@ const PostView = () => {
           .from("posts")
           .select("*")
           .eq("id", postId)
-          .single();
+          .maybeSingle();
 
         if (postError || !postData) {
           setError("পোস্ট পাওয়া যায়নি");
@@ -58,7 +58,7 @@ const PostView = () => {
           .from("public_profiles")
           .select("full_name, avatar_url, username")
           .eq("user_id", postData.user_id)
-          .single();
+          .maybeSingle();
 
         // Fetch comments count
         const { count: commentsCount } = await supabase
