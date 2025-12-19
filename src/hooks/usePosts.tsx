@@ -301,6 +301,17 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
 
           await supabase.from('notifications').insert(notifications);
         }
+
+        // Send browser push notification
+        await supabase.functions.invoke('send-push-notification', {
+          body: {
+            title: `${profileData?.full_name || 'কেউ'} নতুন পোস্ট করেছেন`,
+            body: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
+            url: `/post/${data.id}`,
+            postId: data.id,
+            excludeUserId: userId
+          }
+        });
       } catch (notifError) {
         console.error('Error sending notifications:', notifError);
         // Don't fail the post creation if notifications fail

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { User } from "@/lib/storage";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   User as UserIcon, 
@@ -102,6 +103,7 @@ const professions = [
 export default function Settings({ currentUser, onSignOut }: SettingsProps) {
   const { language, setLanguage } = useLanguage();
   const { theme, setTheme } = useTheme();
+  const { isSupported, isSubscribed, isLoading, subscribe, unsubscribe } = usePushNotifications(currentUser?.id || null);
   const t = (en: string, bn: string) => language === 'bn' ? bn : en;
 
   // Dialog states
@@ -976,10 +978,40 @@ export default function Settings({ currentUser, onSignOut }: SettingsProps) {
           </SheetHeader>
           
           <div className="space-y-6 py-6">
-            {/* Push Notifications */}
+            {/* Browser Push Notifications */}
+            <div className="space-y-4">
+              <h4 className="font-semibold">{t("Browser Push Notifications", "ব্রাউজার পুশ নোটিফিকেশন")}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t("Get notifications even when the app is closed", "অ্যাপ বন্ধ থাকলেও নোটিফিকেশন পান")}
+              </p>
+              
+              {isSupported ? (
+                <Button 
+                  onClick={isSubscribed ? unsubscribe : subscribe}
+                  disabled={isLoading}
+                  variant={isSubscribed ? "outline" : "default"}
+                  className="w-full"
+                >
+                  {isLoading 
+                    ? t("Processing...", "প্রক্রিয়াকরণ হচ্ছে...") 
+                    : isSubscribed 
+                      ? t("Disable Browser Notifications", "ব্রাউজার নোটিফিকেশন বন্ধ করুন") 
+                      : t("Enable Browser Notifications", "ব্রাউজার নোটিফিকেশন চালু করুন")
+                  }
+                </Button>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {t("Your browser doesn't support push notifications", "আপনার ব্রাউজার পুশ নোটিফিকেশন সাপোর্ট করে না")}
+                </p>
+              )}
+            </div>
+
+            <Separator />
+
+            {/* In-App Push Notifications */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="font-semibold">{t("Push Notifications", "পুশ নোটিফিকেশন")}</h4>
+                <h4 className="font-semibold">{t("In-App Notifications", "ইন-অ্যাপ নোটিফিকেশন")}</h4>
                 <Switch
                   checked={notificationSettings.pushEnabled}
                   onCheckedChange={(checked) => setNotificationSettings({ ...notificationSettings, pushEnabled: checked })}
