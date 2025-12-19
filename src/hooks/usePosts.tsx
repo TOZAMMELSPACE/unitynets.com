@@ -283,6 +283,29 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         return updated;
       });
 
+      // Send notification to all other users about the new post
+      try {
+        const { data: allProfiles } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .neq('user_id', userId);
+
+        if (allProfiles && allProfiles.length > 0) {
+          const notifications = allProfiles.map(profile => ({
+            user_id: profile.user_id,
+            type: 'new_post',
+            from_user_id: userId,
+            content: 'নতুন পোস্ট করেছেন',
+            post_id: data.id,
+          }));
+
+          await supabase.from('notifications').insert(notifications);
+        }
+      } catch (notifError) {
+        console.error('Error sending notifications:', notifError);
+        // Don't fail the post creation if notifications fail
+      }
+
       toast({
         title: 'সফল!',
         description: 'পোস্ট তৈরি হয়েছে',
@@ -467,7 +490,18 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
     if (!userId) return;
 
     try {
-      // Try to insert a new view (will fail if already viewed due to unique constraint)
+      // First check if user already viewed this post
+      const { data: existingView } = await supabase
+        .from('post_views')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      // If already viewed, don't do anything
+      if (existingView) return;
+
+      // Insert new view
       const { error } = await supabase
         .from('post_views')
         .insert({
@@ -477,25 +511,32 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
 
       // If successful (new view), increment the views count
       if (!error) {
-        const currentPost = posts.find(p => p.id === postId);
+        // Get current count from database to be accurate
+        const { data: postData } = await supabase
+          .from('posts')
+          .select('views_count')
+          .eq('id', postId)
+          .single();
+
+        const newViewCount = (postData?.views_count || 0) + 1;
+
         await supabase
           .from('posts')
-          .update({ views_count: (currentPost?.views || 0) + 1 })
+          .update({ views_count: newViewCount })
           .eq('id', postId);
 
         // Optimistic update
         setPosts(prev => prev.map(post => 
           post.id === postId 
-            ? { ...post, views: post.views + 1 }
+            ? { ...post, views: newViewCount }
             : post
         ));
       }
-      // If error (duplicate), user already viewed - do nothing
     } catch (err) {
       // Silently fail - duplicate view is expected behavior
-      console.log('View already tracked or error:', err);
+      console.log('View tracking error:', err);
     }
-  }, [userId, posts]);
+  }, [userId]);
 
   useEffect(() => {
     fetchPosts(true);

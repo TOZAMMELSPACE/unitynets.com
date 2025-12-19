@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { User } from "@/lib/storage";
-import { Bell, Heart, MessageCircle, UserPlus, UserCheck, X } from "lucide-react";
+import { Bell, Heart, MessageCircle, UserPlus, UserCheck, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNotificationsDB } from "@/hooks/useNotificationsDB";
 import { useSocial } from "@/hooks/useSocial";
@@ -29,6 +29,8 @@ const getNotificationIcon = (type: string) => {
       return <UserPlus className="w-5 h-5 text-primary" />;
     case "friend_accept":
       return <UserCheck className="w-5 h-5 text-accent" />;
+    case "new_post":
+      return <FileText className="w-5 h-5 text-primary" />;
     default:
       return <Bell className="w-5 h-5" />;
   }
