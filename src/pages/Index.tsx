@@ -4,6 +4,7 @@ import { EnhancedFeed } from "@/components/EnhancedFeed";
 import { FloatingActionButton } from "@/components/FloatingActionButton";
 import { FeedFilter } from "@/components/FeedFilter";
 import { Skeleton } from "@/components/ui/skeleton";
+import AdSense from "@/components/AdSense";
 
 import { User, Post } from "@/lib/storage";
 
@@ -162,6 +163,13 @@ const Index = ({
 
         {/* Right Sidebar - All Widgets (Lazy Loaded) */}
         <aside className="hidden lg:block lg:col-span-4 space-y-6">
+          {/* AdSense Top Banner */}
+          <AdSense 
+            adSlot="YOUR_AD_SLOT_ID" 
+            adFormat="rectangle" 
+            className="rounded-xl overflow-hidden"
+          />
+          
           <Suspense fallback={<Skeleton className="h-48 w-full rounded-xl" />}>
             {currentUser && (
               <GamificationPanel user={currentUser} users={users} />
@@ -170,6 +178,14 @@ const Index = ({
           <Suspense fallback={<Skeleton className="h-64 w-full rounded-xl" />}>
             <UsersList users={users} currentUserId={currentUser?.id} />
           </Suspense>
+          
+          {/* AdSense Mid Banner */}
+          <AdSense 
+            adSlot="YOUR_AD_SLOT_ID_2" 
+            adFormat="auto" 
+            className="rounded-xl overflow-hidden"
+          />
+          
           <Suspense fallback={<Skeleton className="h-48 w-full rounded-xl" />}>
             <LocalEvents posts={posts} onCreateEvent={() => handleCreatePost('event')} />
           </Suspense>
