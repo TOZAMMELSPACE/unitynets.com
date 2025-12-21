@@ -400,6 +400,10 @@ export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
                   <button type="button" onClick={() => setShowTerms(true)} className="text-[hsl(174,55%,50%)] hover:underline font-medium">
                     {t("Terms & Conditions", "শর্তাবলী ও নীতিমালা")}
                   </button>
+                  {" "}{t("and", "এবং")}{" "}
+                  <a href="https://unitynets.com/terms" target="_blank" rel="noopener noreferrer" className="text-[hsl(174,55%,50%)] hover:underline font-medium">
+                    {t("Privacy Policy", "গোপনীয়তা নীতি")}
+                  </a>
                 </p>
               </form>
             ) : (
