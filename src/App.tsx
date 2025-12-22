@@ -23,6 +23,8 @@ const LearningZone = lazy(() => import("./pages/LearningZone"));
 const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
 const Auth = lazy(() => import("./pages/Auth"));
 const PostView = lazy(() => import("./pages/PostView"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const About = lazy(() => import("./pages/About"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -41,8 +43,22 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {/* Landing page - Auth as main page */}
+            {/* Landing page - New vibrant homepage */}
             <Route path="/" element={
+              <Suspense fallback={<PageLoader />}>
+                <LandingPage />
+              </Suspense>
+            } />
+            
+            {/* About/Mission page */}
+            <Route path="/about" element={
+              <Suspense fallback={<PageLoader />}>
+                <About />
+              </Suspense>
+            } />
+            
+            {/* Auth page for direct login */}
+            <Route path="/auth" element={
               <Suspense fallback={<PageLoader />}>
                 <Auth />
               </Suspense>
