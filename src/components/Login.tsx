@@ -17,6 +17,7 @@ interface LoginProps {
   users: User[];
   onLogin: (user: User) => void;
   onRegister: (user: User) => void;
+  defaultMode?: 'login' | 'signup';
 }
 
 const signupSchema = z.object({
@@ -38,8 +39,8 @@ const loginSchema = z.object({
 type SignupFormData = z.infer<typeof signupSchema>;
 type LoginFormData = z.infer<typeof loginSchema>;
 
-export const Login = ({ users, onLogin, onRegister }: LoginProps) => {
-  const [isRegistering, setIsRegistering] = useState(false);
+export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: LoginProps) => {
+  const [isRegistering, setIsRegistering] = useState(defaultMode === 'signup');
   const [showPassword, setShowPassword] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
