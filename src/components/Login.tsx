@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -20,24 +20,25 @@ interface LoginProps {
   defaultMode?: 'login' | 'signup';
 }
 
-const signupSchema = z.object({
-  fullName: z.string().min(2, "নাম দিন"),
-  email: z.string().email("সঠিক ইমেইল দিন"),
+// Schema functions that accept language
+const createSignupSchema = (isEnglish: boolean) => z.object({
+  fullName: z.string().min(2, isEnglish ? "Please enter your name" : "নাম দিন"),
+  email: z.string().email(isEnglish ? "Please enter a valid email" : "সঠিক ইমেইল দিন"),
   phone: z.string().optional(),
-  password: z.string().min(6, "কমপক্ষে ৬ অক্ষর"),
+  password: z.string().min(6, isEnglish ? "Minimum 6 characters" : "কমপক্ষে ৬ অক্ষর"),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "পাসওয়ার্ড মিলছে না",
+  message: isEnglish ? "Passwords do not match" : "পাসওয়ার্ড মিলছে না",
   path: ["confirmPassword"],
 });
 
-const loginSchema = z.object({
-  email: z.string().email("সঠিক ইমেইল দিন"),
-  password: z.string().min(1, "পাসওয়ার্ড দিন"),
+const createLoginSchema = (isEnglish: boolean) => z.object({
+  email: z.string().email(isEnglish ? "Please enter a valid email" : "সঠিক ইমেইল দিন"),
+  password: z.string().min(1, isEnglish ? "Please enter password" : "পাসওয়ার্ড দিন"),
 });
 
-type SignupFormData = z.infer<typeof signupSchema>;
-type LoginFormData = z.infer<typeof loginSchema>;
+type SignupFormData = z.infer<ReturnType<typeof createSignupSchema>>;
+type LoginFormData = z.infer<ReturnType<typeof createLoginSchema>>;
 
 export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: LoginProps) => {
   const [isRegistering, setIsRegistering] = useState(defaultMode === 'signup');
@@ -46,13 +47,19 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
   const [isLoading, setIsLoading] = useState(false);
   const { language, toggleLanguage, t } = useLanguage();
 
+  const isEnglish = language === "en";
+
+  // Memoize schemas based on language
+  const signupSchema = useMemo(() => createSignupSchema(isEnglish), [isEnglish]);
+  const loginSchema = useMemo(() => createLoginSchema(isEnglish), [isEnglish]);
+
   const termsContent = [
-    { icon: FileText, title: "সেবার শর্তাবলী", titleEn: "Terms of Service", content: "UnityNets প্ল্যাটফর্ম ব্যবহার করে আপনি এই শর্তাবলী মেনে নিচ্ছেন।" },
-    { icon: Shield, title: "গোপনীয়তা নীতি", titleEn: "Privacy Policy", content: "আপনার ব্যক্তিগত তথ্য সুরক্ষিত থাকবে।" },
-    { icon: Users, title: "সম্প্রদায় নির্দেশিকা", titleEn: "Community Guidelines", content: "সকল সদস্যকে সম্মান করুন।" },
-    { icon: Scale, title: "Unity Note নীতি", titleEn: "Unity Note Policy", content: "১ ঘণ্টা সেবা = ১ Unity Note।" },
-    { icon: Lock, title: "নিরাপত্তা", titleEn: "Security", content: "শক্তিশালী পাসওয়ার্ড ব্যবহার করুন।" },
-    { icon: Heart, title: "সেবা মান", titleEn: "Service Quality", content: "প্রতিশ্রুত সেবা সততার সাথে প্রদান করুন।" },
+    { icon: FileText, title: "সেবার শর্তাবলী", titleEn: "Terms of Service", content: isEnglish ? "By using the UnityNets platform, you agree to these terms." : "UnityNets প্ল্যাটফর্ম ব্যবহার করে আপনি এই শর্তাবলী মেনে নিচ্ছেন।" },
+    { icon: Shield, title: "গোপনীয়তা নীতি", titleEn: "Privacy Policy", content: isEnglish ? "Your personal information will be protected." : "আপনার ব্যক্তিগত তথ্য সুরক্ষিত থাকবে।" },
+    { icon: Users, title: "সম্প্রদায় নির্দেশিকা", titleEn: "Community Guidelines", content: isEnglish ? "Respect all members of the community." : "সকল সদস্যকে সম্মান করুন।" },
+    { icon: Scale, title: "Unity Note নীতি", titleEn: "Unity Note Policy", content: isEnglish ? "1 hour of service = 1 Unity Note." : "১ ঘণ্টা সেবা = ১ Unity Note।" },
+    { icon: Lock, title: "নিরাপত্তা", titleEn: "Security", content: isEnglish ? "Use a strong password." : "শক্তিশালী পাসওয়ার্ড ব্যবহার করুন।" },
+    { icon: Heart, title: "সেবা মান", titleEn: "Service Quality", content: isEnglish ? "Provide promised services honestly." : "প্রতিশ্রুত সেবা সততার সাথে প্রদান করুন।" },
   ];
 
   const signupForm = useForm<SignupFormData>({
