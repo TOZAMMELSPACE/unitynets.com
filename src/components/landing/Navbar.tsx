@@ -1,23 +1,25 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, Globe } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
-
-const navLinks = [
-  { name: "হোম", nameEn: "Home", path: "/" },
-  { name: "মিশন", nameEn: "About", path: "/about" },
-  { name: "ইউনিটি নোটস", nameEn: "Unity Notes", path: "/unity-note" },
-  { name: "লার্নিং জোন", nameEn: "Learning Zone", path: "/learning-zone" },
-  { name: "ফিড", nameEn: "Feed", path: "/home" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { language, toggleLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const navLinks = [
+    { name: t("Home", "হোম"), path: "/" },
+    { name: t("About", "মিশন"), path: "/about" },
+    { name: t("Unity Notes", "ইউনিটি নোটস"), path: "/unity-note" },
+    { name: t("Learning Zone", "লার্নিং জোন"), path: "/learning-zone" },
+    { name: t("Feed", "ফিড"), path: "/home" },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,7 +59,7 @@ export const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors text-bengali ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   location.pathname === link.path
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -70,6 +72,17 @@ export const Navbar = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2 md:gap-3">
+            {/* Language Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleLanguage}
+              className="rounded-lg"
+              title={t("Switch to Bengali", "Switch to English")}
+            >
+              <Globe className="w-5 h-5" />
+            </Button>
+
             {/* Theme Toggle */}
             <Button
               variant="ghost"
@@ -87,19 +100,19 @@ export const Navbar = () => {
             {/* Login Button */}
             <Button
               variant="ghost"
-              className="hidden sm:flex text-bengali"
+              className="hidden sm:flex"
               onClick={() => navigate('/auth?mode=login')}
             >
-              লগইন
+              {t("Login", "লগইন")}
             </Button>
 
             {/* Signup Button */}
             <Button
               variant="hero"
-              className="hidden sm:flex text-bengali"
+              className="hidden sm:flex"
               onClick={() => navigate('/auth?mode=signup')}
             >
-              জয়েন করুন
+              {t("Join Now", "জয়েন করুন")}
             </Button>
 
             {/* Mobile Menu Button */}
@@ -127,35 +140,35 @@ export const Navbar = () => {
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors text-bengali ${
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                     location.pathname === link.path
                       ? "bg-primary/10 text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
-                  {link.name} <span className="text-muted-foreground/60">/ {link.nameEn}</span>
+                  {link.name}
                 </Link>
               ))}
               <div className="flex gap-2 px-4 pt-4 border-t border-border mt-2">
                 <Button
                   variant="outline"
-                  className="flex-1 text-bengali"
+                  className="flex-1"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     navigate('/auth?mode=login');
                   }}
                 >
-                  লগইন
+                  {t("Login", "লগইন")}
                 </Button>
                 <Button
                   variant="hero"
-                  className="flex-1 text-bengali"
+                  className="flex-1"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     navigate('/auth?mode=signup');
                   }}
                 >
-                  জয়েন করুন
+                  {t("Join Now", "জয়েন করুন")}
                 </Button>
               </div>
             </div>

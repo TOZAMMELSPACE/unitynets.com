@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Sparkles, Users, Globe } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const CTASection = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <section className="py-16 md:py-24 relative overflow-hidden">
@@ -20,21 +22,23 @@ export const CTASection = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
-            <span className="text-bengali">আজই শুরু করুন - সম্পূর্ণ বিনামূল্যে</span>
+            <span>{t("Start Today - Completely Free", "আজই শুরু করুন - সম্পূর্ণ বিনামূল্যে")}</span>
           </div>
 
           {/* Heading */}
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 text-bengali">
-            এখনই অংশ হোন আমাদের স্বপ্নের
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+            {t("Be Part of Our Dream Now", "এখনই অংশ হোন আমাদের স্বপ্নের")}
             <span className="block text-white/80 text-xl md:text-2xl mt-2 font-normal">
-              Join Our Dream Now
+              {t("From South Asia to the World", "দক্ষিণ এশিয়া থেকে সারা বিশ্ব")}
             </span>
           </h2>
 
           {/* Description */}
-          <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto text-bengali">
-            দক্ষিণ এশিয়া থেকে সারা বিশ্ব — আমরা সবাইকে একত্রিত করতে চাই। 
-            আপনার অংশগ্রহণ আমাদের স্বপ্নকে বাস্তব করতে সাহায্য করবে।
+          <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
+            {t(
+              "From South Asia to the whole world — we want to unite everyone. Your participation will help make our dream a reality.",
+              "দক্ষিণ এশিয়া থেকে সারা বিশ্ব — আমরা সবাইকে একত্রিত করতে চাই। আপনার অংশগ্রহণ আমাদের স্বপ্নকে বাস্তব করতে সাহায্য করবে।"
+            )}
           </p>
 
           {/* CTA Buttons */}
@@ -44,7 +48,7 @@ export const CTASection = () => {
               className="bg-white text-primary hover:bg-white/90 text-lg px-8 py-6 rounded-xl group shadow-xl"
               onClick={() => navigate('/auth?mode=signup')}
             >
-              <span className="text-bengali">ফ্রি রেজিস্ট্রেশন করুন</span>
+              <span>{t("Register Free", "ফ্রি রেজিস্ট্রেশন করুন")}</span>
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button 
@@ -53,7 +57,7 @@ export const CTASection = () => {
               className="border-white/30 text-white hover:bg-white/10 text-lg px-8 py-6 rounded-xl bg-transparent"
               onClick={() => navigate('/about')}
             >
-              <span className="text-bengali">আমাদের মিশন জানুন</span>
+              <span>{t("Learn Our Mission", "আমাদের মিশন জানুন")}</span>
             </Button>
           </div>
 
@@ -61,15 +65,15 @@ export const CTASection = () => {
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex items-center gap-2 text-white/80">
               <Users className="w-5 h-5" />
-              <span className="text-bengali">১০,০০০+ সক্রিয় সদস্য</span>
+              <span>{t("10,000+ Active Members", "১০,০০০+ সক্রিয় সদস্য")}</span>
             </div>
             <div className="flex items-center gap-2 text-white/80">
               <Globe className="w-5 h-5" />
-              <span className="text-bengali">১৫+ দেশ থেকে</span>
+              <span>{t("From 15+ Countries", "১৫+ দেশ থেকে")}</span>
             </div>
             <div className="flex items-center gap-2 text-white/80">
               <Sparkles className="w-5 h-5" />
-              <span className="text-bengali">১০০% বিনামূল্যে</span>
+              <span>{t("100% Free", "১০০% বিনামূল্যে")}</span>
             </div>
           </div>
         </div>

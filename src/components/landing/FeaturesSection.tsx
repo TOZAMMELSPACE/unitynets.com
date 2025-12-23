@@ -1,55 +1,69 @@
 import { Shield, BookOpen, Users, Heart } from "lucide-react";
-
-const features = [
-  {
-    icon: Shield,
-    title: "বিশ্বাস / Trust",
-    description: "একটি নিরাপদ কমিউনিটি যেখানে প্রতিটি কণ্ঠস্বর শোনা হয় এবং প্রতিটি সদস্যের মূল্য দেওয়া হয়।",
-    descriptionEn: "A safe community where every voice is heard and every member is valued.",
-    gradient: "from-primary/20 to-primary/5",
-    iconBg: "bg-primary/10",
-    iconColor: "text-primary",
-  },
-  {
-    icon: BookOpen,
-    title: "শিক্ষা / Learn",
-    description: "হাজারো বিনামূল্যে শিক্ষামূলক নোটস এবং দক্ষতা বিনিময়। এখানে শেখা ও শেখানো দুটোই সম্মানের।",
-    descriptionEn: "Thousands of free educational notes and skill sharing opportunities.",
-    gradient: "from-accent/20 to-accent/5",
-    iconBg: "bg-accent/10",
-    iconColor: "text-accent",
-  },
-  {
-    icon: Users,
-    title: "ঐক্য / Unite",
-    description: "দক্ষিণ এশিয়া থেকে শুরু করে পুরো বিশ্ব জুড়ে একটি ঐক্যবদ্ধ সম্প্রদায় গড়ার স্বপ্ন নিয়ে এগিয়ে যাচ্ছি।",
-    descriptionEn: "Building a united community from South Asia to the entire world.",
-    gradient: "from-success/20 to-success/5",
-    iconBg: "bg-success/10",
-    iconColor: "text-success",
-  },
-  {
-    icon: Heart,
-    title: "প্রভাব / Impact",
-    description: "দেখুন কিভাবে আমাদের কমিউনিটির মাধ্যমে মানুষের জীবন বদলে যাচ্ছে। সত্যিকারের গল্প, সত্যিকারের পরিবর্তন।",
-    descriptionEn: "See real stories of lives changing through our community.",
-    gradient: "from-warning/20 to-warning/5",
-    iconBg: "bg-warning/10",
-    iconColor: "text-warning",
-  },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const FeaturesSection = () => {
+  const { t } = useLanguage();
+
+  const features = [
+    {
+      icon: Shield,
+      title: t("Trust", "বিশ্বাস / Trust"),
+      description: t(
+        "A safe community where every voice is heard and every member is valued.",
+        "একটি নিরাপদ কমিউনিটি যেখানে প্রতিটি কণ্ঠস্বর শোনা হয় এবং প্রতিটি সদস্যের মূল্য দেওয়া হয়।"
+      ),
+      gradient: "from-primary/20 to-primary/5",
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary",
+    },
+    {
+      icon: BookOpen,
+      title: t("Learn", "শিক্ষা / Learn"),
+      description: t(
+        "Thousands of free educational notes and skill sharing opportunities.",
+        "হাজারো বিনামূল্যে শিক্ষামূলক নোটস এবং দক্ষতা বিনিময়। এখানে শেখা ও শেখানো দুটোই সম্মানের।"
+      ),
+      gradient: "from-accent/20 to-accent/5",
+      iconBg: "bg-accent/10",
+      iconColor: "text-accent",
+    },
+    {
+      icon: Users,
+      title: t("Unite", "ঐক্য / Unite"),
+      description: t(
+        "Building a united community from South Asia to the entire world.",
+        "দক্ষিণ এশিয়া থেকে শুরু করে পুরো বিশ্ব জুড়ে একটি ঐক্যবদ্ধ সম্প্রদায় গড়ার স্বপ্ন নিয়ে এগিয়ে যাচ্ছি।"
+      ),
+      gradient: "from-success/20 to-success/5",
+      iconBg: "bg-success/10",
+      iconColor: "text-success",
+    },
+    {
+      icon: Heart,
+      title: t("Impact", "প্রভাব / Impact"),
+      description: t(
+        "See real stories of lives changing through our community.",
+        "দেখুন কিভাবে আমাদের কমিউনিটির মাধ্যমে মানুষের জীবন বদলে যাচ্ছে। সত্যিকারের গল্প, সত্যিকারের পরিবর্তন।"
+      ),
+      gradient: "from-warning/20 to-warning/5",
+      iconBg: "bg-warning/10",
+      iconColor: "text-warning",
+    },
+  ];
+
   return (
     <section className="py-16 md:py-24 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="section-header text-bengali mb-4">
-            কেন আমাদের সাথে যোগ দিবেন? / Why Join Us?
+          <h2 className="section-header mb-4">
+            {t("Why Join Us?", "কেন আমাদের সাথে যোগ দিবেন?")}
           </h2>
-          <p className="text-muted-foreground text-bengali max-w-2xl mx-auto">
-            ইউনিটিনেটস শুধু একটি প্ল্যাটফর্ম নয়, এটি একটি পরিবার যেখানে প্রতিটি সদস্য গুরুত্বপূর্ণ
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            {t(
+              "UnityNets is not just a platform, it's a family where every member matters",
+              "ইউনিটিনেটস শুধু একটি প্ল্যাটফর্ম নয়, এটি একটি পরিবার যেখানে প্রতিটি সদস্য গুরুত্বপূর্ণ"
+            )}
           </p>
         </div>
 
@@ -69,14 +83,11 @@ export const FeaturesSection = () => {
               </div>
 
               {/* Content */}
-              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-4 text-bengali">
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-4">
                 {feature.title}
               </h3>
-              <p className="text-muted-foreground leading-relaxed text-bengali">
+              <p className="text-muted-foreground leading-relaxed">
                 {feature.description}
-              </p>
-              <p className="text-sm text-muted-foreground/70 mt-2">
-                {feature.descriptionEn}
               </p>
             </div>
           ))}
