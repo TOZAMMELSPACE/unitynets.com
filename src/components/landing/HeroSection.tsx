@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Play, Globe, Users, Sparkles } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const HeroSection = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
@@ -63,23 +65,24 @@ export const HeroSection = () => {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-8 animate-fade-in">
           <Sparkles className="w-4 h-4" />
-          <span className="text-bengali">বাংলাদেশের বৃহত্তম কমিউনিটি প্ল্যাটফর্ম</span>
+          <span>{t("Bangladesh's Largest Community Platform", "বাংলাদেশের বৃহত্তম কমিউনিটি প্ল্যাটফর্ম")}</span>
         </div>
 
         {/* Main Heading */}
         <h1 className="hero-heading text-foreground mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
           <span className="text-primary">Trust</span> • <span className="text-primary">Learn</span> • <span className="text-primary">Unite</span>
           <br />
-          <span className="text-bengali text-3xl md:text-4xl lg:text-5xl mt-2 block text-muted-foreground">
-            একত্রে শক্তিশালী
+          <span className="text-3xl md:text-4xl lg:text-5xl mt-2 block text-muted-foreground">
+            {t("Stronger Together", "একত্রে শক্তিশালী")}
           </span>
         </h1>
 
         {/* Subheading */}
-        <p className="subheading max-w-3xl mx-auto mb-10 animate-fade-in text-bengali" style={{ animationDelay: '0.2s' }}>
-          Build Together, Grow Together – জয়েন করুন বাংলাদেশের বৃহত্তম কমিউনিটি প্ল্যাটফর্মে। 
-          দক্ষ আদান-প্রদান ও পারস্পরিক উন্নয়নের জন্য। দক্ষিণ এশিয়া থেকে সারা বিশ্বে, 
-          আমরা সবাইকে একত্রিত করার স্বপ্ন দেখি।
+        <p className="subheading max-w-3xl mx-auto mb-10 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          {t(
+            "Build Together, Grow Together – Join Bangladesh's largest community platform for skill sharing and mutual development. From South Asia to the world, we dream of uniting everyone.",
+            "Build Together, Grow Together – জয়েন করুন বাংলাদেশের বৃহত্তম কমিউনিটি প্ল্যাটফর্মে। দক্ষ আদান-প্রদান ও পারস্পরিক উন্নয়নের জন্য। দক্ষিণ এশিয়া থেকে সারা বিশ্বে, আমরা সবাইকে একত্রিত করার স্বপ্ন দেখি।"
+          )}
         </p>
 
         {/* CTA Buttons */}
@@ -90,7 +93,7 @@ export const HeroSection = () => {
             className="text-lg px-8 py-6 rounded-xl group"
             onClick={() => navigate('/auth?mode=signup')}
           >
-            <span className="text-bengali">এখনই ফ্রি জয়েন করুন</span>
+            <span>{t("Join Free Now", "এখনই ফ্রি জয়েন করুন")}</span>
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
           <Button 
@@ -99,7 +102,7 @@ export const HeroSection = () => {
             className="text-lg px-8 py-6 rounded-xl"
             onClick={() => navigate('/auth?mode=login')}
           >
-            <span className="text-bengali">অলরেডি মেম্বার? লগইন করুন</span>
+            <span>{t("Already a member? Login", "অলরেডি মেম্বার? লগইন করুন")}</span>
           </Button>
         </div>
 
@@ -112,7 +115,7 @@ export const HeroSection = () => {
               </div>
             </div>
             <div className="absolute bottom-4 left-4 right-4 text-center">
-              <p className="text-sm text-muted-foreground text-bengali">ইউনিটিনেটস পরিচিতি ভিডিও (শীঘ্রই আসছে)</p>
+              <p className="text-sm text-muted-foreground">{t("UnityNets Introduction Video (Coming Soon)", "ইউনিটিনেটস পরিচিতি ভিডিও (শীঘ্রই আসছে)")}</p>
             </div>
           </div>
         </div>
@@ -121,15 +124,15 @@ export const HeroSection = () => {
         <div className="flex flex-wrap justify-center gap-8 mt-12 animate-fade-in" style={{ animationDelay: '0.5s' }}>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Users className="w-5 h-5 text-primary" />
-            <span className="text-bengali">১০,০০০+ সক্রিয় সদস্য</span>
+            <span>{t("10,000+ Active Members", "১০,০০০+ সক্রিয় সদস্য")}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Globe className="w-5 h-5 text-primary" />
-            <span className="text-bengali">বিভিন্ন দেশ থেকে</span>
+            <span>{t("From Various Countries", "বিভিন্ন দেশ থেকে")}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Sparkles className="w-5 h-5 text-primary" />
-            <span className="text-bengali">৫০,০০০+ ইউনিটি নোটস</span>
+            <span>{t("50,000+ Unity Notes", "৫০,০০০+ ইউনিটি নোটস")}</span>
           </div>
         </div>
       </div>
