@@ -26,6 +26,8 @@ const PostView = lazy(() => import("./pages/PostView"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const About = lazy(() => import("./pages/About"));
 const Donation = lazy(() => import("./pages/Donation"));
+const PublicLearningZone = lazy(() => import("./pages/PublicLearningZone"));
+const PublicFeed = lazy(() => import("./pages/PublicFeed"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -83,6 +85,20 @@ const App = () => (
             <Route path="/donation" element={
               <Suspense fallback={<PageLoader />}>
                 <Donation />
+              </Suspense>
+            } />
+            
+            {/* Public Learning Zone */}
+            <Route path="/learning-zone" element={
+              <Suspense fallback={<PageLoader />}>
+                <PublicLearningZone />
+              </Suspense>
+            } />
+            
+            {/* Public Feed */}
+            <Route path="/feed" element={
+              <Suspense fallback={<PageLoader />}>
+                <PublicFeed />
               </Suspense>
             } />
             
