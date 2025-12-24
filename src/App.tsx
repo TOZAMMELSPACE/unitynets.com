@@ -25,6 +25,7 @@ const Auth = lazy(() => import("./pages/Auth"));
 const PostView = lazy(() => import("./pages/PostView"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const About = lazy(() => import("./pages/About"));
+const Donation = lazy(() => import("./pages/Donation"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -75,6 +76,13 @@ const App = () => (
             <Route path="/terms" element={
               <Suspense fallback={<PageLoader />}>
                 <TermsAndConditions />
+              </Suspense>
+            } />
+            
+            {/* Donation page */}
+            <Route path="/donation" element={
+              <Suspense fallback={<PageLoader />}>
+                <Donation />
               </Suspense>
             } />
             

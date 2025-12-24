@@ -18,6 +18,7 @@ export const Navbar = () => {
     { name: t("About", "মিশন"), path: "/about" },
     { name: t("Unity Notes", "ইউনিটি নোটস"), path: "/unity-note" },
     { name: t("Learning Zone", "লার্নিং জোন"), path: "/learning-zone" },
+    { name: t("Donation", "ডোনেশন"), path: "/donation" },
     { name: t("Feed", "ফিড"), path: "/home" },
   ];
 

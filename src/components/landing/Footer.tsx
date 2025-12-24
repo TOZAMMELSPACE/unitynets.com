@@ -65,6 +65,11 @@ export const Footer = () => {
                   {t("Learning Zone", "লার্নিং জোন")}
                 </Link>
               </li>
+              <li>
+                <Link to="/donation" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  {t("Donation", "ডোনেশন")}
+                </Link>
+              </li>
             </ul>
           </div>
 
