@@ -1,15 +1,66 @@
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
-import { Heart, Globe, Users, Target, Sparkles, BookOpen, Shield, Briefcase, Calendar, MessageCircle, Languages } from "lucide-react";
+import { Heart, Globe, Users, Target, Sparkles, BookOpen, Shield, Briefcase, Calendar, MessageCircle, Languages, Send, Mail, User, Code, DollarSign, Lightbulb, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import founderImage from "@/assets/founder.jpg";
 
 const About = () => {
   const navigate = useNavigate();
   const { t, toggleLanguage, language } = useLanguage();
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    contributionType: "",
+    message: ""
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const contributionTypes = [
+    { id: "investor", icon: DollarSign, label: t("Investor", "ইনভেস্টর"), labelBn: "ইনভেস্টর" },
+    { id: "mentor", icon: Lightbulb, label: t("Mentor", "মেন্টর"), labelBn: "মেন্টর" },
+    { id: "developer", icon: Code, label: t("Developer", "ডেভেলপার"), labelBn: "ডেভেলপার" },
+    { id: "volunteer", icon: Heart, label: t("Volunteer", "ভলান্টিয়ার"), labelBn: "ভলান্টিয়ার" },
+    { id: "other", icon: Users, label: t("Other", "অন্যান্য"), labelBn: "অন্যান্য" }
+  ];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      toast({
+        title: t("Please fill all fields", "সব ফিল্ড পূরণ করুন"),
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    // Simulate form submission - in production, this would send to a backend
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setIsSubmitting(false);
+    setIsSubmitted(true);
+    
+    toast({
+      title: t("Message sent successfully!", "মেসেজ সফলভাবে পাঠানো হয়েছে!"),
+      description: t("Thank you for reaching out. I'll get back to you soon.", "যোগাযোগ করার জন্য ধন্যবাদ। শীঘ্রই আপনার সাথে যোগাযোগ করব।")
+    });
+    
+    // Reset form after 3 seconds
+    setTimeout(() => {
+      setFormData({ name: "", email: "", contributionType: "", message: "" });
+      setIsSubmitted(false);
+    }, 3000);
+  };
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -371,23 +422,162 @@ const About = () => {
                     </p>
                   </div>
                 </div>
-                <p className="text-foreground text-lg mb-8">
+                <p className="text-foreground text-lg">
                   {t(
                     "I don't know how many will see this post. But if even one person sees it and thinks",
                     "আমি জানি না এই পোস্ট কতজন দেখবে। কিন্তু যদি একজনও দেখে এবং মনে করে"
                   )}
                   <span className="text-primary font-bold"> "{t("I can do it too", "আমিও পারি")}"</span> — {t("then I've won.", "তাহলেই জিতে গেছি।")}
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button variant="default" size="lg" onClick={() => navigate('/', { state: { showSignup: true } })}>
-                    <Heart className="w-5 h-5 mr-2" />
-                    {t("Join the Journey", "যাত্রায় যোগ দিন")}
-                  </Button>
-                  <Button variant="outline" size="lg">
-                    <MessageCircle className="w-5 h-5 mr-2" />
-                    {t("Contact Me", "যোগাযোগ করুন")}
-                  </Button>
+              </div>
+
+              {/* Contact Form Section */}
+              <div id="contact" className="bg-card border border-border/30 rounded-2xl p-8 md:p-12 mb-12">
+                <div className="text-center mb-10">
+                  <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+                    <MessageCircle className="w-4 h-4" />
+                    <span>{t("Get in Touch", "যোগাযোগ করুন")}</span>
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+                    {t("Join This Journey", "এই যাত্রায় সহযোগী হন")}
+                  </h3>
+                  <p className="text-muted-foreground max-w-xl mx-auto">
+                    {t(
+                      "Want to contribute, invest, mentor, or just say hello? Fill out the form below and let's build something amazing together.",
+                      "কন্ট্রিবিউট করতে চান, ইনভেস্ট করতে চান, মেন্টর হতে চান, অথবা শুধু হ্যালো বলতে চান? নিচের ফর্মটি পূরণ করুন এবং একসাথে অসাধারণ কিছু তৈরি করি।"
+                    )}
+                  </p>
                 </div>
+
+                {isSubmitted ? (
+                  <div className="text-center py-12">
+                    <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <CheckCircle className="w-10 h-10 text-green-500" />
+                    </div>
+                    <h4 className="text-2xl font-bold text-foreground mb-2">
+                      {t("Thank You!", "ধন্যবাদ!")}
+                    </h4>
+                    <p className="text-muted-foreground">
+                      {t("Your message has been received. I'll get back to you soon.", "আপনার মেসেজ পেয়েছি। শীঘ্রই যোগাযোগ করব।")}
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto">
+                    {/* Contribution Type Selection */}
+                    <div className="space-y-3">
+                      <label className="text-sm font-medium text-foreground">
+                        {t("How would you like to contribute?", "আপনি কীভাবে সহযোগিতা করতে চান?")}
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        {contributionTypes.map((type) => (
+                          <button
+                            key={type.id}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, contributionType: type.id })}
+                            className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                              formData.contributionType === type.id
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-border/50 hover:border-primary/50 text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            <type.icon className="w-6 h-6" />
+                            <span className="text-sm font-medium">{type.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Name & Email */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground">
+                          {t("Your Name", "আপনার নাম")} *
+                        </label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                          <Input
+                            type="text"
+                            placeholder={t("Enter your name", "আপনার নাম লিখুন")}
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="pl-10"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground">
+                          {t("Email Address", "ইমেইল অ্যাড্রেস")} *
+                        </label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                          <Input
+                            type="email"
+                            placeholder={t("Enter your email", "আপনার ইমেইল লিখুন")}
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className="pl-10"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Message */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground">
+                        {t("Your Message", "আপনার মেসেজ")} *
+                      </label>
+                      <Textarea
+                        placeholder={t(
+                          "Tell me about yourself and how you'd like to contribute to this journey...",
+                          "নিজের সম্পর্কে বলুন এবং এই যাত্রায় কীভাবে সহযোগিতা করতে চান..."
+                        )}
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        rows={5}
+                        className="resize-none"
+                        required
+                      />
+                    </div>
+
+                    {/* Submit Button */}
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="w-full"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <span className="flex items-center gap-2">
+                          <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                          {t("Sending...", "পাঠানো হচ্ছে...")}
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <Send className="w-5 h-5" />
+                          {t("Send Message", "মেসেজ পাঠান")}
+                        </span>
+                      )}
+                    </Button>
+
+                    {/* Alternative Contact */}
+                    <div className="text-center pt-4 border-t border-border/30">
+                      <p className="text-muted-foreground text-sm mb-3">
+                        {t("Or reach me directly at:", "অথবা সরাসরি যোগাযোগ করুন:")}
+                      </p>
+                      <div className="flex flex-wrap justify-center gap-4">
+                        <a
+                          href="mailto:tozammelhaque@gmail.com"
+                          className="inline-flex items-center gap-2 text-primary hover:underline"
+                        >
+                          <Mail className="w-4 h-4" />
+                          tozammelhaque@gmail.com
+                        </a>
+                      </div>
+                    </div>
+                  </form>
+                )}
               </div>
 
               {/* Final Message */}
