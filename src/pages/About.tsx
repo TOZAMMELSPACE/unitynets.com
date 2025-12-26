@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
-import { Heart, Globe, Users, Target, Sparkles, BookOpen, Shield, Briefcase, Calendar, MessageCircle, Languages, Send, Mail, User, Code, DollarSign, Lightbulb, CheckCircle } from "lucide-react";
+import { Heart, Globe, Users, Target, Sparkles, BookOpen, Shield, Briefcase, Calendar, MessageCircle, Languages, Send, Mail, User, Code, DollarSign, Lightbulb, CheckCircle, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -133,6 +133,28 @@ const About = () => {
                           "আমি কোনো কর্পোরেট সিইও নই। আমি কোনো বড় ইউনিভার্সিটির ডিগ্রি নিয়ে বসে নেই। আমি একজন বিল্ডার—যে বাস্তব জীবন থেকে উঠে এসেছে।"
                         )}
                       </p>
+                    </div>
+                    
+                    {/* Contact Info */}
+                    <div className="pt-4 border-t border-border/30 space-y-3">
+                      <a 
+                        href="mailto:tozammelbusiness@gmail.com" 
+                        className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors group"
+                      >
+                        <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                          <Mail className="w-4 h-4 text-primary" />
+                        </div>
+                        <span>tozammelbusiness@gmail.com</span>
+                      </a>
+                      <a 
+                        href="tel:+8801650282332" 
+                        className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors group"
+                      >
+                        <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                          <Phone className="w-4 h-4 text-primary" />
+                        </div>
+                        <span>+880 1650-282332</span>
+                      </a>
                     </div>
                   </div>
                 </div>
