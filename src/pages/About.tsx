@@ -590,11 +590,11 @@ const About = () => {
                       </p>
                       <div className="flex flex-wrap justify-center gap-4">
                         <a
-                          href="mailto:tozammelhaque@gmail.com"
+                          href="mailto:tozammelbusiness@gmail.com"
                           className="inline-flex items-center gap-2 text-primary hover:underline"
                         >
                           <Mail className="w-4 h-4" />
-                          tozammelhaque@gmail.com
+                          tozammelbusiness@gmail.com
                         </a>
                       </div>
                     </div>
