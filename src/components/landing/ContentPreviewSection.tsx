@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { FileText, MessageSquare, Eye, ArrowRight, Lock } from "lucide-react";
@@ -175,3 +176,5 @@ export const ContentPreviewSection = () => {
     </section>
   );
 };
+
+export default memo(ContentPreviewSection);
