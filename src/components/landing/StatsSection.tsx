@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Users, FileText, Star, Globe, TrendingUp, Heart } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -86,3 +87,5 @@ export const StatsSection = () => {
     </section>
   );
 };
+
+export default memo(StatsSection);

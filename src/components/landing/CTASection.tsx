@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Sparkles, Users, Globe } from "lucide-react";
@@ -81,3 +82,5 @@ export const CTASection = () => {
     </section>
   );
 };
+
+export default memo(CTASection);

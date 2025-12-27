@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import { Facebook, Youtube, Mail, Phone, MapPin, Heart } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -130,3 +131,5 @@ export const Footer = () => {
     </footer>
   );
 };
+
+export default memo(Footer);

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Shield, BookOpen, Users, Heart } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -96,3 +97,5 @@ export const FeaturesSection = () => {
     </section>
   );
 };
+
+export default memo(FeaturesSection);

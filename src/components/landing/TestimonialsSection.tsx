@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Star, Quote } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -126,3 +127,5 @@ export const TestimonialsSection = () => {
     </section>
   );
 };
+
+export default memo(TestimonialsSection);

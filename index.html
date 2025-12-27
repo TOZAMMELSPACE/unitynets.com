@@ -144,16 +144,37 @@
       }
     </style>
     
-    <!-- Google AdSense - async loading -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1268147765220924" crossorigin="anonymous"></script>
-    
-    <!-- Ezoic Consent Management - defer to reduce render blocking -->
-    <script defer data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
-    <script defer data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
-    
-    <!-- Ezoic Standalone Ads -->
-    <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
+    <!-- Defer ad scripts to after page load for better LCP -->
     <script>
+      // Load ad scripts after page is interactive
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          // Google AdSense
+          var adsScript = document.createElement('script');
+          adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1268147765220924';
+          adsScript.async = true;
+          adsScript.crossOrigin = 'anonymous';
+          document.head.appendChild(adsScript);
+          
+          // Ezoic Consent
+          var cmpScript = document.createElement('script');
+          cmpScript.src = 'https://cmp.gatekeeperconsent.com/min.js';
+          cmpScript.defer = true;
+          document.head.appendChild(cmpScript);
+          
+          var gkScript = document.createElement('script');
+          gkScript.src = 'https://the.gatekeeperconsent.com/cmp.min.js';
+          gkScript.defer = true;
+          document.head.appendChild(gkScript);
+          
+          // Ezoic Standalone
+          var ezScript = document.createElement('script');
+          ezScript.src = '//www.ezojs.com/ezoic/sa.min.js';
+          ezScript.async = true;
+          document.head.appendChild(ezScript);
+        }, 2000); // 2 second delay for better FCP/LCP
+      });
+      
       window.ezstandalone = window.ezstandalone || {};
       ezstandalone.cmd = ezstandalone.cmd || [];
     </script>

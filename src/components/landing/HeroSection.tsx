@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Play, Globe, Users, Sparkles } from "lucide-react";
@@ -146,3 +147,5 @@ export const HeroSection = () => {
     </section>
   );
 };
+
+export default memo(HeroSection);
