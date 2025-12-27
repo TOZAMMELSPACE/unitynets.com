@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Heart, Gift, Users, Globe, ArrowLeft, Copy, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { SEOHead } from "@/components/SEOHead";
 
 const Donation = () => {
   const { t } = useLanguage();
@@ -74,6 +75,22 @@ const Donation = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Donate - সাপোর্ট করুন"
+        description="UnityNets কে সাপোর্ট করুন। আপনার দান আমাদের সম্প্রদায়কে আরও শক্তিশালী করতে সাহায্য করবে। Support our mission to build stronger communities in Bangladesh."
+        keywords="donate UnityNets, support community, দান, সাপোর্ট, Bangladesh donation, community support"
+        canonicalUrl="https://unitynets.com/donation"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "DonateAction",
+          "name": "Support UnityNets",
+          "description": "Donate to support UnityNets community platform",
+          "recipient": {
+            "@type": "Organization",
+            "name": "UnityNets"
+          }
+        }}
+      />
       {/* Header */}
       <div className="bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-20 md:py-28">
         <div className="container mx-auto px-4">

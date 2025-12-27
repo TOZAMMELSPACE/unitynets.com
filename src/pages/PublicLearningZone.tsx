@@ -29,6 +29,7 @@ import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
+import { SEOHead } from "@/components/SEOHead";
 import { useNavigate } from "react-router-dom";
 
 interface Course {
@@ -271,6 +272,22 @@ export default function PublicLearningZone() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Learning Zone - ফ্রি শেখার প্ল্যাটফর্ম"
+        description="UnityNets Learning Zone - বিনামূল্যে প্রোগ্রামিং, ডিজিটাল দক্ষতা, এবং কমিউনিটি কোর্স শিখুন। Free courses on Python, JavaScript, digital literacy and more."
+        keywords="learning zone, free courses, programming, Python, JavaScript, digital skills, বাংলা কোর্স, ফ্রি শেখা, UnityNets"
+        canonicalUrl="https://unitynets.com/learning-zone"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "provider": {
+            "@type": "Organization",
+            "name": "UnityNets"
+          },
+          "isAccessibleForFree": true,
+          "inLanguage": ["bn", "en"]
+        }}
+      />
       <Navbar />
       
       <main className="pt-24 pb-16">

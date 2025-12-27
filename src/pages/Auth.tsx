@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { User } from "@/lib/storage";
+import { SEOHead } from "@/components/SEOHead";
 
 const Auth = () => {
   const { user, loading } = useAuth();
@@ -37,12 +38,21 @@ const Auth = () => {
   }
 
   return (
-    <Login 
-      onLogin={handleLogin}
-      onRegister={handleRegister}
-      users={[]}
-      defaultMode={defaultMode}
-    />
+    <>
+      <SEOHead
+        title={defaultMode === 'signup' ? "Sign Up - Create Account" : "Login - Sign In"}
+        description="Join UnityNets - বাংলাদেশের প্রথম trust-based community platform। Create your account to connect with local communities, share knowledge, and build trust."
+        keywords="UnityNets login, sign up, create account, register, community platform, বাংলাদেশ"
+        canonicalUrl="https://unitynets.com/auth"
+        noIndex={true}
+      />
+      <Login 
+        onLogin={handleLogin}
+        onRegister={handleRegister}
+        users={[]}
+        defaultMode={defaultMode}
+      />
+    </>
   );
 };
 

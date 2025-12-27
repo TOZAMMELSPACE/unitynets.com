@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserCard } from "@/components/UserCard";
 import { useSocial } from "@/hooks/useSocial";
 import { useSocialDB } from "@/hooks/useSocialDB";
+import { SEOHead } from "@/components/SEOHead";
 
 interface ExploreProps {
   currentUser: User | null;
@@ -52,6 +53,12 @@ export default function Explore({ currentUser, currentUserId, users, onSignOut, 
 
   return (
     <main className="container mx-auto px-4 py-6 max-w-2xl">
+      <SEOHead
+        title="Explore - খুঁজুন ও আবিষ্কার করুন"
+        description="UnityNets এ নতুন মানুষ খুঁজুন, জনপ্রিয় হ্যাশট্যাগ দেখুন, ট্রেন্ডিং কনটেন্ট আবিষ্কার করুন। Discover new connections and trending content in your community."
+        keywords="explore UnityNets, discover users, trending hashtags, community search, বাংলাদেশ সম্প্রদায়"
+        canonicalUrl="https://unitynets.com/explore"
+      />
         <div className="mb-6">
           <div className="relative mb-6">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />

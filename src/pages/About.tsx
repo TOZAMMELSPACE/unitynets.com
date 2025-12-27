@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
+import { SEOHead } from "@/components/SEOHead";
 import { Heart, Globe, Users, Target, Sparkles, BookOpen, Shield, Briefcase, Calendar, MessageCircle, Languages, Send, Mail, User, Code, DollarSign, Lightbulb, CheckCircle, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,6 +64,26 @@ const About = () => {
   };
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="About UnityNets - আমাদের গল্প"
+        description="UnityNets প্রতিষ্ঠাতা Md. Tozammel Haque এর গল্প। জানুন কিভাবে একটি স্বপ্ন থেকে বাংলাদেশের প্রথম trust-based community platform তৈরি হলো। Learn about our mission and vision."
+        keywords="UnityNets founder, Tozammel Haque, about UnityNets, community platform Bangladesh, mission vision, প্রতিষ্ঠাতা"
+        canonicalUrl="https://unitynets.com/about"
+        ogType="profile"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "AboutPage",
+          "mainEntity": {
+            "@type": "Person",
+            "name": "Md. Tozammel Haque",
+            "jobTitle": "Founder & Builder",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "UnityNets"
+            }
+          }
+        }}
+      />
       <Navbar />
       <main className="pt-20">
         {/* Language Toggle */}
