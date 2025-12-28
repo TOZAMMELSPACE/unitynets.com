@@ -5,6 +5,7 @@ import Navbar from "@/components/landing/Navbar";
 import HeroSection from "@/components/landing/HeroSection";
 
 import ContentPreviewSection from "@/components/landing/ContentPreviewSection";
+import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import CTASection from "@/components/landing/CTASection";
@@ -43,6 +44,7 @@ const LandingPage = () => {
         <HeroSection />
         
         <ContentPreviewSection />
+        <HowItWorksSection />
         <FeaturesSection />
         <TestimonialsSection />
         <CTASection />
