@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/landing/Navbar";
 import HeroSection from "@/components/landing/HeroSection";
-import StatsSection from "@/components/landing/StatsSection";
+
 import ContentPreviewSection from "@/components/landing/ContentPreviewSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
@@ -41,7 +41,7 @@ const LandingPage = () => {
       <Navbar />
       <main>
         <HeroSection />
-        <StatsSection />
+        
         <ContentPreviewSection />
         <FeaturesSection />
         <TestimonialsSection />
