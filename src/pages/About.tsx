@@ -100,31 +100,31 @@ const About = () => {
         </div>
 
         {/* Hero Section with Founder Story */}
-        <section className="py-16 md:py-24 bg-gradient-to-br from-primary/10 via-background to-accent/10">
+        <section className="py-12 md:py-16 bg-gradient-to-br from-primary/10 via-background to-accent/10">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center mb-12">
-              <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
+            <div className="max-w-4xl mx-auto text-center mb-8">
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
                 {t("A Dream That Became Reality...", "একটা স্বপ্ন ছিল...")}
               </h1>
-              <p className="text-xl text-muted-foreground">
-                {t("The journey of how UnityNet began", "যেভাবে শুরু হলো UnityNet-এর যাত্রা")}
+              <p className="text-lg text-muted-foreground">
+                {t("The journey of how UnityNets began", "যেভাবে শুরু হলো UnityNets-এর যাত্রা")}
               </p>
             </div>
           </div>
         </section>
 
         {/* Founder Section - Expanded */}
-        <section className="py-16 md:py-20 bg-card/50">
+        <section className="py-10 md:py-14 bg-card/50">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               {/* Founder Info Card */}
-              <div className="bg-gradient-to-br from-primary/5 to-accent/5 border border-border/30 rounded-3xl p-8 md:p-12 mb-16">
+              <div className="bg-gradient-to-br from-primary/5 to-accent/5 border border-border/30 rounded-2xl p-6 md:p-10 mb-10">
                 <div className="grid md:grid-cols-2 gap-10 items-center">
                   <div className="relative">
                     <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl">
                       <img 
                         src={founderImage} 
-                        alt={t("UnityNet Founder - Md. Tozammel Haque", "UnityNet প্রতিষ্ঠাতা - মো. তোজাম্মেল হক")}
+                        alt={t("UnityNets Founder - Md. Tozammel Haque", "UnityNets প্রতিষ্ঠাতা - মো. তোজাম্মেল হক")}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -185,11 +185,11 @@ const About = () => {
         </section>
 
         {/* Founder Story */}
-        <section className="py-16 md:py-20">
+        <section className="py-10 md:py-14">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               {/* Journey Intro */}
-              <div className="space-y-6 mb-16">
+              <div className="space-y-4 mb-10">
                 <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium">
                   <Heart className="w-4 h-4" />
                   <span>{t("My Story", "আমার গল্প")}</span>
@@ -303,7 +303,7 @@ const About = () => {
               </div>
 
               {/* The Decision */}
-              <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-8 md:p-10 mb-12">
+              <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-6 md:p-8 mb-10">
                 <h3 className="text-2xl font-bold text-foreground mb-6">
                   {t("Then one day...", "তারপর একদিন...")}
                 </h3>
@@ -335,18 +335,18 @@ const About = () => {
                 </p>
               </div>
 
-              {/* UnityNet Introduction */}
-              <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              {/* UnityNets Introduction */}
+              <div className="text-center mb-10">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
                   {t("And so, gradually I built —", "আর তাই, ধীরে ধীরে তৈরি করে ফেলেছি —")}
                 </h2>
-                <p className="text-5xl md:text-6xl font-bold text-primary mb-8">
-                  UnityNet
+                <p className="text-4xl md:text-5xl font-bold text-primary mb-6">
+                  UnityNets
                 </p>
               </div>
 
               {/* Features */}
-              <div className="mb-16">
+              <div className="mb-10">
                 <h3 className="text-xl font-semibold text-foreground mb-8 text-center">
                   {t("A platform where:", "একটা প্ল্যাটফর্ম যেখানে:")}
                 </h3>
@@ -409,7 +409,7 @@ const About = () => {
               </div>
 
               {/* Why */}
-              <div className="bg-card border border-border/30 rounded-2xl p-8 md:p-10 mb-12">
+              <div className="bg-card border border-border/30 rounded-2xl p-6 md:p-8 mb-10">
                 <h3 className="text-2xl font-bold text-foreground mb-6">
                   {t("Why did I build this?", "কেন বানালাম?")}
                 </h3>
@@ -429,7 +429,7 @@ const About = () => {
               </div>
 
               {/* Call for Help */}
-              <div className="bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl p-8 md:p-12 text-center mb-12">
+              <div className="bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl p-6 md:p-10 text-center mb-10">
                 <h3 className="text-2xl font-bold text-foreground mb-6">
                   {t("I'm writing this because:", "এই পোস্টটা লিখছি কারণ:")}
                 </h3>
@@ -475,8 +475,8 @@ const About = () => {
               </div>
 
               {/* Contact Form Section */}
-              <div id="contact" className="bg-card border border-border/30 rounded-2xl p-8 md:p-12 mb-12">
-                <div className="text-center mb-10">
+              <div id="contact" className="bg-card border border-border/30 rounded-2xl p-6 md:p-10 mb-10">
+                <div className="text-center mb-8">
                   <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
                     <MessageCircle className="w-4 h-4" />
                     <span>{t("Get in Touch", "যোগাযোগ করুন")}</span>

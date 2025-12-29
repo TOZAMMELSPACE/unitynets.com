@@ -145,7 +145,7 @@ const App = () => (
 export default App;
 
 /**
- * UnityNet - A modern web platform
+ * UnityNets - A modern web platform
  * 
  * @author Tozammel Haque
  * @copyright 2025 Tozammel Haque. All rights reserved.

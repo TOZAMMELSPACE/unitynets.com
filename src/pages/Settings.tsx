@@ -1250,7 +1250,7 @@ export default function Settings({ currentUser, onSignOut }: SettingsProps) {
                 </Button>
                 <Button variant="outline" className="justify-start gap-3">
                   <Mail className="w-4 h-4" />
-                  support@unitynet.app
+                  support@unitynets.app
                 </Button>
                 <Button variant="outline" className="justify-start gap-3">
                   <Bug className="w-4 h-4" />
