@@ -92,21 +92,21 @@ const About = () => {
             variant="outline"
             size="sm"
             onClick={toggleLanguage}
-            className="flex items-center gap-2 bg-background/80 backdrop-blur-sm border-border/50"
+            className="flex items-center gap-2 bg-background backdrop-blur-sm border border-border shadow-sm hover:bg-muted"
           >
-            <Languages className="w-4 h-4" />
+            <Languages className="w-4 h-4 text-primary" />
             {language === "en" ? "বাংলা" : "English"}
           </Button>
         </div>
 
         {/* Hero Section with Founder Story */}
-        <section className="py-12 md:py-16 bg-gradient-to-br from-primary/10 via-background to-accent/10">
+        <section className="py-8 md:py-10 bg-gradient-to-br from-primary/10 via-background to-accent/10">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
+            <div className="max-w-4xl mx-auto text-center mb-4">
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3 leading-tight">
                 {t("A Dream That Became Reality...", "একটা স্বপ্ন ছিল...")}
               </h1>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-base text-muted-foreground">
                 {t("The journey of how UnityNets began", "যেভাবে শুরু হলো UnityNets-এর যাত্রা")}
               </p>
             </div>
@@ -114,12 +114,12 @@ const About = () => {
         </section>
 
         {/* Founder Section - Expanded */}
-        <section className="py-10 md:py-14 bg-card/50">
+        <section className="py-6 md:py-8 bg-card/50">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               {/* Founder Info Card */}
-              <div className="bg-gradient-to-br from-primary/5 to-accent/5 border border-border/30 rounded-2xl p-6 md:p-10 mb-10">
-                <div className="grid md:grid-cols-2 gap-10 items-center">
+              <div className="bg-gradient-to-br from-primary/5 to-accent/5 border border-border/30 rounded-2xl p-5 md:p-8 mb-6">
+                <div className="grid md:grid-cols-2 gap-6 items-center">
                   <div className="relative">
                     <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl">
                       <img 
@@ -185,22 +185,22 @@ const About = () => {
         </section>
 
         {/* Founder Story */}
-        <section className="py-10 md:py-14">
+        <section className="py-6 md:py-8">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               {/* Journey Intro */}
-              <div className="space-y-4 mb-10">
-                <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium">
+              <div className="space-y-3 mb-6">
+                <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm font-medium">
                   <Heart className="w-4 h-4" />
                   <span>{t("My Story", "আমার গল্প")}</span>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground leading-relaxed">
+                <h2 className="text-xl md:text-2xl font-bold text-foreground leading-relaxed">
                   {t(
                     "5 years. I've been working as a computer operator for 5 full years.",
                     "৫ বছর। পুরো ৫ বছর ধরে কম্পিউটার অপারেটরের চাকরি করছি।"
                   )}
                 </h2>
-                <p className="text-muted-foreground leading-relaxed text-lg">
+                <p className="text-muted-foreground leading-relaxed">
                   {t(
                     "1.6 years ago, I came to Dhaka with a dream. I thought maybe something would happen here. Something would change.",
                     "১.৬ বছর আগে স্বপ্ন নিয়ে ঢাকায় এসেছিলাম। ভেবেছিলাম হয়তো এখানে কিছু হবে। কিছু একটা বদলাবে।"
@@ -209,7 +209,7 @@ const About = () => {
               </div>
 
               {/* The Reality */}
-              <div className="bg-card border border-border/30 rounded-2xl p-8 md:p-10 mb-12">
+              <div className="bg-card border border-border/30 rounded-xl p-5 md:p-6 mb-6">
                 <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-3">
                   <Target className="w-6 h-6 text-primary" />
                   {t("Reality is Different", "বাস্তবতা অন্যরকম")}
@@ -226,30 +226,30 @@ const About = () => {
               </div>
 
               {/* The Dream */}
-              <div className="mb-12">
-                <div className="inline-flex items-center gap-2 bg-accent/10 text-accent-foreground px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <div className="mb-6">
+                <div className="inline-flex items-center gap-2 bg-accent/10 text-accent-foreground px-3 py-1.5 rounded-full text-sm font-medium mb-4">
                   <Sparkles className="w-4 h-4" />
                   <span>{t("That dream still lives...", "সেই স্বপ্নটা এখনো আছে...")}</span>
                 </div>
                 
-                <div className="prose prose-lg max-w-none">
-                  <p className="text-muted-foreground leading-relaxed text-lg mb-6">
+                <div className="prose max-w-none">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
                     {t(
                       "I remember dreaming of a different world. A place where people would give time to each other. Where there is trust, love, and empathy.",
                       "মনে আছে, একসময় স্বপ্ন দেখতাম একটা ভিন্ন পৃথিবীর। এমন একটা জায়গার, যেখানে মানুষ মানুষের জন্য সময় দেবে। যেখানে বিশ্বাস আছে, ভালোবাসা আছে, সহানুভূতি আছে।"
                     )}
                   </p>
                   
-                  <p className="text-muted-foreground leading-relaxed text-lg mb-6">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
                     {t(
                       "A platform that wouldn't be toxic like today's social media. Where:",
                       "এমন একটা প্ল্যাটফর্মের, যেটা আজকের দিনের সোশ্যাল মিডিয়ার মতো বিষাক্ত হবে না। যেখানে:"
                     )}
                   </p>
                   
-                  <div className="grid md:grid-cols-2 gap-4 mb-8">
-                    <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4">
-                      <p className="text-foreground">
+                  <div className="grid md:grid-cols-2 gap-3 mb-4">
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+                      <p className="text-foreground text-sm">
                         {t(
                           "Instead of negativity, there will be ",
                           "নেগেটিভিটির বদলে থাকবে "
@@ -257,8 +257,8 @@ const About = () => {
                         <strong>{t("positivity", "পজিটিভিটি")}</strong>
                       </p>
                     </div>
-                    <div className="bg-pink-500/10 border border-pink-500/20 rounded-xl p-4">
-                      <p className="text-foreground">
+                    <div className="bg-pink-500/10 border border-pink-500/20 rounded-lg p-3">
+                      <p className="text-foreground text-sm">
                         {t(
                           "Instead of hatred, there will be ",
                           "হিংসার বদলে থাকবে "
@@ -266,8 +266,8 @@ const About = () => {
                         <strong>{t("love", "ভালোবাসা")}</strong>
                       </p>
                     </div>
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-                      <p className="text-foreground">
+                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                      <p className="text-foreground text-sm">
                         {t(
                           "Instead of hate, there will be ",
                           "ঘৃণার বদলে থাকবে "
@@ -275,8 +275,8 @@ const About = () => {
                         <strong>{t("cooperation", "সহযোগিতা")}</strong>
                       </p>
                     </div>
-                    <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
-                      <p className="text-foreground">
+                    <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
+                      <p className="text-foreground text-sm">
                         {t(
                           "Instead of cringe content, there will be ",
                           "ক্রিন্জ কনটেন্টের বদলে থাকবে "
@@ -286,14 +286,14 @@ const About = () => {
                     </div>
                   </div>
                   
-                  <p className="text-foreground leading-relaxed text-lg font-medium">
+                  <p className="text-foreground leading-relaxed font-medium">
                     {t(
                       "A place where good people will become better. And those who are on the wrong path will gradually change. Become good.",
                       "এমন একটা জায়গা, যেখানে ভালো মানুষ আরও ভালো হবে। আর যারা খারাপ পথে হাঁটছে, তারাও এসে একটু একটু করে বদলে যাবে। ভালো হবে।"
                     )}
                   </p>
                   
-                  <p className="text-muted-foreground leading-relaxed text-lg mt-6">
+                  <p className="text-muted-foreground leading-relaxed mt-4">
                     {t(
                       "Trust in humanity will return. Morality will grow. Society will slowly become beautiful. This dream burned in my heart. Every day.",
                       "মানুষের প্রতি মানুষের বিশ্বাস ফিরে আসবে। নৈতিকতা বাড়বে। সমাজ একটু একটু করে সুন্দর হবে। এই স্বপ্নটা আমার বুকে জ্বলত। প্রতিদিন।"
@@ -303,31 +303,31 @@ const About = () => {
               </div>
 
               {/* The Decision */}
-              <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-6 md:p-8 mb-10">
-                <h3 className="text-2xl font-bold text-foreground mb-6">
+              <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl p-5 md:p-6 mb-6">
+                <h3 className="text-xl font-bold text-foreground mb-4">
                   {t("Then one day...", "তারপর একদিন...")}
                 </h3>
-                <p className="text-foreground leading-relaxed text-lg mb-6">
+                <p className="text-foreground leading-relaxed mb-4">
                   {t(
                     "I decided - what's the point of just dreaming? Between work, staying up night after night, with a tired body - I started working.",
                     "সিদ্ধান্ত নিলাম - শুধু স্বপ্ন দেখে কী হবে? কাজের ফাঁকে ফাঁকে, রাতের পর রাত জেগে, ক্লান্ত শরীর নিয়ে - শুরু করলাম কাজ।"
                   )}
                 </p>
-                <div className="grid md:grid-cols-3 gap-4 mb-6">
-                  <div className="text-center p-4">
-                    <Users className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">{t("No team", "কোনো টিম নেই")}</p>
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  <div className="text-center p-2">
+                    <Users className="w-6 h-6 text-muted-foreground mx-auto mb-1" />
+                    <p className="text-muted-foreground text-sm">{t("No team", "কোনো টিম নেই")}</p>
                   </div>
-                  <div className="text-center p-4">
-                    <span className="text-3xl mb-2 block">💰</span>
-                    <p className="text-muted-foreground">{t("No funding", "কোনো ফান্ডিং নেই")}</p>
+                  <div className="text-center p-2">
+                    <span className="text-xl mb-1 block">💰</span>
+                    <p className="text-muted-foreground text-sm">{t("No funding", "কোনো ফান্ডিং নেই")}</p>
                   </div>
-                  <div className="text-center p-4">
-                    <Globe className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">{t("No big connections", "কোনো বড় কানেকশন নেই")}</p>
+                  <div className="text-center p-2">
+                    <Globe className="w-6 h-6 text-muted-foreground mx-auto mb-1" />
+                    <p className="text-muted-foreground text-sm">{t("No big connections", "কোনো বড় কানেকশন নেই")}</p>
                   </div>
                 </div>
-                <p className="text-primary font-bold text-xl text-center">
+                <p className="text-primary font-bold text-lg text-center">
                   {t(
                     "But there is a dream. And the determination to make that dream come true.",
                     "কিন্তু আছে একটা স্বপ্ন। আর সেই স্বপ্নকে সত্যি করার জেদ।"
@@ -336,71 +336,71 @@ const About = () => {
               </div>
 
               {/* UnityNets Introduction */}
-              <div className="text-center mb-10">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+              <div className="text-center mb-6">
+                <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
                   {t("And so, gradually I built —", "আর তাই, ধীরে ধীরে তৈরি করে ফেলেছি —")}
                 </h2>
-                <p className="text-4xl md:text-5xl font-bold text-primary mb-6">
+                <p className="text-3xl md:text-4xl font-bold text-primary mb-4">
                   UnityNets
                 </p>
               </div>
 
               {/* Features */}
-              <div className="mb-10">
-                <h3 className="text-xl font-semibold text-foreground mb-8 text-center">
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-foreground mb-4 text-center">
                   {t("A platform where:", "একটা প্ল্যাটফর্ম যেখানে:")}
                 </h3>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="bg-card border border-border/30 rounded-xl p-6 text-center hover:shadow-lg transition-shadow">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Target className="w-6 h-6 text-primary" />
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="bg-card border border-border/30 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Target className="w-5 h-5 text-primary" />
                     </div>
-                    <h4 className="font-semibold mb-2">{t("Report Local Issues", "স্থানীয় সমস্যা রিপোর্ট")}</h4>
-                    <p className="text-sm text-muted-foreground">{t("Ward-based issue reporting system", "ওয়ার্ড বেসড সমস্যা রিপোর্টিং সিস্টেম")}</p>
+                    <h4 className="font-semibold text-sm mb-1">{t("Report Local Issues", "স্থানীয় সমস্যা রিপোর্ট")}</h4>
+                    <p className="text-xs text-muted-foreground">{t("Ward-based issue reporting system", "ওয়ার্ড বেসড সমস্যা রিপোর্টিং সিস্টেম")}</p>
                   </div>
                   
-                  <div className="bg-card border border-border/30 rounded-xl p-6 text-center hover:shadow-lg transition-shadow">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <BookOpen className="w-6 h-6 text-primary" />
+                  <div className="bg-card border border-border/30 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <BookOpen className="w-5 h-5 text-primary" />
                     </div>
-                    <h4 className="font-semibold mb-2">{t("AI Learning Zone", "AI Learning Zone")}</h4>
-                    <p className="text-sm text-muted-foreground">{t("Learn new skills with AI assistance", "নতুন স্কিল শিখুন AI-এর সাহায্যে")}</p>
+                    <h4 className="font-semibold text-sm mb-1">{t("AI Learning Zone", "AI Learning Zone")}</h4>
+                    <p className="text-xs text-muted-foreground">{t("Learn new skills with AI assistance", "নতুন স্কিল শিখুন AI-এর সাহায্যে")}</p>
                   </div>
                   
-                  <div className="bg-card border border-border/30 rounded-xl p-6 text-center hover:shadow-lg transition-shadow">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Users className="w-6 h-6 text-primary" />
+                  <div className="bg-card border border-border/30 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Users className="w-5 h-5 text-primary" />
                     </div>
-                    <h4 className="font-semibold mb-2">{t("Community Connect", "কমিউনিটি কানেক্ট")}</h4>
-                    <p className="text-sm text-muted-foreground">{t("Connect with people in your area", "আপনার এলাকার মানুষদের সাথে যুক্ত হন")}</p>
+                    <h4 className="font-semibold text-sm mb-1">{t("Community Connect", "কমিউনিটি কানেক্ট")}</h4>
+                    <p className="text-xs text-muted-foreground">{t("Connect with people in your area", "আপনার এলাকার মানুষদের সাথে যুক্ত হন")}</p>
                   </div>
                   
-                  <div className="bg-card border border-border/30 rounded-xl p-6 text-center hover:shadow-lg transition-shadow">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Shield className="w-6 h-6 text-primary" />
+                  <div className="bg-card border border-border/30 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Shield className="w-5 h-5 text-primary" />
                     </div>
-                    <h4 className="font-semibold mb-2">{t("Trust Score", "ট্রাস্ট স্কোর")}</h4>
-                    <p className="text-sm text-muted-foreground">{t("Find trustworthy people easily", "বিশ্বস্ত মানুষ খুঁজে পান সহজেই")}</p>
+                    <h4 className="font-semibold text-sm mb-1">{t("Trust Score", "ট্রাস্ট স্কোর")}</h4>
+                    <p className="text-xs text-muted-foreground">{t("Find trustworthy people easily", "বিশ্বস্ত মানুষ খুঁজে পান সহজেই")}</p>
                   </div>
                   
-                  <div className="bg-card border border-border/30 rounded-xl p-6 text-center hover:shadow-lg transition-shadow">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Briefcase className="w-6 h-6 text-primary" />
+                  <div className="bg-card border border-border/30 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Briefcase className="w-5 h-5 text-primary" />
                     </div>
-                    <h4 className="font-semibold mb-2">{t("Job Opportunities", "চাকরির সুযোগ")}</h4>
-                    <p className="text-sm text-muted-foreground">{t("Local job board & opportunities", "লোকাল জব বোর্ড ও সুযোগ")}</p>
+                    <h4 className="font-semibold text-sm mb-1">{t("Job Opportunities", "চাকরির সুযোগ")}</h4>
+                    <p className="text-xs text-muted-foreground">{t("Local job board & opportunities", "লোকাল জব বোর্ড ও সুযোগ")}</p>
                   </div>
                   
-                  <div className="bg-card border border-border/30 rounded-xl p-6 text-center hover:shadow-lg transition-shadow">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Calendar className="w-6 h-6 text-primary" />
+                  <div className="bg-card border border-border/30 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Calendar className="w-5 h-5 text-primary" />
                     </div>
-                    <h4 className="font-semibold mb-2">{t("Events", "ইভেন্ট")}</h4>
-                    <p className="text-sm text-muted-foreground">{t("Local events & programs", "স্থানীয় ইভেন্ট ও অনুষ্ঠান")}</p>
+                    <h4 className="font-semibold text-sm mb-1">{t("Events", "ইভেন্ট")}</h4>
+                    <p className="text-xs text-muted-foreground">{t("Local events & programs", "স্থানীয় ইভেন্ট ও অনুষ্ঠান")}</p>
                   </div>
                 </div>
                 
-                <p className="text-center text-muted-foreground mt-8 text-lg">
+                <p className="text-center text-muted-foreground mt-4 text-sm">
                   {t(
                     "A complete ecosystem — just for your community.",
                     "মানে একটা সম্পূর্ণ ইকোসিস্টেম — শুধু আপনার কমিউনিটির জন্য।"
@@ -409,11 +409,11 @@ const About = () => {
               </div>
 
               {/* Why */}
-              <div className="bg-card border border-border/30 rounded-2xl p-6 md:p-8 mb-10">
-                <h3 className="text-2xl font-bold text-foreground mb-6">
+              <div className="bg-card border border-border/30 rounded-xl p-5 md:p-6 mb-6">
+                <h3 className="text-lg font-bold text-foreground mb-3">
                   {t("Why did I build this?", "কেন বানালাম?")}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed text-lg mb-6">
+                <p className="text-muted-foreground leading-relaxed mb-3">
                   {t(
                     "Because there are thousands of people like me — who are stuck. Who have dreams but no path.",
                     "কারণ আমার মতো হাজারো মানুষ আছে — যারা আটকে আছে। যাদের স্বপ্ন আছে কিন্তু পথ নেই।"
