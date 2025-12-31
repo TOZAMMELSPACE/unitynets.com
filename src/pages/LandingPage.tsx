@@ -1,17 +1,25 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/landing/Navbar";
 import HeroSection from "@/components/landing/HeroSection";
-
-import ContentPreviewSection from "@/components/landing/ContentPreviewSection";
-import HowItWorksSection from "@/components/landing/HowItWorksSection";
-import FAQSection from "@/components/landing/FAQSection";
-import FeaturesSection from "@/components/landing/FeaturesSection";
-import TestimonialsSection from "@/components/landing/TestimonialsSection";
-import CTASection from "@/components/landing/CTASection";
-import Footer from "@/components/landing/Footer";
 import SEOHead from "@/components/SEOHead";
+
+// Lazy load below-the-fold sections for faster initial load
+const ContentPreviewSection = lazy(() => import("@/components/landing/ContentPreviewSection"));
+const HowItWorksSection = lazy(() => import("@/components/landing/HowItWorksSection"));
+const FAQSection = lazy(() => import("@/components/landing/FAQSection"));
+const FeaturesSection = lazy(() => import("@/components/landing/FeaturesSection"));
+const TestimonialsSection = lazy(() => import("@/components/landing/TestimonialsSection"));
+const CTASection = lazy(() => import("@/components/landing/CTASection"));
+const Footer = lazy(() => import("@/components/landing/Footer"));
+
+// Minimal loading placeholder
+const SectionLoader = () => (
+  <div className="py-8 flex justify-center">
+    <div className="animate-pulse h-32 w-full max-w-4xl bg-muted/20 rounded-lg" />
+  </div>
+);
 
 const LandingPage = () => {
   const { user, loading } = useAuth();
@@ -44,14 +52,28 @@ const LandingPage = () => {
       <main>
         <HeroSection />
         
-        <ContentPreviewSection />
-        <HowItWorksSection />
-        <FAQSection />
-        <FeaturesSection />
-        <TestimonialsSection />
-        <CTASection />
+        <Suspense fallback={<SectionLoader />}>
+          <ContentPreviewSection />
+        </Suspense>
+        <Suspense fallback={<SectionLoader />}>
+          <HowItWorksSection />
+        </Suspense>
+        <Suspense fallback={<SectionLoader />}>
+          <FAQSection />
+        </Suspense>
+        <Suspense fallback={<SectionLoader />}>
+          <FeaturesSection />
+        </Suspense>
+        <Suspense fallback={<SectionLoader />}>
+          <TestimonialsSection />
+        </Suspense>
+        <Suspense fallback={<SectionLoader />}>
+          <CTASection />
+        </Suspense>
       </main>
-      <Footer />
+      <Suspense fallback={<SectionLoader />}>
+        <Footer />
+      </Suspense>
     </div>
   );
 };
