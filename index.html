@@ -144,39 +144,63 @@
       }
     </style>
     
-    <!-- Defer ad scripts to after page load for better LCP -->
+    <!-- Defer ad scripts to after page is fully interactive -->
     <script>
-      // Load ad scripts after page is interactive
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          // Google AdSense
+      window.ezstandalone = window.ezstandalone || {};
+      ezstandalone.cmd = ezstandalone.cmd || [];
+      
+      // Use requestIdleCallback for non-critical ad scripts
+      function loadAdScripts() {
+        // Only load ads if user has scrolled or after 5 seconds
+        var adsLoaded = false;
+        
+        function loadAds() {
+          if (adsLoaded) return;
+          adsLoaded = true;
+          
+          // Google AdSense - load with lower priority
           var adsScript = document.createElement('script');
           adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1268147765220924';
           adsScript.async = true;
           adsScript.crossOrigin = 'anonymous';
           document.head.appendChild(adsScript);
           
-          // Ezoic Consent
-          var cmpScript = document.createElement('script');
-          cmpScript.src = 'https://cmp.gatekeeperconsent.com/min.js';
-          cmpScript.defer = true;
-          document.head.appendChild(cmpScript);
-          
-          var gkScript = document.createElement('script');
-          gkScript.src = 'https://the.gatekeeperconsent.com/cmp.min.js';
-          gkScript.defer = true;
-          document.head.appendChild(gkScript);
-          
-          // Ezoic Standalone
-          var ezScript = document.createElement('script');
-          ezScript.src = '//www.ezojs.com/ezoic/sa.min.js';
-          ezScript.async = true;
-          document.head.appendChild(ezScript);
-        }, 2000); // 2 second delay for better FCP/LCP
-      });
+          // Ezoic scripts - load after AdSense
+          setTimeout(function() {
+            var ezScript = document.createElement('script');
+            ezScript.src = '//www.ezojs.com/ezoic/sa.min.js';
+            ezScript.async = true;
+            document.head.appendChild(ezScript);
+            
+            var cmpScript = document.createElement('script');
+            cmpScript.src = 'https://cmp.gatekeeperconsent.com/min.js';
+            cmpScript.defer = true;
+            document.head.appendChild(cmpScript);
+            
+            var gkScript = document.createElement('script');
+            gkScript.src = 'https://the.gatekeeperconsent.com/cmp.min.js';
+            gkScript.defer = true;
+            document.head.appendChild(gkScript);
+          }, 1000);
+        }
+        
+        // Load ads on scroll or after 5 seconds
+        var scrollHandler = function() {
+          loadAds();
+          window.removeEventListener('scroll', scrollHandler);
+        };
+        window.addEventListener('scroll', scrollHandler, { passive: true });
+        setTimeout(loadAds, 5000);
+      }
       
-      window.ezstandalone = window.ezstandalone || {};
-      ezstandalone.cmd = ezstandalone.cmd || [];
+      // Wait for page to be idle before loading ad scripts
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadAdScripts, { timeout: 3000 });
+      } else {
+        window.addEventListener('load', function() {
+          setTimeout(loadAdScripts, 1000);
+        });
+      }
     </script>
   </head>
 
