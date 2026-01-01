@@ -8,20 +8,24 @@ const TermsAndConditions = () => {
 
   const sections = [
     {
-      icon: Shield,
+      icon: Globe,
       titleBn: "১. সেবা গ্রহণের শর্তাবলী",
       titleEn: "1. Terms of Service",
-      contentBn: `UnityNets প্ল্যাটফর্ম ব্যবহার করতে হলে আপনাকে অবশ্যই:
+      contentBn: `UnityNets হলো একটি গ্লোবাল প্ল্যাটফর্ম। যেকোনো দেশের মানুষ এখানে যুক্ত হতে পারবেন।
+
+ব্যবহারের শর্তাবলী:
 • কমপক্ষে ১৮ বছর বয়স হতে হবে অথবা অভিভাবকের সম্মতি থাকতে হবে
-• বাংলাদেশের নাগরিক হতে হবে অথবা বৈধ ভিসাধারী হতে হবে
+• বিশ্বের যেকোনো দেশ থেকে যুক্ত হতে পারবেন
 • সঠিক ও সত্য তথ্য প্রদান করতে হবে
 • একটি মাত্র অ্যাকাউন্ট রাখতে পারবেন
 • আপনার অ্যাকাউন্টের নিরাপত্তা বজায় রাখতে হবে
 • শক্তিশালী পাসওয়ার্ড ব্যবহার করতে হবে (কমপক্ষে ৬ অক্ষর)
 • আপনার লগইন তথ্য অন্য কাউকে শেয়ার করবেন না`,
-      contentEn: `To use the UnityNets platform, you must:
+      contentEn: `UnityNets is a global platform. People from any country can join.
+
+Terms of use:
 • Be at least 18 years of age or have parental consent
-• Be a citizen of Bangladesh or hold a valid visa
+• You can join from any country in the world
 • Provide accurate and truthful information
 • Maintain only one account
 • Keep your account secure and confidential
