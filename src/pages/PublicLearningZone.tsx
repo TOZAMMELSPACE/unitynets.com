@@ -31,6 +31,7 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { useNavigate } from "react-router-dom";
+import { LearningChatbot } from "@/components/LearningChatbot";
 
 interface Course {
   id: string;
@@ -271,7 +272,9 @@ export default function PublicLearningZone() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <LearningChatbot />
+      <div className="min-h-screen bg-background">
       <SEOHead
         title="Learning Zone - ফ্রি শেখার প্ল্যাটফর্ম"
         description="UnityNets Learning Zone - বিনামূল্যে প্রোগ্রামিং, ডিজিটাল দক্ষতা, এবং কমিউনিটি কোর্স শিখুন। Free courses on Python, JavaScript, digital literacy and more."
@@ -467,5 +470,6 @@ export default function PublicLearningZone() {
       
       <Footer />
     </div>
+    </>
   );
 }
