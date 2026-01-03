@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { LearningChatbot } from "@/components/LearningChatbot";
 
 interface LearningZoneProps {
   currentUser: User | null;
@@ -230,6 +231,9 @@ export default function LearningZone({ currentUser, onSignOut }: LearningZonePro
 
   return (
     <div className="min-h-screen bg-background">
+      {/* AI Learning Chatbot */}
+      <LearningChatbot />
+      
       {/* Header */}
       <header className="card-enhanced p-4 lg:p-6 mb-6">
         <div>
