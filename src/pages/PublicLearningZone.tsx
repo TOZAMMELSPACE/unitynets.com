@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   BookOpen, 
   Trophy, 
@@ -22,17 +22,32 @@ import {
   BookMarked,
   Play,
   CheckCircle2,
-  ArrowLeft,
   ExternalLink,
-  MessageCircle,
-  Sparkles
+  Sparkles,
+  Send,
+  Bot,
+  User,
+  Lightbulb,
+  RotateCcw,
+  Copy,
+  Check,
+  Loader2,
+  GraduationCap,
+  MessageCircle
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { SEOHead } from "@/components/SEOHead";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+}
 
 interface Course {
   id: string;
@@ -46,7 +61,6 @@ interface Course {
   lessons: number;
   icon: any;
   color: string;
-  prerequisites?: string;
 }
 
 interface Book {
@@ -63,91 +77,68 @@ interface Book {
   coverColor: string;
 }
 
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/learning-chat`;
+
+const suggestedQuestions = [
+  { text: "পাইথন প্রোগ্রামিং শিখতে চাই", icon: Code, color: "from-blue-500 to-cyan-500" },
+  { text: "ওয়েব ডেভেলপমেন্ট কিভাবে শুরু করব?", icon: Globe, color: "from-purple-500 to-pink-500" },
+  { text: "AI কিভাবে কাজ করে?", icon: Sparkles, color: "from-amber-500 to-orange-500" },
+  { text: "ফ্রিল্যান্সিং শুরু করতে কি লাগে?", icon: Lightbulb, color: "from-green-500 to-emerald-500" },
+];
+
 const courses: Course[] = [
   {
     id: "python-basics",
-    title: "Python Programming Basics",
-    titleBn: "পাইথন প্রোগ্রামিং বেসিক",
-    description: "Learn Python from scratch with hands-on coding exercises",
-    descriptionBn: "হাতে-কলমে কোডিং অনুশীলনের মাধ্যমে পাইথন শিখুন",
+    title: "Python Programming",
+    titleBn: "পাইথন প্রোগ্রামিং",
+    description: "Learn Python from scratch",
+    descriptionBn: "শুরু থেকে পাইথন শিখুন",
     category: "programming",
     difficulty: "beginner",
     duration: "4 weeks",
     lessons: 20,
     icon: Code,
     color: "from-blue-500 to-cyan-500",
-    prerequisites: "None"
   },
   {
     id: "javascript-web",
-    title: "JavaScript & Web Development",
-    titleBn: "জাভাস্ক্রিপ্ট এবং ওয়েব ডেভেলপমেন্ট",
-    description: "Build interactive websites with JavaScript, HTML, and CSS",
-    descriptionBn: "জাভাস্ক্রিপ্ট, HTML এবং CSS দিয়ে ইন্টারঅ্যাক্টিভ ওয়েবসাইট তৈরি করুন",
+    title: "Web Development",
+    titleBn: "ওয়েব ডেভেলপমেন্ট",
+    description: "Build websites with JS",
+    descriptionBn: "JS দিয়ে ওয়েবসাইট বানান",
     category: "programming",
     difficulty: "intermediate",
     duration: "6 weeks",
     lessons: 30,
     icon: Globe,
     color: "from-yellow-500 to-orange-500",
-    prerequisites: "Basic HTML/CSS knowledge"
   },
   {
     id: "digital-literacy",
-    title: "Digital Literacy & Online Safety",
-    titleBn: "ডিজিটাল সাক্ষরতা এবং অনলাইন নিরাপত্তা",
-    description: "Master essential digital skills and stay safe online",
-    descriptionBn: "প্রয়োজনীয় ডিজিটাল দক্ষতা আয়ত্ত করুন এবং অনলাইনে নিরাপদ থাকুন",
+    title: "Digital Literacy",
+    titleBn: "ডিজিটাল সাক্ষরতা",
+    description: "Essential digital skills",
+    descriptionBn: "প্রয়োজনীয় ডিজিটাল দক্ষতা",
     category: "digital-skills",
     difficulty: "beginner",
     duration: "3 weeks",
     lessons: 15,
     icon: Award,
     color: "from-purple-500 to-pink-500",
-    prerequisites: "None"
   },
   {
     id: "community-civic",
-    title: "Community Skills & Civic Education",
-    titleBn: "কমিউনিটি দক্ষতা এবং নাগরিক শিক্ষা",
-    description: "Learn about local governance, rights, and community participation",
-    descriptionBn: "স্থানীয় শাসন, অধিকার এবং কমিউনিটি অংশগ্রহণ সম্পর্কে জানুন",
+    title: "Community Skills",
+    titleBn: "কমিউনিটি দক্ষতা",
+    description: "Civic education basics",
+    descriptionBn: "নাগরিক শিক্ষা",
     category: "community",
     difficulty: "beginner",
     duration: "2 weeks",
     lessons: 10,
     icon: Users,
     color: "from-green-500 to-teal-500",
-    prerequisites: "None"
   },
-  {
-    id: "bengali-advanced",
-    title: "Advanced Bengali Language & Literature",
-    titleBn: "উন্নত বাংলা ভাষা এবং সাহিত্য",
-    description: "Enhance your Bengali writing skills and explore literature",
-    descriptionBn: "আপনার বাংলা লেখার দক্ষতা বৃদ্ধি করুন এবং সাহিত্য অন্বেষণ করুন",
-    category: "language",
-    difficulty: "intermediate",
-    duration: "5 weeks",
-    lessons: 25,
-    icon: BookMarked,
-    color: "from-red-500 to-rose-500",
-    prerequisites: "Basic Bengali reading/writing"
-  },
-  {
-    id: "mobile-app",
-    title: "Mobile App Development",
-    titleBn: "মোবাইল অ্যাপ ডেভেলপমেন্ট",
-    description: "Build mobile apps using React Native",
-    descriptionBn: "React Native ব্যবহার করে মোবাইল অ্যাপ তৈরি করুন",
-    category: "programming",
-    difficulty: "advanced",
-    duration: "8 weeks",
-    lessons: 40,
-    icon: Code,
-    color: "from-indigo-500 to-purple-500",
-    prerequisites: "JavaScript knowledge"
-  }
 ];
 
 const freeBooks: Book[] = [
@@ -157,8 +148,8 @@ const freeBooks: Book[] = [
     titleBn: "মানুষ না মনুষ্যরূপী?",
     author: "Md. Tozammel Haque",
     authorBn: "মোঃ তোজাম্মেল হক",
-    description: "A sci-fi novel set in future New Earth City, where at age 25, everyone must take a 'Humanity Scan' to determine if they are truly human or just acting like one.",
-    descriptionBn: "ভবিষ্যতের নিউ আর্থ সিটিতে সেট করা একটি সাই-ফাই উপন্যাস, যেখানে ২৫ বছর বয়সে সবাইকে 'মানবতা স্ক্যান' দিতে হয়।",
+    description: "A sci-fi novel set in future New Earth City",
+    descriptionBn: "ভবিষ্যতের নিউ আর্থ সিটিতে সেট করা একটি সাই-ফাই উপন্যাস",
     chapters: 12,
     category: "sci-fi",
     link: "https://sites.google.com/view/tozammelbook/home",
@@ -166,94 +157,138 @@ const freeBooks: Book[] = [
   }
 ];
 
-const CourseCard = ({ course, onEnroll }: { course: Course; onEnroll: () => void }) => {
-  const { t } = useLanguage();
-  const Icon = course.icon;
-  
-  return (
-    <Card className="p-6 hover:shadow-lg transition-all duration-300 border-border/50">
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${course.color} flex items-center justify-center shrink-0`}>
-          <Icon className="w-8 h-8 text-white" />
-        </div>
-        
-        <div className="flex-1 space-y-3">
-          <div>
-            <h3 className="font-semibold text-lg">{t(course.title, course.titleBn)}</h3>
-            <p className="text-sm text-muted-foreground">{t(course.description, course.descriptionBn)}</p>
-          </div>
-          
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary" className="text-xs">
-              <Clock className="w-3 h-3 mr-1" />
-              {course.duration}
-            </Badge>
-            <Badge variant="outline" className="text-xs">
-              {course.lessons} {t("lessons", "লেসন")}
-            </Badge>
-            <Badge 
-              variant="outline" 
-              className={`text-xs ${
-                course.difficulty === "beginner" ? "text-green-600 border-green-600" :
-                course.difficulty === "intermediate" ? "text-yellow-600 border-yellow-600" :
-                "text-red-600 border-red-600"
-              }`}
-            >
-              {t(
-                course.difficulty === "beginner" ? "Beginner" : 
-                course.difficulty === "intermediate" ? "Intermediate" : "Advanced",
-                course.difficulty === "beginner" ? "শুরুর পর্যায়" : 
-                course.difficulty === "intermediate" ? "মধ্যবর্তী" : "উন্নত"
-              )}
-            </Badge>
-          </div>
-          
-          <Button onClick={onEnroll} className="w-full sm:w-auto">
-            <Play className="w-4 h-4 mr-2" />
-            {t("Enroll Now", "ভর্তি হন")}
-          </Button>
-        </div>
-      </div>
-    </Card>
-  );
-};
-
-const BookCard = ({ book }: { book: Book }) => {
-  const { t } = useLanguage();
-  
-  return (
-    <Card className="p-4 hover:shadow-lg transition-all">
-      <div className="flex gap-4">
-        <div className={`w-20 h-28 rounded-lg bg-gradient-to-br ${book.coverColor} flex items-center justify-center shrink-0`}>
-          <BookOpen className="w-8 h-8 text-white" />
-        </div>
-        
-        <div className="flex-1 space-y-2">
-          <h4 className="font-semibold">{t(book.title, book.titleBn)}</h4>
-          <p className="text-sm text-muted-foreground">{t(book.author, book.authorBn)}</p>
-          <p className="text-xs text-muted-foreground line-clamp-2">{t(book.description, book.descriptionBn)}</p>
-          
-          <a 
-            href={book.link} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-          >
-            {t("Read Now", "পড়ুন")}
-            <ExternalLink className="w-3 h-3" />
-          </a>
-        </div>
-      </div>
-    </Card>
-  );
-};
-
 export default function PublicLearningZone() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedDifficulty, setSelectedDifficulty] = useState("all");
+  
+  // Chat state
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + "px";
+    }
+  }, [input]);
+
+  const streamChat = async (userMessages: Message[]) => {
+    const apiMessages = userMessages.map(m => ({ role: m.role, content: m.content }));
+    
+    const resp = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ messages: apiMessages }),
+    });
+
+    if (!resp.ok) {
+      const errorData = await resp.json().catch(() => ({}));
+      throw new Error(errorData.error || "Failed to get response");
+    }
+
+    if (!resp.body) throw new Error("No response body");
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let textBuffer = "";
+    let assistantContent = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      
+      textBuffer += decoder.decode(value, { stream: true });
+
+      let newlineIndex: number;
+      while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+        let line = textBuffer.slice(0, newlineIndex);
+        textBuffer = textBuffer.slice(newlineIndex + 1);
+
+        if (line.endsWith("\r")) line = line.slice(0, -1);
+        if (line.startsWith(":") || line.trim() === "") continue;
+        if (!line.startsWith("data: ")) continue;
+
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === "[DONE]") break;
+
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+          if (content) {
+            assistantContent += content;
+            setMessages(prev => {
+              const last = prev[prev.length - 1];
+              if (last?.role === "assistant") {
+                return prev.map((m, i) => 
+                  i === prev.length - 1 ? { ...m, content: assistantContent } : m
+                );
+              }
+              return [...prev, { role: "assistant", content: assistantContent, timestamp: new Date() }];
+            });
+          }
+        } catch {
+          textBuffer = line + "\n" + textBuffer;
+          break;
+        }
+      }
+    }
+  };
+
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || isLoading) return;
+
+    const userMsg: Message = { role: "user", content: text.trim(), timestamp: new Date() };
+    setMessages(prev => [...prev, userMsg]);
+    setInput("");
+    setIsLoading(true);
+
+    try {
+      await streamChat([...messages, userMsg]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages(prev => [
+        ...prev,
+        { 
+          role: "assistant", 
+          content: error instanceof Error ? error.message : "দুঃখিত, একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।",
+          timestamp: new Date()
+        }
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage(input);
+    }
+  };
+
+  const copyToClipboard = async (text: string, index: number) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const resetChat = () => {
+    setMessages([]);
+    setInput("");
+  };
 
   const handleEnroll = () => {
     toast({
@@ -263,222 +298,371 @@ export default function PublicLearningZone() {
     navigate('/auth?mode=signup');
   };
 
-  const filteredCourses = courses.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         course.titleBn.includes(searchQuery);
-    const matchesCategory = selectedCategory === "all" || course.category === selectedCategory;
-    const matchesDifficulty = selectedDifficulty === "all" || course.difficulty === selectedDifficulty;
-    
-    return matchesSearch && matchesCategory && matchesDifficulty;
-  });
-
   return (
-    <>
-      {/* AI Learning Chat Button */}
-      <Link to="/learn-chat">
-        <Button
-          className="fixed bottom-6 right-6 z-50 rounded-full h-14 px-5 shadow-lg bg-gradient-to-r from-primary to-accent hover:scale-105 transition-all duration-300 gap-2"
-        >
-          <Sparkles className="w-5 h-5" />
-          <span className="hidden sm:inline">{t("Ask AI", "AI জিজ্ঞাসা")}</span>
-        </Button>
-      </Link>
-      <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       <SEOHead
-        title="Learning Zone - ফ্রি শেখার প্ল্যাটফর্ম"
-        description="UnityNets Learning Zone - বিনামূল্যে প্রোগ্রামিং, ডিজিটাল দক্ষতা, এবং কমিউনিটি কোর্স শিখুন। Free courses on Python, JavaScript, digital literacy and more."
-        keywords="learning zone, free courses, programming, Python, JavaScript, digital skills, বাংলা কোর্স, ফ্রি শেখা, UnityNets"
+        title="Learning Zone - ফ্রি শেখার প্ল্যাটফর্ম | AI Learning Buddy"
+        description="UnityNets Learning Zone - AI চ্যাটবট দিয়ে যেকোনো বিষয়ে শিখুন। বিনামূল্যে প্রোগ্রামিং, ডিজিটাল দক্ষতা কোর্স।"
+        keywords="learning zone, AI chatbot, free courses, programming, Python, JavaScript, digital skills, বাংলা কোর্স"
         canonicalUrl="https://unitynets.com/learning-zone"
-        structuredData={{
-          "@context": "https://schema.org",
-          "@type": "Course",
-          "provider": {
-            "@type": "Organization",
-            "name": "UnityNets"
-          },
-          "isAccessibleForFree": true,
-          "inLanguage": ["bn", "en"]
-        }}
       />
       <Navbar />
       
-      <main className="pt-24 pb-16">
+      <main className="pt-20 pb-16">
         <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-              <BookOpen className="w-4 h-4 mr-2" />
-              {t("Free Learning Platform", "ফ্রি লার্নিং প্ল্যাটফর্ম")}
-            </Badge>
-            <h1 className="text-3xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                {t("Learning Zone", "লার্নিং জোন")}
-              </span>
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t(
-                "Enhance your skills with free courses and resources from the UnityNets community",
-                "UnityNets কমিউনিটি থেকে বিনামূল্যে কোর্স এবং রিসোর্স দিয়ে আপনার দক্ষতা বৃদ্ধি করুন"
-              )}
-            </p>
-          </div>
+          
+          {/* Hero Section with AI Chat */}
+          <div className="max-w-4xl mx-auto mb-16">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <Badge className="mb-4 bg-gradient-to-r from-primary/20 to-accent/20 text-primary border-0">
+                <Sparkles className="w-4 h-4 mr-2" />
+                {t("AI-Powered Learning", "AI চালিত শিক্ষা")}
+              </Badge>
+              <h1 className="text-3xl md:text-5xl font-bold mb-4">
+                <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                  Learning Buddy
+                </span>
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+                {t(
+                  "Ask me anything - I'll help you learn step by step in Bengali!",
+                  "যেকোনো প্রশ্ন করো — আমি বাংলায় ধাপে ধাপে শিখতে সাহায্য করব!"
+                )}
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Search and Filters */}
-              <Card className="p-6">
-                <div className="space-y-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder={t("Search courses...", "কোর্স খুঁজুন...")}
-                      className="pl-10"
-                    />
+            {/* Chat Interface */}
+            <Card className="border-2 border-primary/20 shadow-xl overflow-hidden">
+              {/* Chat Header */}
+              <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary/5 to-accent/5">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                    <Bot className="h-5 w-5 text-primary-foreground" />
                   </div>
-                  
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder={t("Category", "ক্যাটাগরি")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">{t("All Categories", "সব ক্যাটাগরি")}</SelectItem>
-                        <SelectItem value="programming">{t("Programming", "প্রোগ্রামিং")}</SelectItem>
-                        <SelectItem value="digital-skills">{t("Digital Skills", "ডিজিটাল দক্ষতা")}</SelectItem>
-                        <SelectItem value="community">{t("Community", "কমিউনিটি")}</SelectItem>
-                        <SelectItem value="language">{t("Language", "ভাষা")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder={t("Difficulty", "কঠিনতা")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">{t("All Levels", "সব লেভেল")}</SelectItem>
-                        <SelectItem value="beginner">{t("Beginner", "শুরুর পর্যায়")}</SelectItem>
-                        <SelectItem value="intermediate">{t("Intermediate", "মধ্যবর্তী")}</SelectItem>
-                        <SelectItem value="advanced">{t("Advanced", "উন্নত")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Courses List */}
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                  <Target className="w-5 h-5 text-primary" />
-                  {t("Available Courses", "উপলব্ধ কোর্স")} ({filteredCourses.length})
-                </h2>
-                
-                {filteredCourses.map((course) => (
-                  <CourseCard
-                    key={course.id}
-                    course={course}
-                    onEnroll={handleEnroll}
-                  />
-                ))}
-              </div>
-
-              {/* Free Books */}
-              <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
-                <div className="flex items-center gap-3 mb-6">
-                  <BookMarked className="w-6 h-6 text-primary" />
                   <div>
-                    <h2 className="text-xl font-bold">{t("Free Reading Library", "ফ্রি পড়ার লাইব্রেরি")}</h2>
-                    <p className="text-sm text-muted-foreground">
-                      {t("Explore free books and novels from our community", "কমিউনিটি থেকে ফ্রি বই এবং উপন্যাস পড়ুন")}
+                    <h2 className="font-semibold">Learning Buddy</h2>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                      {t("Online - Ready to help", "অনলাইন - সাহায্যে আছি")}
                     </p>
                   </div>
                 </div>
-                
-                <div className="grid gap-4">
-                  {freeBooks.map((book) => (
-                    <BookCard key={book.id} book={book} />
-                  ))}
-                </div>
-              </Card>
-            </div>
+                {messages.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={resetChat} className="gap-2">
+                    <RotateCcw className="h-4 w-4" />
+                    <span className="hidden sm:inline">{t("New Chat", "নতুন চ্যাট")}</span>
+                  </Button>
+                )}
+              </div>
 
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Stats Card */}
-              <Card className="p-6 bg-gradient-to-br from-primary/10 to-accent/10">
-                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-primary" />
-                  {t("Platform Stats", "প্ল্যাটফর্ম স্ট্যাটস")}
-                </h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-background rounded-lg">
-                    <span className="text-sm text-muted-foreground">{t("Total Courses", "মোট কোর্স")}</span>
-                    <span className="font-bold text-xl text-primary">{courses.length}</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-background rounded-lg">
-                    <span className="text-sm text-muted-foreground">{t("Active Learners", "সক্রিয় শিক্ষার্থী")}</span>
-                    <span className="font-bold text-xl text-primary">500+</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-background rounded-lg">
-                    <span className="text-sm text-muted-foreground">{t("Free Books", "ফ্রি বই")}</span>
-                    <span className="font-bold text-xl text-primary">{freeBooks.length}</span>
-                  </div>
-                </div>
-              </Card>
+              {/* Chat Messages */}
+              <ScrollArea className="h-[400px] p-4" ref={scrollRef}>
+                {messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                    <div className="relative mb-6">
+                      <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                        <MessageCircle className="h-8 w-8 text-primary" />
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-xl font-semibold mb-2">
+                      {t("Hello! 👋", "হ্যালো বন্ধু! 👋")}
+                    </h3>
+                    <p className="text-muted-foreground text-sm mb-6 max-w-md">
+                      {t(
+                        "I can help you learn about any topic. Ask me anything!",
+                        "যেকোনো বিষয়ে শিখতে আমাকে জিজ্ঞাসা করো!"
+                      )}
+                    </p>
 
-              {/* Achievements Preview */}
-              <Card className="p-6">
-                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-warning" />
-                  {t("Earn Badges", "ব্যাজ অর্জন করুন")}
-                </h3>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
-                      <Star className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{t("First Course", "প্রথম কোর্স")}</p>
-                      <p className="text-xs text-muted-foreground">{t("Complete your first course", "প্রথম কোর্স সম্পন্ন করুন")}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                      <Flame className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{t("7 Day Streak", "৭ দিনের স্ট্রিক")}</p>
-                      <p className="text-xs text-muted-foreground">{t("Learn for 7 days straight", "টানা ৭ দিন শিখুন")}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg">
+                      {suggestedQuestions.map((q, i) => (
+                        <button
+                          key={i}
+                          onClick={() => sendMessage(q.text)}
+                          className={cn(
+                            "flex items-center gap-3 p-3 rounded-xl",
+                            "bg-muted/50 hover:bg-muted border border-border/50",
+                            "text-left transition-all duration-200 hover:shadow-sm"
+                          )}
+                        >
+                          <div className={cn(
+                            "h-8 w-8 rounded-lg bg-gradient-to-br flex items-center justify-center shrink-0",
+                            q.color
+                          )}>
+                            <q.icon className="h-4 w-4 text-white" />
+                          </div>
+                          <span className="text-sm">{q.text}</span>
+                        </button>
+                      ))}
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
-                      <CheckCircle2 className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{t("Course Master", "কোর্স মাস্টার")}</p>
-                      <p className="text-xs text-muted-foreground">{t("Complete 5 courses", "৫টি কোর্স সম্পন্ন করুন")}</p>
-                    </div>
+                ) : (
+                  <div className="space-y-4">
+                    {messages.map((msg, i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "flex gap-3",
+                          msg.role === "user" ? "flex-row-reverse" : ""
+                        )}
+                      >
+                        <div className={cn(
+                          "h-8 w-8 rounded-full flex items-center justify-center shrink-0",
+                          msg.role === "user" 
+                            ? "bg-primary text-primary-foreground" 
+                            : "bg-gradient-to-br from-primary/20 to-accent/20"
+                        )}>
+                          {msg.role === "user" ? (
+                            <User className="h-4 w-4" />
+                          ) : (
+                            <Bot className="h-4 w-4 text-primary" />
+                          )}
+                        </div>
+
+                        <div className={cn(
+                          "flex-1 max-w-[85%]",
+                          msg.role === "user" ? "flex flex-col items-end" : ""
+                        )}>
+                          <div className={cn(
+                            "rounded-2xl px-4 py-3",
+                            msg.role === "user"
+                              ? "bg-primary text-primary-foreground rounded-tr-sm"
+                              : "bg-muted rounded-tl-sm"
+                          )}>
+                            <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                              {msg.content}
+                            </p>
+                          </div>
+                          
+                          {msg.role === "assistant" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 mt-1 text-xs text-muted-foreground"
+                              onClick={() => copyToClipboard(msg.content, i)}
+                            >
+                              {copiedIndex === i ? (
+                                <><Check className="h-3 w-3 mr-1" />{t("Copied", "কপি হয়েছে")}</>
+                              ) : (
+                                <><Copy className="h-3 w-3 mr-1" />{t("Copy", "কপি")}</>
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
+                    {isLoading && messages[messages.length - 1]?.role === "user" && (
+                      <div className="flex gap-3">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                          <Bot className="h-4 w-4 text-primary" />
+                        </div>
+                        <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                            <span className="text-sm text-muted-foreground">
+                              {t("Thinking...", "ভাবছি...")}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-                
-                <Button className="w-full mt-4" onClick={() => navigate('/auth?mode=signup')}>
-                  {t("Join to Start Learning", "শেখা শুরু করতে জয়েন করুন")}
-                </Button>
-              </Card>
-            </div>
+                )}
+              </ScrollArea>
+
+              {/* Input Area */}
+              <div className="p-4 border-t bg-background">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    sendMessage(input);
+                  }}
+                  className="flex items-end gap-2"
+                >
+                  <div className="flex-1 relative">
+                    <Textarea
+                      ref={textareaRef}
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder={t("Ask me anything...", "যেকোনো প্রশ্ন করো...")}
+                      disabled={isLoading}
+                      rows={1}
+                      className="min-h-[44px] max-h-[120px] resize-none pr-12 rounded-xl border-border/50 focus:border-primary/50"
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    size="icon"
+                    disabled={!input.trim() || isLoading}
+                    className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
+                </form>
+                <p className="text-xs text-center text-muted-foreground mt-2">
+                  {t("Learning Buddy can make mistakes. Verify important info.", "Learning Buddy ভুল করতে পারে।")}
+                </p>
+              </div>
+            </Card>
           </div>
+
+          {/* Courses Section */}
+          <section className="mb-16">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">
+                {t("Free Courses", "ফ্রি কোর্স")}
+              </h2>
+              <p className="text-muted-foreground">
+                {t("Start learning with structured courses", "কাঠামোবদ্ধ কোর্স দিয়ে শেখা শুরু করুন")}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {courses.map((course) => {
+                const Icon = course.icon;
+                return (
+                  <Card key={course.id} className="p-5 hover:shadow-lg transition-all group cursor-pointer" onClick={handleEnroll}>
+                    <div className={cn(
+                      "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center mb-4",
+                      course.color
+                    )}>
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">
+                      {t(course.title, course.titleBn)}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t(course.description, course.descriptionBn)}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Clock className="w-3 h-3" />
+                      <span>{course.duration}</span>
+                      <span>•</span>
+                      <span>{course.lessons} {t("lessons", "লেসন")}</span>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+
+            <div className="text-center mt-6">
+              <Button variant="outline" onClick={handleEnroll} className="gap-2">
+                <GraduationCap className="w-4 h-4" />
+                {t("View All Courses", "সব কোর্স দেখুন")}
+              </Button>
+            </div>
+          </section>
+
+          {/* Free Books Section */}
+          <section className="mb-16">
+            <Card className="p-6 md:p-8 bg-gradient-to-br from-primary/5 via-background to-accent/5 border-primary/20">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <BookMarked className="w-5 h-5 text-primary" />
+                    <h2 className="text-xl font-bold">{t("Free Reading", "ফ্রি পড়া")}</h2>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">{freeBooks[0].titleBn}</h3>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    {t("by", "লেখক:")} {freeBooks[0].authorBn}
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {t(freeBooks[0].description, freeBooks[0].descriptionBn)}
+                  </p>
+                  <a 
+                    href={freeBooks[0].link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <Button className="gap-2">
+                      <BookOpen className="w-4 h-4" />
+                      {t("Read Now", "পড়ুন")}
+                      <ExternalLink className="w-3 h-3" />
+                    </Button>
+                  </a>
+                </div>
+                <div className={cn(
+                  "w-32 h-44 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0",
+                  freeBooks[0].coverColor
+                )}>
+                  <BookOpen className="w-12 h-12 text-white/80" />
+                </div>
+              </div>
+            </Card>
+          </section>
+
+          {/* Stats Section */}
+          <section className="mb-16">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="p-6 text-center">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-primary" />
+                </div>
+                <div className="text-2xl font-bold text-primary">{courses.length}+</div>
+                <div className="text-sm text-muted-foreground">{t("Free Courses", "ফ্রি কোর্স")}</div>
+              </Card>
+              
+              <Card className="p-6 text-center">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-accent/10 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-accent" />
+                </div>
+                <div className="text-2xl font-bold text-accent">500+</div>
+                <div className="text-sm text-muted-foreground">{t("Learners", "শিক্ষার্থী")}</div>
+              </Card>
+              
+              <Card className="p-6 text-center">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-500/10 flex items-center justify-center">
+                  <Bot className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="text-2xl font-bold text-green-600">24/7</div>
+                <div className="text-sm text-muted-foreground">{t("AI Support", "AI সাপোর্ট")}</div>
+              </Card>
+              
+              <Card className="p-6 text-center">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-amber-500/10 flex items-center justify-center">
+                  <Trophy className="w-6 h-6 text-amber-600" />
+                </div>
+                <div className="text-2xl font-bold text-amber-600">100%</div>
+                <div className="text-sm text-muted-foreground">{t("Free Forever", "চিরকাল ফ্রি")}</div>
+              </Card>
+            </div>
+          </section>
+
+          {/* CTA Section */}
+          <section className="text-center">
+            <Card className="p-8 md:p-12 bg-gradient-to-r from-primary to-accent text-primary-foreground">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                {t("Ready to Start Learning?", "শেখা শুরু করতে প্রস্তুত?")}
+              </h2>
+              <p className="text-lg opacity-90 mb-6 max-w-xl mx-auto">
+                {t(
+                  "Join thousands of learners and start your journey today!",
+                  "হাজারো শিক্ষার্থীদের সাথে আজই আপনার যাত্রা শুরু করুন!"
+                )}
+              </p>
+              <Button 
+                size="lg" 
+                variant="secondary" 
+                onClick={() => navigate('/auth?mode=signup')}
+                className="gap-2"
+              >
+                <GraduationCap className="w-5 h-5" />
+                {t("Join Now - It's Free", "এখনই জয়েন করুন - ফ্রি")}
+              </Button>
+            </Card>
+          </section>
         </div>
       </main>
       
       <Footer />
     </div>
-    </>
   );
 }

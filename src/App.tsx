@@ -28,7 +28,6 @@ const About = lazy(() => import("./pages/About"));
 const Donation = lazy(() => import("./pages/Donation"));
 const PublicLearningZone = lazy(() => import("./pages/PublicLearningZone"));
 const PublicFeed = lazy(() => import("./pages/PublicFeed"));
-const LearnChat = lazy(() => import("./pages/LearnChat"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -111,13 +110,6 @@ const App = () => (
             <Route path="/feed" element={
               <Suspense fallback={<PageLoader />}>
                 <PublicFeed />
-              </Suspense>
-            } />
-            
-            {/* AI Learning Chat - Full page ChatGPT-like interface */}
-            <Route path="/learn-chat" element={
-              <Suspense fallback={<PageLoader />}>
-                <LearnChat />
               </Suspense>
             } />
             
