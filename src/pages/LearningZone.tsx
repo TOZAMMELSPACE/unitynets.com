@@ -24,11 +24,13 @@ import {
   Users,
   BookMarked,
   Play,
-  CheckCircle2
+  CheckCircle2,
+  MessageCircle,
+  Sparkles
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { LearningChatbot } from "@/components/LearningChatbot";
+import { Link } from "react-router-dom";
 
 interface LearningZoneProps {
   currentUser: User | null;
@@ -231,8 +233,15 @@ export default function LearningZone({ currentUser, onSignOut }: LearningZonePro
 
   return (
     <div className="min-h-screen bg-background">
-      {/* AI Learning Chatbot */}
-      <LearningChatbot />
+      {/* AI Learning Chat Button */}
+      <Link to="/learn-chat">
+        <Button
+          className="fixed bottom-6 right-6 z-50 rounded-full h-14 px-5 shadow-lg bg-gradient-to-r from-primary to-accent hover:scale-105 transition-all duration-300 gap-2"
+        >
+          <Sparkles className="w-5 h-5" />
+          <span className="hidden sm:inline">{t("Ask AI", "AI জিজ্ঞাসা")}</span>
+        </Button>
+      </Link>
       
       {/* Header */}
       <header className="card-enhanced p-4 lg:p-6 mb-6">
