@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import "@/types/speech.d.ts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +34,9 @@ import {
   Check,
   Loader2,
   GraduationCap,
-  MessageCircle
+  MessageCircle,
+  Mic,
+  MicOff
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -178,8 +181,64 @@ export default function PublicLearningZone() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<typeof window.SpeechRecognition.prototype | null>(null);
+
+  // Check for Web Speech API support
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      setSpeechSupported(true);
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'bn-BD'; // Bengali language
+      
+      recognition.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map(result => result[0].transcript)
+          .join('');
+        setInput(transcript);
+      };
+      
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        if (event.error === 'not-allowed') {
+          toast({
+            title: t("Microphone Access Required", "মাইক্রোফোন অ্যাক্সেস প্রয়োজন"),
+            description: t("Please allow microphone access to use voice input", "ভয়েস ইনপুট ব্যবহার করতে মাইক্রোফোন অ্যাক্সেস দিন"),
+            variant: "destructive"
+          });
+        }
+      };
+      
+      recognitionRef.current = recognition;
+    }
+  }, [t]);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) return;
+    
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (error) {
+        console.error('Failed to start speech recognition:', error);
+      }
+    }
+  };
 
   // Save messages to localStorage whenever they change
   useEffect(() => {
@@ -511,11 +570,31 @@ export default function PublicLearningZone() {
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
                       placeholder={t("Ask me anything...", "যেকোনো প্রশ্ন করো...")}
-                      disabled={isLoading}
+                      disabled={isLoading || isListening}
                       rows={1}
                       className="min-h-[44px] max-h-[120px] resize-none pr-12 rounded-xl border-border/50 focus:border-primary/50"
                     />
                   </div>
+                  {speechSupported && (
+                    <Button 
+                      type="button"
+                      size="icon"
+                      variant={isListening ? "destructive" : "outline"}
+                      onClick={toggleListening}
+                      disabled={isLoading}
+                      className={cn(
+                        "h-11 w-11 shrink-0 rounded-xl transition-all",
+                        isListening && "animate-pulse"
+                      )}
+                      title={isListening ? t("Stop listening", "শোনা বন্ধ করুন") : t("Voice input", "ভয়েস ইনপুট")}
+                    >
+                      {isListening ? (
+                        <MicOff className="h-4 w-4" />
+                      ) : (
+                        <Mic className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
                   <Button 
                     type="submit" 
                     size="icon"
