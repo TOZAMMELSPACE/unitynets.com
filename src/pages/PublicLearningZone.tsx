@@ -36,8 +36,13 @@ import {
   GraduationCap,
   MessageCircle,
   Mic,
-  MicOff
+  MicOff,
+  Paperclip,
+  X,
+  FileText,
+  Image as ImageIcon
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Navbar } from "@/components/landing/Navbar";
@@ -46,10 +51,17 @@ import { SEOHead } from "@/components/SEOHead";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
+interface FileAttachment {
+  name: string;
+  url: string;
+  type: string;
+}
+
 interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: string;
+  files?: FileAttachment[];
 }
 
 interface Course {
@@ -183,8 +195,11 @@ export default function PublicLearningZone() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<FileAttachment[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<typeof window.SpeechRecognition.prototype | null>(null);
 
   // Check for Web Speech API support
@@ -327,12 +342,34 @@ export default function PublicLearningZone() {
     }
   };
 
-  const sendMessage = async (text: string) => {
-    if (!text.trim() || isLoading) return;
+  const sendMessage = async (text: string, files?: FileAttachment[]) => {
+    if ((!text.trim() && (!files || files.length === 0)) || isLoading) return;
 
-    const userMsg: Message = { role: "user", content: text.trim(), timestamp: new Date().toISOString() };
+    // Build message content with file info
+    let messageContent = text.trim();
+    if (files && files.length > 0) {
+      const fileDescriptions = files.map(f => {
+        if (f.type.startsWith('image/')) {
+          return `[ছবি আপলোড করা হয়েছে: ${f.name}]`;
+        } else if (f.type === 'application/pdf') {
+          return `[PDF ফাইল আপলোড করা হয়েছে: ${f.name}]`;
+        } else if (f.type.includes('word') || f.type.includes('document')) {
+          return `[Word ডকুমেন্ট আপলোড করা হয়েছে: ${f.name}]`;
+        }
+        return `[ফাইল আপলোড করা হয়েছে: ${f.name}]`;
+      }).join('\n');
+      messageContent = messageContent ? `${messageContent}\n\n${fileDescriptions}` : fileDescriptions;
+    }
+
+    const userMsg: Message = { 
+      role: "user", 
+      content: messageContent, 
+      timestamp: new Date().toISOString(),
+      files: files
+    };
     setMessages(prev => [...prev, userMsg]);
     setInput("");
+    setAttachedFiles([]);
     setIsLoading(true);
 
     try {
@@ -352,10 +389,98 @@ export default function PublicLearningZone() {
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    const newFiles: FileAttachment[] = [];
+
+    try {
+      for (const file of Array.from(files)) {
+        // Validate file type
+        const allowedTypes = [
+          'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
+        
+        if (!allowedTypes.includes(file.type)) {
+          toast({
+            title: t("Invalid file type", "অবৈধ ফাইল টাইপ"),
+            description: t("Only images, PDF and Word files are allowed", "শুধুমাত্র ছবি, PDF এবং Word ফাইল অনুমোদিত"),
+            variant: "destructive"
+          });
+          continue;
+        }
+
+        // Check file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          toast({
+            title: t("File too large", "ফাইল অনেক বড়"),
+            description: t("Maximum file size is 10MB", "সর্বোচ্চ ফাইল সাইজ ১০MB"),
+            variant: "destructive"
+          });
+          continue;
+        }
+
+        const fileName = `${Date.now()}-${file.name}`;
+        const { data, error } = await supabase.storage
+          .from('learning-chat-files')
+          .upload(fileName, file);
+
+        if (error) {
+          console.error('Upload error:', error);
+          toast({
+            title: t("Upload failed", "আপলোড ব্যর্থ"),
+            description: error.message,
+            variant: "destructive"
+          });
+          continue;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('learning-chat-files')
+          .getPublicUrl(data.path);
+
+        newFiles.push({
+          name: file.name,
+          url: urlData.publicUrl,
+          type: file.type
+        });
+      }
+
+      if (newFiles.length > 0) {
+        setAttachedFiles(prev => [...prev, ...newFiles]);
+        toast({
+          title: t("Files attached", "ফাইল সংযুক্ত হয়েছে"),
+          description: t(`${newFiles.length} file(s) ready to send`, `${newFiles.length}টি ফাইল পাঠানোর জন্য প্রস্তুত`)
+        });
+      }
+    } catch (error) {
+      console.error('File upload error:', error);
+      toast({
+        title: t("Upload error", "আপলোড এরর"),
+        description: t("Something went wrong", "কিছু সমস্যা হয়েছে"),
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const removeAttachedFile = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      sendMessage(input);
+      sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined);
     }
   };
 
@@ -368,6 +493,7 @@ export default function PublicLearningZone() {
   const resetChat = () => {
     setMessages([]);
     setInput("");
+    setAttachedFiles([]);
     localStorage.removeItem(STORAGE_KEY);
   };
 
@@ -377,6 +503,11 @@ export default function PublicLearningZone() {
       description: t("Please sign in to enroll in courses", "কোর্সে ভর্তি হতে সাইন ইন করুন"),
     });
     navigate('/auth?mode=signup');
+  };
+
+  const getFileIcon = (type: string) => {
+    if (type.startsWith('image/')) return <ImageIcon className="h-4 w-4" />;
+    return <FileText className="h-4 w-4" />;
   };
 
   return (
@@ -512,6 +643,33 @@ export default function PublicLearningZone() {
                               ? "bg-primary text-primary-foreground rounded-tr-sm"
                               : "bg-muted rounded-tl-sm"
                           )}>
+                            {/* Display attached files */}
+                            {msg.files && msg.files.length > 0 && (
+                              <div className="flex flex-wrap gap-2 mb-2">
+                                {msg.files.map((file, fileIdx) => (
+                                  <a
+                                    key={fileIdx}
+                                    href={file.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block"
+                                  >
+                                    {file.type.startsWith('image/') ? (
+                                      <img
+                                        src={file.url}
+                                        alt={file.name}
+                                        className="max-w-[200px] max-h-[150px] rounded-lg object-cover"
+                                      />
+                                    ) : (
+                                      <div className="flex items-center gap-2 bg-background/20 rounded-lg px-3 py-2">
+                                        <FileText className="h-4 w-4" />
+                                        <span className="text-xs truncate max-w-[120px]">{file.name}</span>
+                                      </div>
+                                    )}
+                                  </a>
+                                ))}
+                              </div>
+                            )}
                             <p className="text-sm whitespace-pre-wrap leading-relaxed">
                               {msg.content}
                             </p>
@@ -556,13 +714,59 @@ export default function PublicLearningZone() {
 
               {/* Input Area */}
               <div className="p-4 border-t bg-background">
+                {/* Attached files preview */}
+                {attachedFiles.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3 p-2 bg-muted/50 rounded-lg">
+                    {attachedFiles.map((file, idx) => (
+                      <div key={idx} className="flex items-center gap-2 bg-background rounded-lg px-2 py-1 text-xs">
+                        {getFileIcon(file.type)}
+                        <span className="truncate max-w-[100px]">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeAttachedFile(idx)}
+                          className="text-muted-foreground hover:text-destructive"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    sendMessage(input);
+                    sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined);
                   }}
                   className="flex items-end gap-2"
                 >
+                  {/* Hidden file input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,.pdf,.doc,.docx"
+                    multiple
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  
+                  {/* File upload button */}
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isLoading || isUploading}
+                    className="h-11 w-11 shrink-0 rounded-xl"
+                    title={t("Attach files", "ফাইল সংযুক্ত করুন")}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Paperclip className="h-4 w-4" />
+                    )}
+                  </Button>
+
                   <div className="flex-1 relative">
                     <Textarea
                       ref={textareaRef}
@@ -598,7 +802,7 @@ export default function PublicLearningZone() {
                   <Button 
                     type="submit" 
                     size="icon"
-                    disabled={!input.trim() || isLoading}
+                    disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
                     className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90"
                   >
                     {isLoading ? (
