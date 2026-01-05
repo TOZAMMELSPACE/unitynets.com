@@ -46,7 +46,7 @@ import { cn } from "@/lib/utils";
 interface Message {
   role: "user" | "assistant";
   content: string;
-  timestamp: Date;
+  timestamp: string;
 }
 
 interface Course {
@@ -161,13 +161,34 @@ export default function PublicLearningZone() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   
-  // Chat state
-  const [messages, setMessages] = useState<Message[]>([]);
+  const STORAGE_KEY = "learning_chat_history";
+  
+  // Chat state - load from localStorage on init
+  const [messages, setMessages] = useState<Message[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error("Error loading chat history:", e);
+    }
+    return [];
+  });
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    } catch (e) {
+      console.error("Error saving chat history:", e);
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -236,7 +257,7 @@ export default function PublicLearningZone() {
                   i === prev.length - 1 ? { ...m, content: assistantContent } : m
                 );
               }
-              return [...prev, { role: "assistant", content: assistantContent, timestamp: new Date() }];
+              return [...prev, { role: "assistant", content: assistantContent, timestamp: new Date().toISOString() }];
             });
           }
         } catch {
@@ -250,7 +271,7 @@ export default function PublicLearningZone() {
   const sendMessage = async (text: string) => {
     if (!text.trim() || isLoading) return;
 
-    const userMsg: Message = { role: "user", content: text.trim(), timestamp: new Date() };
+    const userMsg: Message = { role: "user", content: text.trim(), timestamp: new Date().toISOString() };
     setMessages(prev => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
@@ -264,7 +285,7 @@ export default function PublicLearningZone() {
         { 
           role: "assistant", 
           content: error instanceof Error ? error.message : "দুঃখিত, একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।",
-          timestamp: new Date()
+          timestamp: new Date().toISOString()
         }
       ]);
     } finally {
@@ -288,6 +309,7 @@ export default function PublicLearningZone() {
   const resetChat = () => {
     setMessages([]);
     setInput("");
+    localStorage.removeItem(STORAGE_KEY);
   };
 
   const handleEnroll = () => {
