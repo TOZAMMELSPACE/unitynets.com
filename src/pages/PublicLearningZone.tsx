@@ -40,7 +40,9 @@ import {
   Paperclip,
   X,
   FileText,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -197,13 +199,21 @@ export default function PublicLearningZone() {
   const [speechSupported, setSpeechSupported] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<FileAttachment[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [ttsSupported, setTtsSupported] = useState(false);
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<typeof window.SpeechRecognition.prototype | null>(null);
 
-  // Check for Web Speech API support
+  // Check for Web Speech API support (both recognition and synthesis)
   useEffect(() => {
+    // Check TTS support
+    if ('speechSynthesis' in window) {
+      setTtsSupported(true);
+    }
+    
+    // Check Speech Recognition support
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       setSpeechSupported(true);
@@ -237,6 +247,13 @@ export default function PublicLearningZone() {
       
       recognitionRef.current = recognition;
     }
+    
+    // Cleanup TTS on unmount
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
   }, [t]);
 
   const toggleListening = () => {
@@ -254,6 +271,58 @@ export default function PublicLearningZone() {
       }
     }
   };
+
+  // Text-to-Speech function
+  const speakText = (text: string, index: number) => {
+    if (!ttsSupported) return;
+    
+    // If already speaking this message, stop it
+    if (speakingIndex === index) {
+      window.speechSynthesis.cancel();
+      setSpeakingIndex(null);
+      return;
+    }
+    
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'bn-BD'; // Bengali language
+    utterance.rate = 0.9; // Slightly slower for clarity
+    utterance.pitch = 1;
+    
+    // Try to find a Bengali voice
+    const voices = window.speechSynthesis.getVoices();
+    const bengaliVoice = voices.find(voice => 
+      voice.lang.startsWith('bn') || voice.lang.includes('Bengali')
+    );
+    if (bengaliVoice) {
+      utterance.voice = bengaliVoice;
+    }
+    
+    utterance.onstart = () => {
+      setSpeakingIndex(index);
+    };
+    
+    utterance.onend = () => {
+      setSpeakingIndex(null);
+    };
+    
+    utterance.onerror = () => {
+      setSpeakingIndex(null);
+    };
+    
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Stop speech when navigating away
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   // Save messages to localStorage whenever they change
   useEffect(() => {
@@ -678,18 +747,37 @@ export default function PublicLearningZone() {
                           </div>
                           
                           {msg.role === "assistant" && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 px-2 mt-1 text-xs text-muted-foreground"
-                              onClick={() => copyToClipboard(msg.content, i)}
-                            >
-                              {copiedIndex === i ? (
-                                <><Check className="h-3 w-3 mr-1" />{t("Copied", "কপি হয়েছে")}</>
-                              ) : (
-                                <><Copy className="h-3 w-3 mr-1" />{t("Copy", "কপি")}</>
+                            <div className="flex items-center gap-1 mt-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2 text-xs text-muted-foreground"
+                                onClick={() => copyToClipboard(msg.content, i)}
+                              >
+                                {copiedIndex === i ? (
+                                  <><Check className="h-3 w-3 mr-1" />{t("Copied", "কপি হয়েছে")}</>
+                                ) : (
+                                  <><Copy className="h-3 w-3 mr-1" />{t("Copy", "কপি")}</>
+                                )}
+                              </Button>
+                              {ttsSupported && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className={cn(
+                                    "h-7 px-2 text-xs",
+                                    speakingIndex === i ? "text-primary" : "text-muted-foreground"
+                                  )}
+                                  onClick={() => speakText(msg.content, i)}
+                                >
+                                  {speakingIndex === i ? (
+                                    <><VolumeX className="h-3 w-3 mr-1" />{t("Stop", "থামাও")}</>
+                                  ) : (
+                                    <><Volume2 className="h-3 w-3 mr-1" />{t("Listen", "শুনুন")}</>
+                                  )}
+                                </Button>
                               )}
-                            </Button>
+                            </div>
                           )}
                         </div>
                       </div>
