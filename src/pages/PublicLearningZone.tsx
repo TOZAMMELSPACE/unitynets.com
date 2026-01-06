@@ -277,7 +277,7 @@ export default function PublicLearningZone() {
     }
   }, [input]);
 
-  const streamChat = async (userMessages: Message[]) => {
+  const streamChat = async (userMessages: Message[], imageUrls?: string[]) => {
     const apiMessages = userMessages.map(m => ({ role: m.role, content: m.content }));
     
     const resp = await fetch(CHAT_URL, {
@@ -286,7 +286,7 @@ export default function PublicLearningZone() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages: apiMessages }),
+      body: JSON.stringify({ messages: apiMessages, imageUrls }),
     });
 
     if (!resp.ok) {
@@ -373,7 +373,9 @@ export default function PublicLearningZone() {
     setIsLoading(true);
 
     try {
-      await streamChat([...messages, userMsg]);
+      // Extract image URLs for AI vision
+      const imageUrls = files?.filter(f => f.type.startsWith('image/')).map(f => f.url);
+      await streamChat([...messages, userMsg], imageUrls && imageUrls.length > 0 ? imageUrls : undefined);
     } catch (error) {
       console.error("Chat error:", error);
       setMessages(prev => [
