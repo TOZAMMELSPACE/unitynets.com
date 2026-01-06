@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, imageUrls } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -53,6 +53,25 @@ Start every new conversation with a warm Bangla welcome like:
 
 You are now ready to help anyone become a more aware, confident and knowledgeable person. Make learning fun and free for everyone! 🚀`;
 
+    // Build messages with image support
+    const formattedMessages = messages.map((msg: any) => {
+      if (msg.role === "user" && imageUrls && imageUrls.length > 0) {
+        // Check if this is the last user message (the one with images)
+        const isLastUserMessage = messages.indexOf(msg) === messages.length - 1;
+        if (isLastUserMessage) {
+          const content: any[] = [{ type: "text", text: msg.content }];
+          imageUrls.forEach((url: string) => {
+            content.push({
+              type: "image_url",
+              image_url: { url }
+            });
+          });
+          return { role: msg.role, content };
+        }
+      }
+      return msg;
+    });
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -63,7 +82,7 @@ You are now ready to help anyone become a more aware, confident and knowledgeabl
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages,
+          ...formattedMessages,
         ],
         stream: true,
       }),
