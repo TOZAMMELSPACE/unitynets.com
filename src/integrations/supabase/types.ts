@@ -124,6 +124,33 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_chat_sessions: {
+        Row: {
+          created_at: string
+          device_fingerprint: string | null
+          id: string
+          messages: Json
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          device_fingerprint?: string | null
+          id?: string
+          messages?: Json
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          device_fingerprint?: string | null
+          id?: string
+          messages?: Json
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string | null
