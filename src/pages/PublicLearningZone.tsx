@@ -44,9 +44,20 @@ import {
   FileText,
   Image as ImageIcon,
   Volume2,
-  VolumeX
+  VolumeX,
+  Save,
+  FolderOpen,
+  Trash2,
+  History
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Navbar } from "@/components/landing/Navbar";
@@ -203,6 +214,10 @@ export default function PublicLearningZone() {
   const [isUploading, setIsUploading] = useState(false);
   const [ttsSupported, setTtsSupported] = useState(false);
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
+  const [savedSessions, setSavedSessions] = useState<{id: string; title: string; created_at: string; messages: Message[]}[]>([]);
+  const [isLoadingSessions, setIsLoadingSessions] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [sessionSheetOpen, setSessionSheetOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -570,6 +585,145 @@ export default function PublicLearningZone() {
     localStorage.removeItem(STORAGE_KEY);
   };
 
+  // Generate device fingerprint for session identification
+  const getDeviceFingerprint = () => {
+    const nav = window.navigator;
+    const screen = window.screen;
+    const fingerprint = [
+      nav.userAgent,
+      nav.language,
+      screen.colorDepth,
+      screen.width + 'x' + screen.height,
+      new Date().getTimezoneOffset()
+    ].join('|');
+    return btoa(fingerprint).slice(0, 32);
+  };
+
+  // Load saved sessions
+  const loadSavedSessions = async () => {
+    setIsLoadingSessions(true);
+    try {
+      const fingerprint = getDeviceFingerprint();
+      const { data, error } = await supabase
+        .from('learning_chat_sessions')
+        .select('*')
+        .eq('device_fingerprint', fingerprint)
+        .order('updated_at', { ascending: false });
+      
+      if (error) throw error;
+      // Transform data to match expected type
+      const sessions = (data || []).map(d => ({
+        id: d.id,
+        title: d.title,
+        created_at: d.created_at,
+        messages: d.messages as unknown as Message[]
+      }));
+      setSavedSessions(sessions);
+    } catch (error) {
+      console.error('Error loading sessions:', error);
+      toast({
+        title: t("Error", "ত্রুটি"),
+        description: t("Failed to load saved sessions", "সেভ করা সেশন লোড করতে ব্যর্থ"),
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingSessions(false);
+    }
+  };
+
+  // Save current chat session
+  const saveCurrentSession = async () => {
+    if (messages.length === 0) {
+      toast({
+        title: t("Nothing to save", "সেভ করার কিছু নেই"),
+        description: t("Start a conversation first", "প্রথমে একটি কথোপকথন শুরু করুন"),
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const fingerprint = getDeviceFingerprint();
+      // Generate title from first user message
+      const firstUserMsg = messages.find(m => m.role === 'user');
+      const title = firstUserMsg 
+        ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '...' : '')
+        : 'New Chat';
+
+      const { error } = await supabase
+        .from('learning_chat_sessions')
+        .insert([{
+          title,
+          messages: JSON.parse(JSON.stringify(messages)),
+          device_fingerprint: fingerprint
+        }]);
+
+      if (error) throw error;
+      
+      toast({
+        title: t("Saved!", "সেভ হয়েছে!"),
+        description: t("Chat session saved successfully", "চ্যাট সেশন সফলভাবে সেভ হয়েছে"),
+      });
+      
+      // Reload sessions
+      loadSavedSessions();
+    } catch (error) {
+      console.error('Error saving session:', error);
+      toast({
+        title: t("Error", "ত্রুটি"),
+        description: t("Failed to save session", "সেশন সেভ করতে ব্যর্থ"),
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Load a saved session
+  const loadSession = (session: typeof savedSessions[0]) => {
+    setMessages(session.messages);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(session.messages));
+    setSessionSheetOpen(false);
+    toast({
+      title: t("Loaded!", "লোড হয়েছে!"),
+      description: t("Chat session loaded", "চ্যাট সেশন লোড হয়েছে"),
+    });
+  };
+
+  // Delete a saved session
+  const deleteSession = async (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const { error } = await supabase
+        .from('learning_chat_sessions')
+        .delete()
+        .eq('id', sessionId);
+
+      if (error) throw error;
+      
+      setSavedSessions(prev => prev.filter(s => s.id !== sessionId));
+      toast({
+        title: t("Deleted", "ডিলিট হয়েছে"),
+        description: t("Session deleted successfully", "সেশন সফলভাবে ডিলিট হয়েছে"),
+      });
+    } catch (error) {
+      console.error('Error deleting session:', error);
+      toast({
+        title: t("Error", "ত্রুটি"),
+        description: t("Failed to delete session", "সেশন ডিলিট করতে ব্যর্থ"),
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Load sessions when sheet opens
+  useEffect(() => {
+    if (sessionSheetOpen) {
+      loadSavedSessions();
+    }
+  }, [sessionSheetOpen]);
+
   const handleEnroll = () => {
     toast({
       title: t("Sign in required", "সাইন ইন প্রয়োজন"),
@@ -581,6 +735,16 @@ export default function PublicLearningZone() {
   const getFileIcon = (type: string) => {
     if (type.startsWith('image/')) return <ImageIcon className="h-4 w-4" />;
     return <FileText className="h-4 w-4" />;
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('bn-BD', { 
+      day: 'numeric', 
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
@@ -633,12 +797,95 @@ export default function PublicLearningZone() {
                     </p>
                   </div>
                 </div>
-                {messages.length > 0 && (
-                  <Button variant="ghost" size="sm" onClick={resetChat} className="gap-2">
-                    <RotateCcw className="h-4 w-4" />
-                    <span className="hidden sm:inline">{t("New Chat", "নতুন চ্যাট")}</span>
+                <div className="flex items-center gap-1">
+                  {/* Save Session Button */}
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={saveCurrentSession}
+                    disabled={isSaving || messages.length === 0}
+                    className="gap-2"
+                    title={t("Save Chat", "চ্যাট সেভ করো")}
+                  >
+                    {isSaving ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4" />
+                    )}
+                    <span className="hidden sm:inline">{t("Save", "সেভ")}</span>
                   </Button>
-                )}
+
+                  {/* Load Sessions Sheet */}
+                  <Sheet open={sessionSheetOpen} onOpenChange={setSessionSheetOpen}>
+                    <SheetTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="gap-2"
+                        title={t("Saved Sessions", "সেভ করা সেশন")}
+                      >
+                        <History className="h-4 w-4" />
+                        <span className="hidden sm:inline">{t("History", "হিস্ট্রি")}</span>
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent>
+                      <SheetHeader>
+                        <SheetTitle className="flex items-center gap-2">
+                          <FolderOpen className="h-5 w-5" />
+                          {t("Saved Sessions", "সেভ করা সেশন")}
+                        </SheetTitle>
+                      </SheetHeader>
+                      <div className="mt-4">
+                        {isLoadingSessions ? (
+                          <div className="flex items-center justify-center py-8">
+                            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                          </div>
+                        ) : savedSessions.length === 0 ? (
+                          <div className="text-center py-8 text-muted-foreground">
+                            <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                            <p>{t("No saved sessions yet", "এখনও কোনো সেশন সেভ করা হয়নি")}</p>
+                            <p className="text-sm mt-1">{t("Save a chat to see it here", "এখানে দেখতে চ্যাট সেভ করুন")}</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-2">
+                            {savedSessions.map((session) => (
+                              <div
+                                key={session.id}
+                                onClick={() => loadSession(session)}
+                                className="p-3 rounded-lg border bg-card hover:bg-muted/50 cursor-pointer transition-colors group"
+                              >
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-sm truncate">{session.title}</p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {formatDate(session.created_at)} • {session.messages.length} {t("messages", "মেসেজ")}
+                                    </p>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    onClick={(e) => deleteSession(session.id, e)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+
+                  {/* New Chat Button */}
+                  {messages.length > 0 && (
+                    <Button variant="ghost" size="sm" onClick={resetChat} className="gap-2">
+                      <RotateCcw className="h-4 w-4" />
+                      <span className="hidden sm:inline">{t("New Chat", "নতুন চ্যাট")}</span>
+                    </Button>
+                  )}
+                </div>
               </div>
 
               {/* Chat Messages */}
