@@ -3,29 +3,9 @@ import "@/types/speech.d.ts";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
-  BookOpen, 
-  Trophy, 
-  Star, 
-  Search, 
-  Clock,
-  BarChart3,
-  Award,
-  Target,
-  Flame,
-  Code,
-  Globe,
-  Users,
-  BookMarked,
-  Play,
-  CheckCircle2,
-  ExternalLink,
   Sparkles,
   Send,
   Bot,
@@ -35,7 +15,6 @@ import {
   Copy,
   Check,
   Loader2,
-  GraduationCap,
   MessageCircle,
   Mic,
   MicOff,
@@ -45,25 +24,20 @@ import {
   Image as ImageIcon,
   Volume2,
   VolumeX,
-  Save,
-  FolderOpen,
   Trash2,
-  History
+  Plus,
+  PanelLeftClose,
+  PanelLeft,
+  Search,
+  Code,
+  Globe,
+  GraduationCap,
+  Menu
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Navbar } from "@/components/landing/Navbar";
-import { Footer } from "@/components/landing/Footer";
 import { SEOHead } from "@/components/SEOHead";
-import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 interface FileAttachment {
@@ -79,121 +53,33 @@ interface Message {
   files?: FileAttachment[];
 }
 
-interface Course {
+interface ChatSession {
   id: string;
   title: string;
-  titleBn: string;
-  description: string;
-  descriptionBn: string;
-  category: string;
-  difficulty: "beginner" | "intermediate" | "advanced";
-  duration: string;
-  lessons: number;
-  icon: any;
-  color: string;
-}
-
-interface Book {
-  id: string;
-  title: string;
-  titleBn: string;
-  author: string;
-  authorBn: string;
-  description: string;
-  descriptionBn: string;
-  chapters: number;
-  category: string;
-  link: string;
-  coverColor: string;
+  created_at: string;
+  messages: Message[];
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/learning-chat`;
 
 const suggestedQuestions = [
-  { text: "পাইথন প্রোগ্রামিং শিখতে চাই", icon: Code, color: "from-blue-500 to-cyan-500" },
-  { text: "ওয়েব ডেভেলপমেন্ট কিভাবে শুরু করব?", icon: Globe, color: "from-purple-500 to-pink-500" },
-  { text: "AI কিভাবে কাজ করে?", icon: Sparkles, color: "from-amber-500 to-orange-500" },
-  { text: "ফ্রিল্যান্সিং শুরু করতে কি লাগে?", icon: Lightbulb, color: "from-green-500 to-emerald-500" },
-];
-
-const courses: Course[] = [
-  {
-    id: "python-basics",
-    title: "Python Programming",
-    titleBn: "পাইথন প্রোগ্রামিং",
-    description: "Learn Python from scratch",
-    descriptionBn: "শুরু থেকে পাইথন শিখুন",
-    category: "programming",
-    difficulty: "beginner",
-    duration: "4 weeks",
-    lessons: 20,
-    icon: Code,
-    color: "from-blue-500 to-cyan-500",
-  },
-  {
-    id: "javascript-web",
-    title: "Web Development",
-    titleBn: "ওয়েব ডেভেলপমেন্ট",
-    description: "Build websites with JS",
-    descriptionBn: "JS দিয়ে ওয়েবসাইট বানান",
-    category: "programming",
-    difficulty: "intermediate",
-    duration: "6 weeks",
-    lessons: 30,
-    icon: Globe,
-    color: "from-yellow-500 to-orange-500",
-  },
-  {
-    id: "digital-literacy",
-    title: "Digital Literacy",
-    titleBn: "ডিজিটাল সাক্ষরতা",
-    description: "Essential digital skills",
-    descriptionBn: "প্রয়োজনীয় ডিজিটাল দক্ষতা",
-    category: "digital-skills",
-    difficulty: "beginner",
-    duration: "3 weeks",
-    lessons: 15,
-    icon: Award,
-    color: "from-purple-500 to-pink-500",
-  },
-  {
-    id: "community-civic",
-    title: "Community Skills",
-    titleBn: "কমিউনিটি দক্ষতা",
-    description: "Civic education basics",
-    descriptionBn: "নাগরিক শিক্ষা",
-    category: "community",
-    difficulty: "beginner",
-    duration: "2 weeks",
-    lessons: 10,
-    icon: Users,
-    color: "from-green-500 to-teal-500",
-  },
-];
-
-const freeBooks: Book[] = [
-  {
-    id: "manush-na-monushyarupi",
-    title: "মানুষ না মনুষ্যরূপী?",
-    titleBn: "মানুষ না মনুষ্যরূপী?",
-    author: "Md. Tozammel Haque",
-    authorBn: "মোঃ তোজাম্মেল হক",
-    description: "A sci-fi novel set in future New Earth City",
-    descriptionBn: "ভবিষ্যতের নিউ আর্থ সিটিতে সেট করা একটি সাই-ফাই উপন্যাস",
-    chapters: 12,
-    category: "sci-fi",
-    link: "https://sites.google.com/view/tozammelbook/home",
-    coverColor: "from-indigo-600 via-purple-600 to-pink-600"
-  }
+  { text: "পাইথন প্রোগ্রামিং শিখতে চাই", icon: Code, color: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
+  { text: "ওয়েব ডেভেলপমেন্ট কিভাবে শুরু করব?", icon: Globe, color: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
+  { text: "AI কিভাবে কাজ করে?", icon: Sparkles, color: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+  { text: "ফ্রিল্যান্সিং শুরু করতে কি লাগে?", icon: Lightbulb, color: "bg-green-500/10 text-green-600 dark:text-green-400" },
 ];
 
 export default function PublicLearningZone() {
   const { t } = useLanguage();
-  const navigate = useNavigate();
   
   const STORAGE_KEY = "learning_chat_history";
+  const CURRENT_SESSION_KEY = "current_session_id";
   
-  // Chat state - load from localStorage on init
+  // Sidebar state
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false);
+  
+  // Chat state
   const [messages, setMessages] = useState<Message[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -214,30 +100,31 @@ export default function PublicLearningZone() {
   const [isUploading, setIsUploading] = useState(false);
   const [ttsSupported, setTtsSupported] = useState(false);
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
-  const [savedSessions, setSavedSessions] = useState<{id: string; title: string; created_at: string; messages: Message[]}[]>([]);
+  
+  // Sessions state
+  const [savedSessions, setSavedSessions] = useState<ChatSession[]>([]);
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [sessionSheetOpen, setSessionSheetOpen] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<typeof window.SpeechRecognition.prototype | null>(null);
 
-  // Check for Web Speech API support (both recognition and synthesis)
+  // Check for Web Speech API support
   useEffect(() => {
-    // Check TTS support
     if ('speechSynthesis' in window) {
       setTtsSupported(true);
     }
     
-    // Check Speech Recognition support
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       setSpeechSupported(true);
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = true;
-      recognition.lang = 'bn-BD'; // Bengali language
+      recognition.lang = 'bn-BD';
       
       recognition.onresult = (event) => {
         const transcript = Array.from(event.results)
@@ -265,7 +152,6 @@ export default function PublicLearningZone() {
       recognitionRef.current = recognition;
     }
     
-    // Cleanup TTS on unmount
     return () => {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -289,26 +175,22 @@ export default function PublicLearningZone() {
     }
   };
 
-  // Text-to-Speech function
   const speakText = (text: string, index: number) => {
     if (!ttsSupported) return;
     
-    // If already speaking this message, stop it
     if (speakingIndex === index) {
       window.speechSynthesis.cancel();
       setSpeakingIndex(null);
       return;
     }
     
-    // Cancel any ongoing speech
     window.speechSynthesis.cancel();
     
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'bn-BD'; // Bengali language
-    utterance.rate = 0.9; // Slightly slower for clarity
+    utterance.lang = 'bn-BD';
+    utterance.rate = 0.9;
     utterance.pitch = 1;
     
-    // Try to find a Bengali voice
     const voices = window.speechSynthesis.getVoices();
     const bengaliVoice = voices.find(voice => 
       voice.lang.startsWith('bn') || voice.lang.includes('Bengali')
@@ -317,29 +199,12 @@ export default function PublicLearningZone() {
       utterance.voice = bengaliVoice;
     }
     
-    utterance.onstart = () => {
-      setSpeakingIndex(index);
-    };
-    
-    utterance.onend = () => {
-      setSpeakingIndex(null);
-    };
-    
-    utterance.onerror = () => {
-      setSpeakingIndex(null);
-    };
+    utterance.onstart = () => setSpeakingIndex(index);
+    utterance.onend = () => setSpeakingIndex(null);
+    utterance.onerror = () => setSpeakingIndex(null);
     
     window.speechSynthesis.speak(utterance);
   };
-
-  // Stop speech when navigating away
-  useEffect(() => {
-    return () => {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, []);
 
   // Save messages to localStorage whenever they change
   useEffect(() => {
@@ -359,9 +224,52 @@ export default function PublicLearningZone() {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + "px";
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 200) + "px";
     }
   }, [input]);
+
+  // Load sessions on mount
+  useEffect(() => {
+    loadSavedSessions();
+  }, []);
+
+  const getDeviceFingerprint = () => {
+    const nav = window.navigator;
+    const screen = window.screen;
+    const fingerprint = [
+      nav.userAgent,
+      nav.language,
+      screen.colorDepth,
+      screen.width + 'x' + screen.height,
+      new Date().getTimezoneOffset()
+    ].join('|');
+    return btoa(fingerprint).slice(0, 32);
+  };
+
+  const loadSavedSessions = async () => {
+    setIsLoadingSessions(true);
+    try {
+      const fingerprint = getDeviceFingerprint();
+      const { data, error } = await supabase
+        .from('learning_chat_sessions')
+        .select('*')
+        .eq('device_fingerprint', fingerprint)
+        .order('updated_at', { ascending: false });
+      
+      if (error) throw error;
+      const sessions = (data || []).map(d => ({
+        id: d.id,
+        title: d.title,
+        created_at: d.created_at,
+        messages: d.messages as unknown as Message[]
+      }));
+      setSavedSessions(sessions);
+    } catch (error) {
+      console.error('Error loading sessions:', error);
+    } finally {
+      setIsLoadingSessions(false);
+    }
+  };
 
   const streamChat = async (userMessages: Message[], imageUrls?: string[]) => {
     const apiMessages = userMessages.map(m => ({ role: m.role, content: m.content }));
@@ -431,7 +339,6 @@ export default function PublicLearningZone() {
   const sendMessage = async (text: string, files?: FileAttachment[]) => {
     if ((!text.trim() && (!files || files.length === 0)) || isLoading) return;
 
-    // Build message content with file info
     let messageContent = text.trim();
     if (files && files.length > 0) {
       const fileDescriptions = files.map(f => {
@@ -453,15 +360,26 @@ export default function PublicLearningZone() {
       timestamp: new Date().toISOString(),
       files: files
     };
-    setMessages(prev => [...prev, userMsg]);
+    
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
     setInput("");
     setAttachedFiles([]);
     setIsLoading(true);
 
+    // Auto-save session after first message
+    if (messages.length === 0) {
+      autoSaveSession(newMessages, messageContent);
+    }
+
     try {
-      // Extract image URLs for AI vision
       const imageUrls = files?.filter(f => f.type.startsWith('image/')).map(f => f.url);
-      await streamChat([...messages, userMsg], imageUrls && imageUrls.length > 0 ? imageUrls : undefined);
+      await streamChat(newMessages, imageUrls && imageUrls.length > 0 ? imageUrls : undefined);
+      
+      // Update session after response
+      if (currentSessionId) {
+        updateSessionMessages();
+      }
     } catch (error) {
       console.error("Chat error:", error);
       setMessages(prev => [
@@ -477,6 +395,47 @@ export default function PublicLearningZone() {
     }
   };
 
+  const autoSaveSession = async (msgs: Message[], firstMessage: string) => {
+    try {
+      const fingerprint = getDeviceFingerprint();
+      const title = firstMessage.slice(0, 50) + (firstMessage.length > 50 ? '...' : '');
+
+      const { data, error } = await supabase
+        .from('learning_chat_sessions')
+        .insert([{
+          title,
+          messages: JSON.parse(JSON.stringify(msgs)),
+          device_fingerprint: fingerprint
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setCurrentSessionId(data.id);
+      loadSavedSessions();
+    } catch (error) {
+      console.error('Error auto-saving session:', error);
+    }
+  };
+
+  const updateSessionMessages = async () => {
+    if (!currentSessionId) return;
+    
+    try {
+      const currentMessages = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      await supabase
+        .from('learning_chat_sessions')
+        .update({ 
+          messages: currentMessages,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', currentSessionId);
+    } catch (error) {
+      console.error('Error updating session:', error);
+    }
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -486,7 +445,6 @@ export default function PublicLearningZone() {
 
     try {
       for (const file of Array.from(files)) {
-        // Validate file type
         const allowedTypes = [
           'image/jpeg', 'image/png', 'image/gif', 'image/webp',
           'application/pdf',
@@ -503,7 +461,6 @@ export default function PublicLearningZone() {
           continue;
         }
 
-        // Check file size (max 10MB)
         if (file.size > 10 * 1024 * 1024) {
           toast({
             title: t("File too large", "ফাইল অনেক বড়"),
@@ -578,120 +535,22 @@ export default function PublicLearningZone() {
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  const resetChat = () => {
+  const startNewChat = () => {
     setMessages([]);
     setInput("");
     setAttachedFiles([]);
+    setCurrentSessionId(null);
     localStorage.removeItem(STORAGE_KEY);
+    setSidebarMobileOpen(false);
   };
 
-  // Generate device fingerprint for session identification
-  const getDeviceFingerprint = () => {
-    const nav = window.navigator;
-    const screen = window.screen;
-    const fingerprint = [
-      nav.userAgent,
-      nav.language,
-      screen.colorDepth,
-      screen.width + 'x' + screen.height,
-      new Date().getTimezoneOffset()
-    ].join('|');
-    return btoa(fingerprint).slice(0, 32);
-  };
-
-  // Load saved sessions
-  const loadSavedSessions = async () => {
-    setIsLoadingSessions(true);
-    try {
-      const fingerprint = getDeviceFingerprint();
-      const { data, error } = await supabase
-        .from('learning_chat_sessions')
-        .select('*')
-        .eq('device_fingerprint', fingerprint)
-        .order('updated_at', { ascending: false });
-      
-      if (error) throw error;
-      // Transform data to match expected type
-      const sessions = (data || []).map(d => ({
-        id: d.id,
-        title: d.title,
-        created_at: d.created_at,
-        messages: d.messages as unknown as Message[]
-      }));
-      setSavedSessions(sessions);
-    } catch (error) {
-      console.error('Error loading sessions:', error);
-      toast({
-        title: t("Error", "ত্রুটি"),
-        description: t("Failed to load saved sessions", "সেভ করা সেশন লোড করতে ব্যর্থ"),
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoadingSessions(false);
-    }
-  };
-
-  // Save current chat session
-  const saveCurrentSession = async () => {
-    if (messages.length === 0) {
-      toast({
-        title: t("Nothing to save", "সেভ করার কিছু নেই"),
-        description: t("Start a conversation first", "প্রথমে একটি কথোপকথন শুরু করুন"),
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      const fingerprint = getDeviceFingerprint();
-      // Generate title from first user message
-      const firstUserMsg = messages.find(m => m.role === 'user');
-      const title = firstUserMsg 
-        ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '...' : '')
-        : 'New Chat';
-
-      const { error } = await supabase
-        .from('learning_chat_sessions')
-        .insert([{
-          title,
-          messages: JSON.parse(JSON.stringify(messages)),
-          device_fingerprint: fingerprint
-        }]);
-
-      if (error) throw error;
-      
-      toast({
-        title: t("Saved!", "সেভ হয়েছে!"),
-        description: t("Chat session saved successfully", "চ্যাট সেশন সফলভাবে সেভ হয়েছে"),
-      });
-      
-      // Reload sessions
-      loadSavedSessions();
-    } catch (error) {
-      console.error('Error saving session:', error);
-      toast({
-        title: t("Error", "ত্রুটি"),
-        description: t("Failed to save session", "সেশন সেভ করতে ব্যর্থ"),
-        variant: "destructive"
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  // Load a saved session
-  const loadSession = (session: typeof savedSessions[0]) => {
+  const loadSession = (session: ChatSession) => {
     setMessages(session.messages);
+    setCurrentSessionId(session.id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session.messages));
-    setSessionSheetOpen(false);
-    toast({
-      title: t("Loaded!", "লোড হয়েছে!"),
-      description: t("Chat session loaded", "চ্যাট সেশন লোড হয়েছে"),
-    });
+    setSidebarMobileOpen(false);
   };
 
-  // Delete a saved session
   const deleteSession = async (sessionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
@@ -703,6 +562,11 @@ export default function PublicLearningZone() {
       if (error) throw error;
       
       setSavedSessions(prev => prev.filter(s => s.id !== sessionId));
+      
+      if (currentSessionId === sessionId) {
+        startNewChat();
+      }
+      
       toast({
         title: t("Deleted", "ডিলিট হয়েছে"),
         description: t("Session deleted successfully", "সেশন সফলভাবে ডিলিট হয়েছে"),
@@ -717,400 +581,517 @@ export default function PublicLearningZone() {
     }
   };
 
-  // Load sessions when sheet opens
-  useEffect(() => {
-    if (sessionSheetOpen) {
-      loadSavedSessions();
-    }
-  }, [sessionSheetOpen]);
-
-  const handleEnroll = () => {
-    toast({
-      title: t("Sign in required", "সাইন ইন প্রয়োজন"),
-      description: t("Please sign in to enroll in courses", "কোর্সে ভর্তি হতে সাইন ইন করুন"),
-    });
-    navigate('/auth?mode=signup');
-  };
-
   const getFileIcon = (type: string) => {
     if (type.startsWith('image/')) return <ImageIcon className="h-4 w-4" />;
     return <FileText className="h-4 w-4" />;
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('bn-BD', { 
-      day: 'numeric', 
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const filteredSessions = savedSessions.filter(session =>
+    session.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  return (
-    <div className="min-h-screen bg-background">
-      <SEOHead
-        title="Learning Zone - ফ্রি শেখার প্ল্যাটফর্ম | AI Learning Buddy"
-        description="UnityNets Learning Zone - AI চ্যাটবট দিয়ে যেকোনো বিষয়ে শিখুন। বিনামূল্যে প্রোগ্রামিং, ডিজিটাল দক্ষতা কোর্স।"
-        keywords="learning zone, AI chatbot, free courses, programming, Python, JavaScript, digital skills, বাংলা কোর্স"
-        canonicalUrl="https://unitynets.com/learning-zone"
-      />
-      <Navbar />
+  // Group sessions by date
+  const groupedSessions = filteredSessions.reduce((groups, session) => {
+    const date = new Date(session.created_at);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    let groupKey: string;
+    if (date.toDateString() === today.toDateString()) {
+      groupKey = t("Today", "আজ");
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      groupKey = t("Yesterday", "গতকাল");
+    } else if (date > new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)) {
+      groupKey = t("Previous 7 Days", "গত ৭ দিন");
+    } else {
+      groupKey = t("Older", "আগের");
+    }
+    
+    if (!groups[groupKey]) {
+      groups[groupKey] = [];
+    }
+    groups[groupKey].push(session);
+    return groups;
+  }, {} as Record<string, ChatSession[]>);
+
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full">
+      {/* Sidebar Header */}
+      <div className="p-3 border-b border-border/50">
+        <Button
+          onClick={startNewChat}
+          variant="outline"
+          className="w-full justify-start gap-2 h-10"
+        >
+          <Plus className="h-4 w-4" />
+          {t("New chat", "নতুন চ্যাট")}
+        </Button>
+      </div>
       
-      <main className="pt-20 pb-16">
-        <div className="container mx-auto px-4">
-          
-          {/* Hero Section with AI Chat */}
-          <div className="max-w-4xl mx-auto mb-16">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <Badge className="mb-4 bg-gradient-to-r from-primary/20 to-accent/20 text-primary border-0">
-                <Sparkles className="w-4 h-4 mr-2" />
-                {t("AI-Powered Learning", "AI চালিত শিক্ষা")}
-              </Badge>
-              <h1 className="text-3xl md:text-5xl font-bold mb-4">
-                <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                  Learning Buddy
-                </span>
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-                {t(
-                  "Ask me anything - I'll help you learn step by step in Bengali!",
-                  "যেকোনো প্রশ্ন করো — আমি বাংলায় ধাপে ধাপে শিখতে সাহায্য করব!"
-                )}
-              </p>
-            </div>
-
-            {/* Chat Interface */}
-            <Card className="border-2 border-primary/20 shadow-xl overflow-hidden">
-              {/* Chat Header */}
-              <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary/5 to-accent/5">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                    <Bot className="h-5 w-5 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <h2 className="font-semibold">Learning Buddy</h2>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                      {t("Online - Ready to help", "অনলাইন - সাহায্যে আছি")}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  {/* Save Session Button */}
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={saveCurrentSession}
-                    disabled={isSaving || messages.length === 0}
-                    className="gap-2"
-                    title={t("Save Chat", "চ্যাট সেভ করো")}
-                  >
-                    {isSaving ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Save className="h-4 w-4" />
-                    )}
-                    <span className="hidden sm:inline">{t("Save", "সেভ")}</span>
-                  </Button>
-
-                  {/* Load Sessions Sheet */}
-                  <Sheet open={sessionSheetOpen} onOpenChange={setSessionSheetOpen}>
-                    <SheetTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="gap-2"
-                        title={t("Saved Sessions", "সেভ করা সেশন")}
+      {/* Search */}
+      <div className="p-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder={t("Search chats...", "চ্যাট খুঁজুন...")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 text-sm bg-muted/50 rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+      </div>
+      
+      {/* Sessions List */}
+      <ScrollArea className="flex-1 px-2">
+        {isLoadingSessions ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        ) : filteredSessions.length === 0 ? (
+          <div className="text-center py-8 px-4">
+            <MessageCircle className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
+            <p className="text-sm text-muted-foreground">
+              {searchQuery 
+                ? t("No chats found", "কোনো চ্যাট পাওয়া যায়নি")
+                : t("No chat history", "চ্যাট হিস্ট্রি নেই")}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4 pb-4">
+            {Object.entries(groupedSessions).map(([group, sessions]) => (
+              <div key={group}>
+                <p className="text-xs font-medium text-muted-foreground px-2 py-1">
+                  {group}
+                </p>
+                <div className="space-y-0.5">
+                  {sessions.map((session) => (
+                    <div
+                      key={session.id}
+                      onClick={() => loadSession(session)}
+                      className={cn(
+                        "group flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-colors",
+                        currentSessionId === session.id 
+                          ? "bg-muted" 
+                          : "hover:bg-muted/50"
+                      )}
+                    >
+                      <MessageCircle className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <span className="flex-1 text-sm truncate">{session.title}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                        onClick={(e) => deleteSession(session.id, e)}
                       >
-                        <History className="h-4 w-4" />
-                        <span className="hidden sm:inline">{t("History", "হিস্ট্রি")}</span>
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
-                    </SheetTrigger>
-                    <SheetContent>
-                      <SheetHeader>
-                        <SheetTitle className="flex items-center gap-2">
-                          <FolderOpen className="h-5 w-5" />
-                          {t("Saved Sessions", "সেভ করা সেশন")}
-                        </SheetTitle>
-                      </SheetHeader>
-                      <div className="mt-4">
-                        {isLoadingSessions ? (
-                          <div className="flex items-center justify-center py-8">
-                            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                          </div>
-                        ) : savedSessions.length === 0 ? (
-                          <div className="text-center py-8 text-muted-foreground">
-                            <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                            <p>{t("No saved sessions yet", "এখনও কোনো সেশন সেভ করা হয়নি")}</p>
-                            <p className="text-sm mt-1">{t("Save a chat to see it here", "এখানে দেখতে চ্যাট সেভ করুন")}</p>
-                          </div>
-                        ) : (
-                          <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-2">
-                            {savedSessions.map((session) => (
-                              <div
-                                key={session.id}
-                                onClick={() => loadSession(session)}
-                                className="p-3 rounded-lg border bg-card hover:bg-muted/50 cursor-pointer transition-colors group"
-                              >
-                                <div className="flex items-start justify-between gap-2">
-                                  <div className="flex-1 min-w-0">
-                                    <p className="font-medium text-sm truncate">{session.title}</p>
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      {formatDate(session.created_at)} • {session.messages.length} {t("messages", "মেসেজ")}
-                                    </p>
-                                  </div>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
-                                    onClick={(e) => deleteSession(session.id, e)}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </SheetContent>
-                  </Sheet>
-
-                  {/* New Chat Button */}
-                  {messages.length > 0 && (
-                    <Button variant="ghost" size="sm" onClick={resetChat} className="gap-2">
-                      <RotateCcw className="h-4 w-4" />
-                      <span className="hidden sm:inline">{t("New Chat", "নতুন চ্যাট")}</span>
-                    </Button>
-                  )}
+                    </div>
+                  ))}
                 </div>
               </div>
+            ))}
+          </div>
+        )}
+      </ScrollArea>
+      
+      {/* Sidebar Footer */}
+      <div className="p-3 border-t border-border/50">
+        <div className="flex items-center gap-2 px-2 py-2 rounded-lg">
+          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+            <GraduationCap className="h-4 w-4 text-primary-foreground" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate">Learning Buddy</p>
+            <p className="text-xs text-muted-foreground">{t("Free", "ফ্রি")}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
-              {/* Chat Messages */}
-              <ScrollArea className="h-[400px] p-4" ref={scrollRef}>
-                {messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-center px-4">
-                    <div className="relative mb-6">
-                      <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                        <MessageCircle className="h-8 w-8 text-primary" />
-                      </div>
-                    </div>
-                    
-                    <h3 className="text-xl font-semibold mb-2">
-                      {t("Hello! 👋", "হ্যালো বন্ধু! 👋")}
-                    </h3>
-                    <p className="text-muted-foreground text-sm mb-6 max-w-md">
-                      {t(
-                        "I can help you learn about any topic. Ask me anything!",
-                        "যেকোনো বিষয়ে শিখতে আমাকে জিজ্ঞাসা করো!"
-                      )}
-                    </p>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg">
-                      {suggestedQuestions.map((q, i) => (
-                        <button
-                          key={i}
-                          onClick={() => sendMessage(q.text)}
-                          className={cn(
-                            "flex items-center gap-3 p-3 rounded-xl",
-                            "bg-muted/50 hover:bg-muted border border-border/50",
-                            "text-left transition-all duration-200 hover:shadow-sm"
-                          )}
-                        >
-                          <div className={cn(
-                            "h-8 w-8 rounded-lg bg-gradient-to-br flex items-center justify-center shrink-0",
-                            q.color
-                          )}>
-                            <q.icon className="h-4 w-4 text-white" />
+  return (
+    <div className="h-screen bg-background flex overflow-hidden">
+      <SEOHead
+        title="Learning Buddy - AI শেখার সঙ্গী | UnityNets"
+        description="AI চ্যাটবট দিয়ে যেকোনো বিষয়ে বাংলায় শিখুন। প্রোগ্রামিং, ডিজিটাল দক্ষতা, ফ্রিল্যান্সিং।"
+        keywords="AI chatbot, learning, programming, Python, JavaScript, digital skills, বাংলা, শেখা"
+        canonicalUrl="https://unitynets.com/learning-zone"
+      />
+      
+      {/* Desktop Sidebar */}
+      <div 
+        className={cn(
+          "hidden md:flex flex-col border-r border-border/50 bg-muted/30 transition-all duration-300",
+          sidebarOpen ? "w-64" : "w-0 overflow-hidden"
+        )}
+      >
+        <SidebarContent />
+      </div>
+      
+      {/* Mobile Sidebar Overlay */}
+      {sidebarMobileOpen && (
+        <div 
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setSidebarMobileOpen(false)}
+        />
+      )}
+      
+      {/* Mobile Sidebar */}
+      <div 
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 w-72 bg-background border-r border-border/50 transform transition-transform duration-300 md:hidden",
+          sidebarMobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <SidebarContent />
+      </div>
+      
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Header */}
+        <header className="flex items-center justify-between px-4 py-3 border-b border-border/50">
+          <div className="flex items-center gap-2">
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden h-9 w-9"
+              onClick={() => setSidebarMobileOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            
+            {/* Desktop sidebar toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden md:flex h-9 w-9"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? (
+                <PanelLeftClose className="h-5 w-5" />
+              ) : (
+                <PanelLeft className="h-5 w-5" />
+              )}
+            </Button>
+            
+            <h1 className="text-lg font-semibold">Learning Buddy</h1>
+          </div>
+          
+          {messages.length > 0 && (
+            <Button variant="ghost" size="sm" onClick={startNewChat} className="gap-2">
+              <RotateCcw className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("New Chat", "নতুন চ্যাট")}</span>
+            </Button>
+          )}
+        </header>
+        
+        {/* Chat Area */}
+        <div className="flex-1 overflow-hidden">
+          {messages.length === 0 ? (
+            /* Welcome Screen */
+            <div className="h-full flex flex-col items-center justify-center px-4">
+              <div className="max-w-2xl w-full text-center">
+                <h2 className="text-3xl md:text-4xl font-semibold mb-8">
+                  {t("What can I help with?", "কিভাবে সাহায্য করতে পারি?")}
+                </h2>
+                
+                {/* Input Box */}
+                <div className="relative mb-6">
+                  <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
+                    {/* Attached files preview */}
+                    {attachedFiles.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-2 px-2">
+                        {attachedFiles.map((file, idx) => (
+                          <div key={idx} className="flex items-center gap-2 bg-background rounded-lg px-2 py-1 text-xs">
+                            {getFileIcon(file.type)}
+                            <span className="truncate max-w-[100px]">{file.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeAttachedFile(idx)}
+                              className="text-muted-foreground hover:text-destructive"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
                           </div>
-                          <span className="text-sm">{q.text}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {messages.map((msg, i) => (
-                      <div
-                        key={i}
-                        className={cn(
-                          "flex gap-3",
-                          msg.role === "user" ? "flex-row-reverse" : ""
-                        )}
-                      >
-                        <div className={cn(
-                          "h-8 w-8 rounded-full flex items-center justify-center shrink-0",
-                          msg.role === "user" 
-                            ? "bg-primary text-primary-foreground" 
-                            : "bg-gradient-to-br from-primary/20 to-accent/20"
-                        )}>
-                          {msg.role === "user" ? (
-                            <User className="h-4 w-4" />
-                          ) : (
-                            <Bot className="h-4 w-4 text-primary" />
-                          )}
-                        </div>
-
-                        <div className={cn(
-                          "flex-1 max-w-[85%]",
-                          msg.role === "user" ? "flex flex-col items-end" : ""
-                        )}>
-                          <div className={cn(
-                            "rounded-2xl px-4 py-3",
-                            msg.role === "user"
-                              ? "bg-primary text-primary-foreground rounded-tr-sm"
-                              : "bg-muted rounded-tl-sm"
-                          )}>
-                            {/* Display attached files */}
-                            {msg.files && msg.files.length > 0 && (
-                              <div className="flex flex-wrap gap-2 mb-2">
-                                {msg.files.map((file, fileIdx) => (
-                                  <a
-                                    key={fileIdx}
-                                    href={file.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block"
-                                  >
-                                    {file.type.startsWith('image/') ? (
-                                      <img
-                                        src={file.url}
-                                        alt={file.name}
-                                        className="max-w-[200px] max-h-[150px] rounded-lg object-cover"
-                                      />
-                                    ) : (
-                                      <div className="flex items-center gap-2 bg-background/20 rounded-lg px-3 py-2">
-                                        <FileText className="h-4 w-4" />
-                                        <span className="text-xs truncate max-w-[120px]">{file.name}</span>
-                                      </div>
-                                    )}
-                                  </a>
-                                ))}
-                              </div>
-                            )}
-                            {msg.role === "assistant" ? (
-                              <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-                                <ReactMarkdown
-                                  remarkPlugins={[remarkGfm]}
-                                  components={{
-                                    code: ({ className, children, ...props }) => {
-                                      const isInline = !className;
-                                      if (isInline) {
-                                        return (
-                                          <code className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-xs font-mono" {...props}>
-                                            {children}
-                                          </code>
-                                        );
-                                      }
-                                      return (
-                                        <pre className="bg-muted-foreground/10 rounded-lg p-3 overflow-x-auto my-2">
-                                          <code className={cn("text-xs font-mono", className)} {...props}>
-                                            {children}
-                                          </code>
-                                        </pre>
-                                      );
-                                    },
-                                    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                                    ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
-                                    ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
-                                    li: ({ children }) => <li className="text-sm">{children}</li>,
-                                    strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
-                                    em: ({ children }) => <em className="italic">{children}</em>,
-                                    h1: ({ children }) => <h1 className="text-lg font-bold mb-2 mt-3">{children}</h1>,
-                                    h2: ({ children }) => <h2 className="text-base font-bold mb-2 mt-3">{children}</h2>,
-                                    h3: ({ children }) => <h3 className="text-sm font-bold mb-1 mt-2">{children}</h3>,
-                                    blockquote: ({ children }) => (
-                                      <blockquote className="border-l-2 border-primary/50 pl-3 italic text-muted-foreground my-2">
-                                        {children}
-                                      </blockquote>
-                                    ),
-                                    a: ({ children, href }) => (
-                                      <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">
-                                        {children}
-                                      </a>
-                                    ),
-                                    table: ({ children }) => (
-                                      <div className="overflow-x-auto my-2">
-                                        <table className="min-w-full border-collapse text-xs">{children}</table>
-                                      </div>
-                                    ),
-                                    th: ({ children }) => <th className="border border-border px-2 py-1 bg-muted font-semibold">{children}</th>,
-                                    td: ({ children }) => <td className="border border-border px-2 py-1">{children}</td>,
-                                  }}
-                                >
-                                  {msg.content}
-                                </ReactMarkdown>
-                              </div>
-                            ) : (
-                              <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                                {msg.content}
-                              </p>
-                            )}
-                          </div>
-                          
-                          {msg.role === "assistant" && (
-                            <div className="flex items-center gap-1 mt-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-7 px-2 text-xs text-muted-foreground"
-                                onClick={() => copyToClipboard(msg.content, i)}
-                              >
-                                {copiedIndex === i ? (
-                                  <><Check className="h-3 w-3 mr-1" />{t("Copied", "কপি হয়েছে")}</>
-                                ) : (
-                                  <><Copy className="h-3 w-3 mr-1" />{t("Copy", "কপি")}</>
-                                )}
-                              </Button>
-                              {ttsSupported && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className={cn(
-                                    "h-7 px-2 text-xs",
-                                    speakingIndex === i ? "text-primary" : "text-muted-foreground"
-                                  )}
-                                  onClick={() => speakText(msg.content, i)}
-                                >
-                                  {speakingIndex === i ? (
-                                    <><VolumeX className="h-3 w-3 mr-1" />{t("Stop", "থামাও")}</>
-                                  ) : (
-                                    <><Volume2 className="h-3 w-3 mr-1" />{t("Listen", "শুনুন")}</>
-                                  )}
-                                </Button>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-
-                    {isLoading && messages[messages.length - 1]?.role === "user" && (
-                      <div className="flex gap-3">
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                          <Bot className="h-4 w-4 text-primary" />
-                        </div>
-                        <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                            <span className="text-sm text-muted-foreground">
-                              {t("Thinking...", "ভাবছি...")}
-                            </span>
-                          </div>
-                        </div>
+                        ))}
                       </div>
                     )}
+                    
+                    <div className="flex items-end gap-2">
+                      {/* Hidden file input */}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*,.pdf,.doc,.docx"
+                        multiple
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                      
+                      {/* Attach button */}
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isLoading || isUploading}
+                        className="h-10 w-10 shrink-0 rounded-xl"
+                      >
+                        {isUploading ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Paperclip className="h-5 w-5" />
+                        )}
+                      </Button>
+                      
+                      <Textarea
+                        ref={textareaRef}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder={t("Ask anything", "যেকোনো প্রশ্ন করো")}
+                        disabled={isLoading || isListening}
+                        rows={1}
+                        className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                      />
+                      
+                      {speechSupported && (
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant={isListening ? "destructive" : "ghost"}
+                          onClick={toggleListening}
+                          disabled={isLoading}
+                          className={cn(
+                            "h-10 w-10 shrink-0 rounded-xl",
+                            isListening && "animate-pulse"
+                          )}
+                        >
+                          {isListening ? (
+                            <MicOff className="h-5 w-5" />
+                          ) : (
+                            <Mic className="h-5 w-5" />
+                          )}
+                        </Button>
+                      )}
+                      
+                      <Button
+                        type="button"
+                        size="icon"
+                        onClick={() => sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined)}
+                        disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
+                        className="h-10 w-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
+                      >
+                        {isLoading ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Send className="h-5 w-5" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Suggested Questions */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-xl mx-auto">
+                  {suggestedQuestions.map((q, i) => {
+                    const Icon = q.icon;
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => sendMessage(q.text)}
+                        className={cn(
+                          "flex items-center gap-3 p-3 rounded-xl text-left",
+                          "bg-muted/50 hover:bg-muted border border-border/30",
+                          "transition-all duration-200 hover:shadow-sm"
+                        )}
+                      >
+                        <div className={cn("p-2 rounded-lg", q.color)}>
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <span className="text-sm">{q.text}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Chat Messages */
+            <ScrollArea className="h-full" ref={scrollRef}>
+              <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+                {messages.map((msg, i) => (
+                  <div key={i} className={cn("flex gap-4", msg.role === "user" && "flex-row-reverse")}>
+                    <div className={cn(
+                      "h-8 w-8 rounded-full flex items-center justify-center shrink-0",
+                      msg.role === "user" 
+                        ? "bg-primary" 
+                        : "bg-gradient-to-br from-primary/20 to-accent/20"
+                    )}>
+                      {msg.role === "user" ? (
+                        <User className="h-4 w-4 text-primary-foreground" />
+                      ) : (
+                        <Bot className="h-4 w-4 text-primary" />
+                      )}
+                    </div>
+                    
+                    <div className={cn("flex-1 space-y-2", msg.role === "user" && "flex flex-col items-end")}>
+                      {/* File attachments */}
+                      {msg.files && msg.files.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {msg.files.map((file, idx) => (
+                            <div key={idx} className="flex items-center gap-2 bg-muted rounded-lg px-3 py-2 text-xs">
+                              {file.type.startsWith('image/') ? (
+                                <img 
+                                  src={file.url} 
+                                  alt={file.name} 
+                                  className="h-16 w-16 object-cover rounded"
+                                />
+                              ) : (
+                                <>
+                                  {getFileIcon(file.type)}
+                                  <span>{file.name}</span>
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      <div className={cn(
+                        "rounded-2xl px-4 py-3 max-w-[85%]",
+                        msg.role === "user"
+                          ? "bg-primary text-primary-foreground rounded-tr-sm"
+                          : "bg-muted rounded-tl-sm"
+                      )}>
+                        {msg.role === "assistant" ? (
+                          <div className="prose prose-sm dark:prose-invert max-w-none">
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                code: ({ className, children, ...props }) => {
+                                  const isInline = !className;
+                                  if (isInline) {
+                                    return (
+                                      <code className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-xs font-mono" {...props}>
+                                        {children}
+                                      </code>
+                                    );
+                                  }
+                                  return (
+                                    <pre className="bg-muted-foreground/10 rounded-lg p-3 overflow-x-auto my-2">
+                                      <code className={cn("text-xs font-mono", className)} {...props}>
+                                        {children}
+                                      </code>
+                                    </pre>
+                                  );
+                                },
+                                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                                ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
+                                ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
+                                li: ({ children }) => <li className="text-sm">{children}</li>,
+                                strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                                em: ({ children }) => <em className="italic">{children}</em>,
+                                h1: ({ children }) => <h1 className="text-lg font-bold mb-2 mt-3">{children}</h1>,
+                                h2: ({ children }) => <h2 className="text-base font-bold mb-2 mt-3">{children}</h2>,
+                                h3: ({ children }) => <h3 className="text-sm font-bold mb-1 mt-2">{children}</h3>,
+                                blockquote: ({ children }) => (
+                                  <blockquote className="border-l-2 border-primary/50 pl-3 italic text-muted-foreground my-2">
+                                    {children}
+                                  </blockquote>
+                                ),
+                                a: ({ children, href }) => (
+                                  <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">
+                                    {children}
+                                  </a>
+                                ),
+                                table: ({ children }) => (
+                                  <div className="overflow-x-auto my-2">
+                                    <table className="min-w-full border-collapse text-xs">{children}</table>
+                                  </div>
+                                ),
+                                th: ({ children }) => <th className="border border-border px-2 py-1 bg-muted font-semibold">{children}</th>,
+                                td: ({ children }) => <td className="border border-border px-2 py-1">{children}</td>,
+                              }}
+                            >
+                              {msg.content}
+                            </ReactMarkdown>
+                          </div>
+                        ) : (
+                          <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                            {msg.content}
+                          </p>
+                        )}
+                      </div>
+                      
+                      {msg.role === "assistant" && (
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs text-muted-foreground"
+                            onClick={() => copyToClipboard(msg.content, i)}
+                          >
+                            {copiedIndex === i ? (
+                              <><Check className="h-3 w-3 mr-1" />{t("Copied", "কপি হয়েছে")}</>
+                            ) : (
+                              <><Copy className="h-3 w-3 mr-1" />{t("Copy", "কপি")}</>
+                            )}
+                          </Button>
+                          {ttsSupported && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className={cn(
+                                "h-7 px-2 text-xs",
+                                speakingIndex === i ? "text-primary" : "text-muted-foreground"
+                              )}
+                              onClick={() => speakText(msg.content, i)}
+                            >
+                              {speakingIndex === i ? (
+                                <><VolumeX className="h-3 w-3 mr-1" />{t("Stop", "থামাও")}</>
+                              ) : (
+                                <><Volume2 className="h-3 w-3 mr-1" />{t("Listen", "শুনুন")}</>
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                {isLoading && messages[messages.length - 1]?.role === "user" && (
+                  <div className="flex gap-4">
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                      <Bot className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                        <span className="text-sm text-muted-foreground">
+                          {t("Thinking...", "ভাবছি...")}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 )}
-              </ScrollArea>
-
-              {/* Input Area */}
-              <div className="p-4 border-t bg-background">
+              </div>
+            </ScrollArea>
+          )}
+        </div>
+        
+        {/* Input Area (when messages exist) */}
+        {messages.length > 0 && (
+          <div className="border-t border-border/50 p-4">
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
                 {/* Attached files preview */}
                 {attachedFiles.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-3 p-2 bg-muted/50 rounded-lg">
+                  <div className="flex flex-wrap gap-2 mb-2 px-2">
                     {attachedFiles.map((file, idx) => (
                       <div key={idx} className="flex items-center gap-2 bg-background rounded-lg px-2 py-1 text-xs">
                         {getFileIcon(file.type)}
@@ -1126,7 +1107,7 @@ export default function PublicLearningZone() {
                     ))}
                   </div>
                 )}
-
+                
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -1134,7 +1115,6 @@ export default function PublicLearningZone() {
                   }}
                   className="flex items-end gap-2"
                 >
-                  {/* Hidden file input */}
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -1144,224 +1124,73 @@ export default function PublicLearningZone() {
                     className="hidden"
                   />
                   
-                  {/* File upload button */}
                   <Button
                     type="button"
                     size="icon"
-                    variant="outline"
+                    variant="ghost"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading || isUploading}
-                    className="h-11 w-11 shrink-0 rounded-xl"
-                    title={t("Attach files", "ফাইল সংযুক্ত করুন")}
+                    className="h-10 w-10 shrink-0 rounded-xl"
                   >
                     {isUploading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                      <Paperclip className="h-4 w-4" />
+                      <Paperclip className="h-5 w-5" />
                     )}
                   </Button>
-
-                  <div className="flex-1 relative">
-                    <Textarea
-                      ref={textareaRef}
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      placeholder={t("Ask me anything...", "যেকোনো প্রশ্ন করো...")}
-                      disabled={isLoading || isListening}
-                      rows={1}
-                      className="min-h-[44px] max-h-[120px] resize-none pr-12 rounded-xl border-border/50 focus:border-primary/50"
-                    />
-                  </div>
+                  
+                  <Textarea
+                    ref={textareaRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder={t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
+                    disabled={isLoading || isListening}
+                    rows={1}
+                    className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                  />
+                  
                   {speechSupported && (
-                    <Button 
+                    <Button
                       type="button"
                       size="icon"
-                      variant={isListening ? "destructive" : "outline"}
+                      variant={isListening ? "destructive" : "ghost"}
                       onClick={toggleListening}
                       disabled={isLoading}
                       className={cn(
-                        "h-11 w-11 shrink-0 rounded-xl transition-all",
+                        "h-10 w-10 shrink-0 rounded-xl",
                         isListening && "animate-pulse"
                       )}
-                      title={isListening ? t("Stop listening", "শোনা বন্ধ করুন") : t("Voice input", "ভয়েস ইনপুট")}
                     >
                       {isListening ? (
-                        <MicOff className="h-4 w-4" />
+                        <MicOff className="h-5 w-5" />
                       ) : (
-                        <Mic className="h-4 w-4" />
+                        <Mic className="h-5 w-5" />
                       )}
                     </Button>
                   )}
-                  <Button 
-                    type="submit" 
+                  
+                  <Button
+                    type="submit"
                     size="icon"
                     disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
-                    className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90"
+                    className="h-10 w-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
                   >
                     {isLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                      <Send className="h-4 w-4" />
+                      <Send className="h-5 w-5" />
                     )}
                   </Button>
                 </form>
-                <p className="text-xs text-center text-muted-foreground mt-2">
-                  {t("Learning Buddy can make mistakes. Verify important info.", "Learning Buddy ভুল করতে পারে।")}
-                </p>
               </div>
-            </Card>
+              <p className="text-xs text-center text-muted-foreground mt-2">
+                {t("Learning Buddy can make mistakes. Verify important info.", "Learning Buddy ভুল করতে পারে।")}
+              </p>
+            </div>
           </div>
-
-          {/* Courses Section */}
-          <section className="mb-16">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">
-                {t("Free Courses", "ফ্রি কোর্স")}
-              </h2>
-              <p className="text-muted-foreground">
-                {t("Start learning with structured courses", "কাঠামোবদ্ধ কোর্স দিয়ে শেখা শুরু করুন")}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {courses.map((course) => {
-                const Icon = course.icon;
-                return (
-                  <Card key={course.id} className="p-5 hover:shadow-lg transition-all group cursor-pointer" onClick={handleEnroll}>
-                    <div className={cn(
-                      "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center mb-4",
-                      course.color
-                    )}>
-                      <Icon className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">
-                      {t(course.title, course.titleBn)}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {t(course.description, course.descriptionBn)}
-                    </p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Clock className="w-3 h-3" />
-                      <span>{course.duration}</span>
-                      <span>•</span>
-                      <span>{course.lessons} {t("lessons", "লেসন")}</span>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
-
-            <div className="text-center mt-6">
-              <Button variant="outline" onClick={handleEnroll} className="gap-2">
-                <GraduationCap className="w-4 h-4" />
-                {t("View All Courses", "সব কোর্স দেখুন")}
-              </Button>
-            </div>
-          </section>
-
-          {/* Free Books Section */}
-          <section className="mb-16">
-            <Card className="p-6 md:p-8 bg-gradient-to-br from-primary/5 via-background to-accent/5 border-primary/20">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <BookMarked className="w-5 h-5 text-primary" />
-                    <h2 className="text-xl font-bold">{t("Free Reading", "ফ্রি পড়া")}</h2>
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{freeBooks[0].titleBn}</h3>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    {t("by", "লেখক:")} {freeBooks[0].authorBn}
-                  </p>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {t(freeBooks[0].description, freeBooks[0].descriptionBn)}
-                  </p>
-                  <a 
-                    href={freeBooks[0].link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    <Button className="gap-2">
-                      <BookOpen className="w-4 h-4" />
-                      {t("Read Now", "পড়ুন")}
-                      <ExternalLink className="w-3 h-3" />
-                    </Button>
-                  </a>
-                </div>
-                <div className={cn(
-                  "w-32 h-44 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0",
-                  freeBooks[0].coverColor
-                )}>
-                  <BookOpen className="w-12 h-12 text-white/80" />
-                </div>
-              </div>
-            </Card>
-          </section>
-
-          {/* Stats Section */}
-          <section className="mb-16">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="p-6 text-center">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-primary" />
-                </div>
-                <div className="text-2xl font-bold text-primary">{courses.length}+</div>
-                <div className="text-sm text-muted-foreground">{t("Free Courses", "ফ্রি কোর্স")}</div>
-              </Card>
-              
-              <Card className="p-6 text-center">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-accent/10 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-accent" />
-                </div>
-                <div className="text-2xl font-bold text-accent">500+</div>
-                <div className="text-sm text-muted-foreground">{t("Learners", "শিক্ষার্থী")}</div>
-              </Card>
-              
-              <Card className="p-6 text-center">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-500/10 flex items-center justify-center">
-                  <Bot className="w-6 h-6 text-green-600" />
-                </div>
-                <div className="text-2xl font-bold text-green-600">24/7</div>
-                <div className="text-sm text-muted-foreground">{t("AI Support", "AI সাপোর্ট")}</div>
-              </Card>
-              
-              <Card className="p-6 text-center">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-amber-500/10 flex items-center justify-center">
-                  <Trophy className="w-6 h-6 text-amber-600" />
-                </div>
-                <div className="text-2xl font-bold text-amber-600">100%</div>
-                <div className="text-sm text-muted-foreground">{t("Free Forever", "চিরকাল ফ্রি")}</div>
-              </Card>
-            </div>
-          </section>
-
-          {/* CTA Section */}
-          <section className="text-center">
-            <Card className="p-8 md:p-12 bg-gradient-to-r from-primary to-accent text-primary-foreground">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                {t("Ready to Start Learning?", "শেখা শুরু করতে প্রস্তুত?")}
-              </h2>
-              <p className="text-lg opacity-90 mb-6 max-w-xl mx-auto">
-                {t(
-                  "Join thousands of learners and start your journey today!",
-                  "হাজারো শিক্ষার্থীদের সাথে আজই আপনার যাত্রা শুরু করুন!"
-                )}
-              </p>
-              <Button 
-                size="lg" 
-                variant="secondary" 
-                onClick={() => navigate('/auth?mode=signup')}
-                className="gap-2"
-              >
-                <GraduationCap className="w-5 h-5" />
-                {t("Join Now - It's Free", "এখনই জয়েন করুন - ফ্রি")}
-              </Button>
-            </Card>
-          </section>
-        </div>
-      </main>
-      
-      <Footer />
+        )}
+      </div>
     </div>
   );
 }
