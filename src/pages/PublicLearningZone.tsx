@@ -39,6 +39,7 @@ import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SEOHead } from "@/components/SEOHead";
 import { cn } from "@/lib/utils";
+import { Navbar } from "@/components/landing/Navbar";
 
 interface FileAttachment {
   name: string;
@@ -712,13 +713,19 @@ export default function PublicLearningZone() {
   );
 
   return (
-    <div className="h-screen bg-background flex overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
         title="Learning Buddy - AI শেখার সঙ্গী | UnityNets"
         description="AI চ্যাটবট দিয়ে যেকোনো বিষয়ে বাংলায় শিখুন। প্রোগ্রামিং, ডিজিটাল দক্ষতা, ফ্রিল্যান্সিং।"
         keywords="AI chatbot, learning, programming, Python, JavaScript, digital skills, বাংলা, শেখা"
         canonicalUrl="https://unitynets.com/learning-zone"
       />
+      
+      {/* Site Navbar */}
+      <Navbar />
+      
+      {/* Main Content - Below Navbar */}
+      <div className="flex-1 flex overflow-hidden pt-16 md:pt-20">
       
       {/* Desktop Sidebar */}
       <div 
@@ -1190,6 +1197,7 @@ export default function PublicLearningZone() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );
