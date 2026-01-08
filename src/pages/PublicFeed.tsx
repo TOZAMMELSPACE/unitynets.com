@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,17 +7,21 @@ import {
   Heart, 
   MessageCircle, 
   Share2, 
-  ThumbsDown,
   Eye,
   TrendingUp,
   Users,
   Newspaper,
-  Sparkles
+  Sparkles,
+  Loader2,
+  HandHeart,
+  GraduationCap,
+  Shield
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DemoPost {
   id: string;
@@ -113,7 +117,137 @@ const demoPosts: DemoPost[] = [
   }
 ];
 
-const PostCard = ({ post }: { post: DemoPost }) => {
+interface DbPost {
+  id: string;
+  content: string;
+  likes: number;
+  views: number;
+  created_at: string;
+  images: string[] | null;
+  video_url: string | null;
+  community_tag: string | null;
+  profiles: {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
+    bio: string | null;
+  } | null;
+  comments: { id: string }[];
+}
+
+const RealPostCard = ({ post }: { post: DbPost }) => {
+  const { t } = useLanguage();
+  const navigate = useNavigate();
+  
+  const handleInteraction = () => {
+    navigate('/auth?mode=signup');
+  };
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return t("Just now", "এইমাত্র");
+    if (diffMins < 60) return t(`${diffMins} minutes ago`, `${diffMins} মিনিট আগে`);
+    if (diffHours < 24) return t(`${diffHours} hours ago`, `${diffHours} ঘন্টা আগে`);
+    return t(`${diffDays} days ago`, `${diffDays} দিন আগে`);
+  };
+  
+  return (
+    <Card className="p-6 hover:shadow-lg transition-all duration-300">
+      {/* Author Info */}
+      <div className="flex items-start gap-3 mb-4">
+        <Avatar className="w-12 h-12 border-2 border-primary/20">
+          <AvatarImage src={post.profiles?.avatar_url || ""} />
+          <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+            {(post.profiles?.full_name || "U").charAt(0)}
+          </AvatarFallback>
+        </Avatar>
+        
+        <div className="flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="font-semibold">{post.profiles?.full_name || t("Anonymous", "অজ্ঞাতনামা")}</h4>
+          </div>
+          <p className="text-xs text-muted-foreground">{formatTimeAgo(post.created_at)}</p>
+        </div>
+        
+        {post.community_tag && (
+          <Badge variant="outline" className="text-xs">
+            {post.community_tag}
+          </Badge>
+        )}
+      </div>
+      
+      {/* Content */}
+      <p className="text-foreground mb-4 leading-relaxed whitespace-pre-wrap">
+        {post.content}
+      </p>
+
+      {/* Images */}
+      {post.images && post.images.length > 0 && (
+        <div className="mb-4 grid gap-2 grid-cols-2">
+          {post.images.slice(0, 4).map((img, idx) => (
+            <img 
+              key={idx} 
+              src={img} 
+              alt={`Post image ${idx + 1}`}
+              className="w-full h-40 object-cover rounded-lg"
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Video */}
+      {post.video_url && (
+        <div className="mb-4">
+          <video 
+            src={post.video_url} 
+            controls 
+            className="w-full rounded-lg max-h-80"
+          />
+        </div>
+      )}
+      
+      {/* Stats */}
+      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4 pt-4 border-t">
+        <span className="flex items-center gap-1">
+          <Heart className="w-4 h-4" />
+          {post.likes}
+        </span>
+        <span className="flex items-center gap-1">
+          <MessageCircle className="w-4 h-4" />
+          {post.comments?.length || 0}
+        </span>
+        <span className="flex items-center gap-1">
+          <Eye className="w-4 h-4" />
+          {post.views}
+        </span>
+      </div>
+      
+      {/* Actions */}
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="sm" className="flex-1" onClick={handleInteraction}>
+          <Heart className="w-4 h-4 mr-2" />
+          {t("Like", "লাইক")}
+        </Button>
+        <Button variant="ghost" size="sm" className="flex-1" onClick={handleInteraction}>
+          <MessageCircle className="w-4 h-4 mr-2" />
+          {t("Comment", "মন্তব্য")}
+        </Button>
+        <Button variant="ghost" size="sm" className="flex-1" onClick={handleInteraction}>
+          <Share2 className="w-4 h-4 mr-2" />
+          {t("Share", "শেয়ার")}
+        </Button>
+      </div>
+    </Card>
+  );
+};
+
+const DemoPostCard = ({ post }: { post: DemoPost }) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   
@@ -192,6 +326,48 @@ const PostCard = ({ post }: { post: DemoPost }) => {
 export default function PublicFeed() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const [posts, setPosts] = useState<DbPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('posts')
+        .select(`
+          id,
+          content,
+          likes,
+          views,
+          created_at,
+          images,
+          video_url,
+          community_tag,
+          profiles:user_id (
+            id,
+            full_name,
+            avatar_url,
+            bio
+          ),
+          comments (id)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      setPosts((data as unknown as DbPost[]) || []);
+      setHasMore((data?.length || 0) >= 20);
+    } catch (err) {
+      console.error('Error fetching posts:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -199,18 +375,75 @@ export default function PublicFeed() {
       
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4">
+          {/* Welcome Message */}
+          <Card className="mb-8 p-8 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 border-primary/20 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+            
+            <div className="relative z-10 text-center max-w-3xl mx-auto">
+              <div className="flex justify-center gap-3 mb-6">
+                <div className="p-3 bg-primary/10 rounded-full">
+                  <Shield className="w-6 h-6 text-primary" />
+                </div>
+                <div className="p-3 bg-accent/10 rounded-full">
+                  <GraduationCap className="w-6 h-6 text-accent" />
+                </div>
+                <div className="p-3 bg-primary/10 rounded-full">
+                  <HandHeart className="w-6 h-6 text-primary" />
+                </div>
+              </div>
+              
+              <h1 className="text-3xl md:text-4xl font-bold mb-4">
+                <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                  {t("Welcome to UnityNets!", "UnityNets-এ স্বাগতম!")}
+                </span>
+              </h1>
+              
+              <p className="text-lg text-muted-foreground mb-6">
+                {t(
+                  "A trusted community where we learn together, grow together, and build a stronger Bangladesh. Trust • Learn • Unite",
+                  "একটি বিশ্বস্ত কমিউনিটি যেখানে আমরা একসাথে শিখি, একসাথে বেড়ে উঠি এবং একটি শক্তিশালী বাংলাদেশ গড়ি। বিশ্বাস • শিক্ষা • ঐক্য"
+                )}
+              </p>
+              
+              <div className="flex flex-wrap justify-center gap-4 mb-6">
+                <div className="flex items-center gap-2 text-sm bg-background/50 px-4 py-2 rounded-full">
+                  <Users className="w-4 h-4 text-primary" />
+                  <span>{t("1000+ Members", "১০০০+ সদস্য")}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm bg-background/50 px-4 py-2 rounded-full">
+                  <GraduationCap className="w-4 h-4 text-accent" />
+                  <span>{t("Free Learning", "ফ্রি শিক্ষা")}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm bg-background/50 px-4 py-2 rounded-full">
+                  <HandHeart className="w-4 h-4 text-primary" />
+                  <span>{t("Community Support", "কমিউনিটি সাপোর্ট")}</span>
+                </div>
+              </div>
+              
+              <Button 
+                size="lg" 
+                onClick={() => navigate('/auth?mode=signup')}
+                className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                {t("Join Our Community", "কমিউনিটিতে যোগ দিন")}
+              </Button>
+            </div>
+          </Card>
+
           {/* Header */}
           <div className="text-center mb-12">
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
               <Newspaper className="w-4 h-4 mr-2" />
               {t("Community Feed", "কমিউনিটি ফিড")}
             </Badge>
-            <h1 className="text-3xl md:text-5xl font-bold mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 {t("What's Happening", "কি চলছে")}
               </span>
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
               {t(
                 "See what the UnityNets community is sharing, learning, and building together",
                 "দেখুন UnityNets কমিউনিটি কি শেয়ার করছে, শিখছে এবং একসাথে তৈরি করছে"
@@ -238,10 +471,22 @@ export default function PublicFeed() {
                   </Button>
                 </div>
               </Card>
+
+              {/* Loading State */}
+              {loading && (
+                <div className="flex justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              )}
               
-              {/* Posts */}
-              {demoPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {/* Real Posts from Database */}
+              {!loading && posts.length > 0 && posts.map((post) => (
+                <RealPostCard key={post.id} post={post} />
+              ))}
+
+              {/* Demo Posts (shown if no real posts or as fallback) */}
+              {!loading && posts.length === 0 && demoPosts.map((post) => (
+                <DemoPostCard key={post.id} post={post} />
               ))}
               
               {/* Load More CTA */}
