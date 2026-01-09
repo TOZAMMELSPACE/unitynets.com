@@ -120,10 +120,10 @@ const demoPosts: DemoPost[] = [
 interface DbPost {
   id: string;
   content: string;
-  likes: number;
-  views: number;
+  likes_count: number;
+  views_count: number;
   created_at: string;
-  images: string[] | null;
+  image_urls: string[] | null;
   video_url: string | null;
   community_tag: string | null;
   profiles: {
@@ -188,9 +188,9 @@ const RealPostCard = ({ post }: { post: DbPost }) => {
       </p>
 
       {/* Images */}
-      {post.images && post.images.length > 0 && (
+      {post.image_urls && post.image_urls.length > 0 && (
         <div className="mb-4 grid gap-2 grid-cols-2">
-          {post.images.slice(0, 4).map((img, idx) => (
+          {post.image_urls.slice(0, 4).map((img, idx) => (
             <img 
               key={idx} 
               src={img} 
@@ -216,7 +216,7 @@ const RealPostCard = ({ post }: { post: DbPost }) => {
       <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4 pt-4 border-t">
         <span className="flex items-center gap-1">
           <Heart className="w-4 h-4" />
-          {post.likes}
+          {post.likes_count}
         </span>
         <span className="flex items-center gap-1">
           <MessageCircle className="w-4 h-4" />
@@ -224,7 +224,7 @@ const RealPostCard = ({ post }: { post: DbPost }) => {
         </span>
         <span className="flex items-center gap-1">
           <Eye className="w-4 h-4" />
-          {post.views}
+          {post.views_count}
         </span>
       </div>
       
@@ -342,10 +342,10 @@ export default function PublicFeed() {
         .select(`
           id,
           content,
-          likes,
-          views,
+          likes_count,
+          views_count,
           created_at,
-          images,
+          image_urls,
           video_url,
           community_tag,
           profiles:user_id (
