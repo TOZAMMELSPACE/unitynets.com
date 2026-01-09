@@ -70,7 +70,7 @@ export const CTASection = () => {
             </div>
             <div className="flex items-center gap-2 text-white/80">
               <Globe className="w-5 h-5" />
-              <span>{t("From 15+ Countries", "১৫+ দেশ থেকে")}</span>
+              <span>{t("50+ Countries Worldwide", "৫০+ দেশে বিস্তৃত")}</span>
             </div>
             <div className="flex items-center gap-2 text-white/80">
               <Sparkles className="w-5 h-5" />

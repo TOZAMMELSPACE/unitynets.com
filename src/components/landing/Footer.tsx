@@ -110,7 +110,7 @@ export const Footer = () => {
               </li>
               <li className="flex items-start gap-2 text-muted-foreground text-sm">
                 <MapPin className="w-4 h-4 text-primary mt-0.5" />
-                <span>{t("Dhaka, Bangladesh", "ঢাকা, বাংলাদেশ")}</span>
+                <span>{t("Global • Headquarters in South Asia", "বিশ্বব্যাপী • দক্ষিণ এশিয়ায় সদর দপ্তর")}</span>
               </li>
             </ul>
           </div>
@@ -124,7 +124,7 @@ export const Footer = () => {
           <p className="text-sm text-muted-foreground flex items-center gap-1">
             <span>{t("Made with", "ভালোবাসা দিয়ে তৈরি")}</span>
             <Heart className="w-4 h-4 text-destructive fill-destructive" />
-            <span>{t("from Bangladesh", "বাংলাদেশ থেকে")}</span>
+            <span>{t("for the World", "সারা বিশ্বের জন্য")}</span>
           </p>
         </div>
       </div>
