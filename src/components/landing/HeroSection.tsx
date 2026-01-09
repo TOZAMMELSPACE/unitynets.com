@@ -72,7 +72,7 @@ export const HeroSection = () => {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-5 py-2.5 rounded-full text-sm font-semibold mb-8 animate-fade-in border border-primary/20 shadow-sm">
           <Sparkles className="w-4 h-4 text-primary" />
-          <span>🕊️ {t("Bangladesh's Largest Community Platform", "বাংলাদেশের বৃহত্তম কমিউনিটি প্ল্যাটফর্ম")}</span>
+          <span>🌍 {t("World Community Platform", "বিশ্ব কমিউনিটি প্ল্যাটফর্ম")}</span>
         </div>
 
         {/* Main Heading */}
@@ -91,8 +91,8 @@ export const HeroSection = () => {
         {/* Subheading */}
         <p className="subheading max-w-3xl mx-auto mb-10 animate-fade-in" style={{ animationDelay: '0.2s' }}>
           {t(
-            "Build Together, Grow Together – Join Bangladesh's largest community platform for skill sharing and mutual development. From South Asia to the world, we dream of uniting everyone.",
-            "Build Together, Grow Together – জয়েন করুন বাংলাদেশের বৃহত্তম কমিউনিটি প্ল্যাটফর্মে। দক্ষ আদান-প্রদান ও পারস্পরিক উন্নয়নের জন্য। দক্ষিণ এশিয়া থেকে সারা বিশ্বে, আমরা সবাইকে একত্রিত করার স্বপ্ন দেখি।"
+            "Build Together, Grow Together – Join the world's most trusted community platform for skill sharing and mutual growth. Building bridges of unity from South Asia to the world.",
+            "Build Together, Grow Together – জয়েন করুন বিশ্বের সবচেয়ে বিশ্বস্ত কমিউনিটি প্ল্যাটফর্মে। দক্ষতা শেয়ার ও পারস্পরিক উন্নয়নের জন্য। দক্ষিণ এশিয়া থেকে সারা বিশ্বে ঐক্যের সেতুবন্ধন।"
           )}
         </p>
 
@@ -138,7 +138,7 @@ export const HeroSection = () => {
           </div>
           <div className="flex items-center gap-2 text-foreground/80 bg-card px-4 py-2 rounded-full border border-border/50 shadow-sm">
             <Globe className="w-5 h-5 text-accent" />
-            <span className="font-medium">{t("From Various Countries", "বিভিন্ন দেশ থেকে")}</span>
+            <span className="font-medium">{t("50+ Countries Worldwide", "৫০+ দেশে বিস্তৃত")}</span>
           </div>
           <div className="flex items-center gap-2 text-foreground/80 bg-card px-4 py-2 rounded-full border border-border/50 shadow-sm">
             <Sparkles className="w-5 h-5 text-primary" />

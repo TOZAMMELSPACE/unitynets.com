@@ -43,8 +43,8 @@ const LandingPage = () => {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="Trust • Learn • Unite"
-        description="UnityNets - বাংলাদেশের প্রথম trust-based community platform। স্থানীয় সম্প্রদায়ে যুক্ত হন, জ্ঞান শেয়ার করুন, Unity Note দিয়ে সেবা বিনিময় করুন। Join for local engagement, learning, and building trust."
-        keywords="UnityNets, community platform, Bangladesh, বাংলাদেশ, trust network, Unity Note, local community, সম্প্রদায়, civic engagement, learning platform, social network"
+        description="UnityNets - World's trusted community platform. Building bridges of unity from South Asia to the world. Join for skill sharing, learning, and mutual growth."
+        keywords="UnityNets, community platform, world community, trust network, Unity Note, global community, skill sharing, learning platform, social network, South Asia"
         canonicalUrl="https://unitynets.com/"
         ogType="website"
       />
