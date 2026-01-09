@@ -126,12 +126,11 @@ interface DbPost {
   image_urls: string[] | null;
   video_url: string | null;
   community_tag: string | null;
-  profiles: {
-    id: string;
+  user_id: string;
+  author?: {
     full_name: string | null;
     avatar_url: string | null;
-    bio: string | null;
-  } | null;
+  };
   comments: { id: string }[];
 }
 
@@ -162,15 +161,15 @@ const RealPostCard = ({ post }: { post: DbPost }) => {
       {/* Author Info */}
       <div className="flex items-start gap-3 mb-4">
         <Avatar className="w-12 h-12 border-2 border-primary/20">
-          <AvatarImage src={post.profiles?.avatar_url || ""} />
+          <AvatarImage src={post.author?.avatar_url || ""} />
           <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-            {(post.profiles?.full_name || "U").charAt(0)}
+            {(post.author?.full_name || "U").charAt(0)}
           </AvatarFallback>
         </Avatar>
         
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="font-semibold">{post.profiles?.full_name || t("Anonymous", "অজ্ঞাতনামা")}</h4>
+            <h4 className="font-semibold">{post.author?.full_name || t("Anonymous", "অজ্ঞাতনামা")}</h4>
           </div>
           <p className="text-xs text-muted-foreground">{formatTimeAgo(post.created_at)}</p>
         </div>
@@ -337,7 +336,9 @@ export default function PublicFeed() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // Fetch posts first
+      const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select(`
           id,
@@ -348,20 +349,42 @@ export default function PublicFeed() {
           image_urls,
           video_url,
           community_tag,
-          profiles:user_id (
-            id,
-            full_name,
-            avatar_url,
-            bio
-          ),
+          user_id,
           comments (id)
         `)
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (error) throw error;
-      setPosts((data as unknown as DbPost[]) || []);
-      setHasMore((data?.length || 0) >= 20);
+      if (postsError) throw postsError;
+      
+      if (!postsData || postsData.length === 0) {
+        setPosts([]);
+        setHasMore(false);
+        return;
+      }
+
+      // Get unique user IDs
+      const userIds = [...new Set(postsData.map(p => p.user_id))];
+      
+      // Fetch profiles for those users
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, avatar_url')
+        .in('user_id', userIds);
+
+      // Create a map of user_id to profile
+      const profilesMap = new Map(
+        (profilesData || []).map(p => [p.user_id, p])
+      );
+
+      // Combine posts with author info
+      const postsWithAuthors: DbPost[] = postsData.map(post => ({
+        ...post,
+        author: profilesMap.get(post.user_id) || { full_name: null, avatar_url: null }
+      }));
+
+      setPosts(postsWithAuthors);
+      setHasMore(postsData.length >= 20);
     } catch (err) {
       console.error('Error fetching posts:', err);
     } finally {
