@@ -1,14 +1,15 @@
-import { memo, useState, useMemo } from "react";
+import { memo, useState, useMemo, useEffect } from "react";
 import { ComposableMap, Geographies, Geography, Marker, Line } from "react-simple-maps";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Globe, Users, TrendingUp, MessageSquare, Heart, X, Sparkles, Award, Calendar } from "lucide-react";
+import { Globe, Users, TrendingUp, MessageSquare, Heart, Sparkles, Award, Calendar, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useLocationStats, AggregatedLocation } from "@/hooks/useLocationStats";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-// Extended community data for each location
+// Extended community data for each location (used as fallback and for modal details)
 interface LocationData {
   name: string;
   coordinates: [number, number];
@@ -490,8 +491,53 @@ const WorldMapSection = () => {
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Fetch real location data from database
+  const { locations: realLocations, totalMembers: realTotalMembers, countriesCount, loading, hasData } = useLocationStats();
 
-  const totalMembers = memberLocations.reduce((sum, loc) => sum + loc.members, 0);
+  // Merge real data with fallback data
+  const displayLocations = useMemo(() => {
+    if (!hasData) {
+      // Return fallback data if no real data
+      return memberLocations;
+    }
+
+    // Create a map of real locations by name
+    const realLocationMap = new Map(realLocations.map(loc => [loc.name, loc]));
+    
+    // Merge: prefer real data, fallback to static data for display details
+    const merged: LocationData[] = [];
+    const seenNames = new Set<string>();
+
+    // First, add all real locations with merged data
+    realLocations.forEach(realLoc => {
+      const fallback = memberLocations.find(m => m.name === realLoc.name);
+      seenNames.add(realLoc.name);
+      
+      merged.push({
+        name: realLoc.name,
+        coordinates: realLoc.coordinates,
+        members: realLoc.members, // Use real member count
+        color: realLoc.color,
+        isHub: realLoc.isHub,
+        flag: realLoc.flag,
+        region: realLoc.region,
+        // Use fallback for additional details or generate defaults
+        joinedDate: fallback?.joinedDate || "2024",
+        activeMembers: fallback?.activeMembers || Math.floor(realLoc.members * 0.65),
+        postsThisMonth: fallback?.postsThisMonth || Math.floor(realLoc.members * 0.3),
+        topSkills: fallback?.topSkills || ["Community Building", "Networking"],
+        highlights: fallback?.highlights || ["Active community members"],
+        growthRate: fallback?.growthRate || 20,
+      });
+    });
+
+    return merged;
+  }, [realLocations, hasData]);
+
+  // Calculate totals from real data or fallback
+  const totalMembers = hasData ? realTotalMembers : memberLocations.reduce((sum, loc) => sum + loc.members, 0);
+  const displayCountriesCount = hasData ? countriesCount : memberLocations.length;
 
   const lineStyles = useMemo(() => ({
     strong: { strokeWidth: 1.5, opacity: 0.6, dashArray: "none" },
@@ -512,6 +558,7 @@ const WorldMapSection = () => {
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold mb-4">
             <Globe className="w-4 h-4" />
             <span>{t("Global Community", "বৈশ্বিক কমিউনিটি")}</span>
+            {loading && <Loader2 className="w-3 h-3 animate-spin" />}
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
             {t("United Across the World", "বিশ্বজুড়ে ঐক্যবদ্ধ")}
@@ -636,7 +683,7 @@ const WorldMapSection = () => {
               })}
 
               {/* Member markers */}
-              {memberLocations.map((location, index) => (
+              {displayLocations.map((location, index) => (
                 <Marker
                   key={location.name}
                   coordinates={location.coordinates}
@@ -741,7 +788,7 @@ const WorldMapSection = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 max-w-4xl mx-auto">
           <div className="text-center p-4 bg-card rounded-xl border border-border/50">
             <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-              {memberLocations.length}+
+              {displayCountriesCount > 0 ? displayCountriesCount : memberLocations.length}+
             </div>
             <div className="text-sm text-muted-foreground">
               {t("Countries", "দেশ")}
@@ -749,7 +796,7 @@ const WorldMapSection = () => {
           </div>
           <div className="text-center p-4 bg-card rounded-xl border border-border/50">
             <div className="text-3xl md:text-4xl font-bold text-accent mb-1">
-              {(totalMembers / 1000).toFixed(0)}K+
+              {totalMembers >= 1000 ? `${(totalMembers / 1000).toFixed(1)}K` : totalMembers}+
             </div>
             <div className="text-sm text-muted-foreground">
               {t("Members", "সদস্য")}
