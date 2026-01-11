@@ -6,7 +6,7 @@ import HeroSection from "@/components/landing/HeroSection";
 import SEOHead from "@/components/SEOHead";
 
 // Lazy load below-the-fold sections for faster initial load
-const WorldMapSection = lazy(() => import("@/components/landing/WorldMapSection"));
+// WorldMapSection is now integrated into HeroSection
 const ContentPreviewSection = lazy(() => import("@/components/landing/ContentPreviewSection"));
 const HowItWorksSection = lazy(() => import("@/components/landing/HowItWorksSection"));
 const FAQSection = lazy(() => import("@/components/landing/FAQSection"));
@@ -53,9 +53,7 @@ const LandingPage = () => {
       <main>
         <HeroSection />
         
-        <Suspense fallback={<SectionLoader />}>
-          <WorldMapSection />
-        </Suspense>
+        {/* WorldMapSection removed - now integrated into HeroSection */}
         <Suspense fallback={<SectionLoader />}>
           <ContentPreviewSection />
         </Suspense>
