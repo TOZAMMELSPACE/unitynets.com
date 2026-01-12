@@ -634,6 +634,7 @@ export const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchResults, setSearchResults] = useState<LocationData[]>([]);
+  const [highlightedLocation, setHighlightedLocation] = useState<string | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const handleSearch = useCallback((query: string) => {
@@ -654,6 +655,7 @@ export const HeroSection = () => {
     setSearchResults([]);
     setIsSearchOpen(false);
     setSelectedLocation(location);
+    setHighlightedLocation(location.name);
     animateToLocation(location.coordinates, 4, () => {
       setIsModalOpen(true);
     });
@@ -757,6 +759,28 @@ export const HeroSection = () => {
           .marker-clickable:hover {
             transform: scale(1.2);
           }
+          @keyframes highlightPulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(2.5); opacity: 0.3; }
+            100% { transform: scale(1); opacity: 1; }
+          }
+          @keyframes highlightGlow {
+            0%, 100% { filter: drop-shadow(0 0 8px hsl(var(--accent))) drop-shadow(0 0 20px hsl(var(--accent))); }
+            50% { filter: drop-shadow(0 0 15px hsl(var(--accent))) drop-shadow(0 0 35px hsl(var(--accent))) drop-shadow(0 0 50px hsl(var(--primary))); }
+          }
+          @keyframes highlightRing {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(3); opacity: 0; }
+          }
+          .highlight-marker {
+            animation: highlightGlow 1.5s ease-in-out infinite;
+          }
+          .highlight-ring {
+            animation: highlightRing 1.5s ease-out infinite;
+          }
+          .highlight-pulse {
+            animation: highlightPulse 2s ease-in-out infinite;
+          }
         `}</style>
         
         {/* Map - More visible with zoom/pan */}
@@ -848,87 +872,121 @@ export const HeroSection = () => {
               })}
 
               {/* Member markers */}
-              {displayLocations.map((location, index) => (
-                <Marker
-                  key={location.name}
-                  coordinates={location.coordinates}
-                  onMouseEnter={() => setHoveredLocation(location.name)}
-                  onMouseLeave={() => setHoveredLocation(null)}
-                  onClick={() => handleMarkerClick(location)}
-                  className="marker-clickable"
-                >
-                  {/* Outer pulse ring for hubs */}
-                  {location.isHub && (
-                    <circle
-                      r={(Math.min(location.members / 100, 16) + 4) / position.zoom}
-                      fill="none"
-                      stroke={location.color}
-                      strokeWidth={1.5 / position.zoom}
-                      opacity={0.35}
-                      className="animate-ping"
-                      style={{ animationDuration: `${2.5 + index * 0.1}s` }}
-                    />
-                  )}
-                  {/* Pulse ring */}
-                  <circle
-                    r={(Math.min(location.members / 120, 12) + 3) / position.zoom}
-                    fill="none"
-                    stroke={location.color}
-                    strokeWidth={1.5 / position.zoom}
-                    opacity={0.45}
-                    className="animate-ping"
-                    style={{ animationDuration: `${2 + index * 0.2}s` }}
-                  />
-                  {/* Main dot - larger and more visible */}
-                  <circle
-                    r={(Math.min(location.members / 150, 10) + 3) / position.zoom}
-                    fill={location.color}
-                    className="cursor-pointer transition-all duration-300 hover:opacity-80"
-                    style={{
-                      filter: `drop-shadow(0 0 ${location.members > 500 ? 12 : 6}px ${location.color})`,
-                    }}
-                  />
-                  {/* Inner glow */}
-                  <circle
-                    r={(Math.min(location.members / 300, 5) + 1.5) / position.zoom}
-                    fill="white"
-                    opacity={0.7}
-                  />
-                  
-                  {/* Tooltip */}
-                  {hoveredLocation === location.name && (
-                    <g transform={`scale(${1 / position.zoom})`}>
-                      <rect
-                        x={-55}
-                        y={-60}
-                        width={110}
-                        height={50}
-                        rx={8}
-                        fill="hsl(var(--popover))"
-                        stroke="hsl(var(--border))"
-                        strokeWidth={1}
-                        style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))" }}
+              {displayLocations.map((location, index) => {
+                const isHighlighted = highlightedLocation === location.name;
+                const baseRadius = (Math.min(location.members / 150, 10) + 3) / position.zoom;
+                
+                return (
+                  <Marker
+                    key={location.name}
+                    coordinates={location.coordinates}
+                    onMouseEnter={() => setHoveredLocation(location.name)}
+                    onMouseLeave={() => setHoveredLocation(null)}
+                    onClick={() => handleMarkerClick(location)}
+                    className="marker-clickable"
+                  >
+                    {/* Highlight effect - expanding rings */}
+                    {isHighlighted && (
+                      <>
+                        <circle
+                          r={baseRadius * 1.5}
+                          fill="hsl(var(--accent))"
+                          opacity={0.3}
+                          className="highlight-ring"
+                        />
+                        <circle
+                          r={baseRadius * 1.2}
+                          fill="hsl(var(--accent))"
+                          opacity={0.4}
+                          className="highlight-ring"
+                          style={{ animationDelay: "0.5s" }}
+                        />
+                        <circle
+                          r={baseRadius * 2}
+                          fill="none"
+                          stroke="hsl(var(--accent))"
+                          strokeWidth={3 / position.zoom}
+                          opacity={0.6}
+                          className="highlight-pulse"
+                        />
+                      </>
+                    )}
+                    
+                    {/* Outer pulse ring for hubs */}
+                    {location.isHub && (
+                      <circle
+                        r={(Math.min(location.members / 100, 16) + 4) / position.zoom}
+                        fill="none"
+                        stroke={location.color}
+                        strokeWidth={1.5 / position.zoom}
+                        opacity={0.35}
+                        className="animate-ping"
+                        style={{ animationDuration: `${2.5 + index * 0.1}s` }}
                       />
-                      <text
-                        textAnchor="middle"
-                        y={-38}
-                        className="fill-foreground font-semibold"
-                        style={{ fontSize: "11px" }}
-                      >
-                        {location.flag} {location.name}
-                      </text>
-                      <text
-                        textAnchor="middle"
-                        y={-22}
-                        className="fill-muted-foreground"
-                        style={{ fontSize: "9px" }}
-                      >
-                        {location.members.toLocaleString()} members
-                      </text>
-                    </g>
-                  )}
-                </Marker>
-              ))}
+                    )}
+                    {/* Pulse ring */}
+                    <circle
+                      r={(Math.min(location.members / 120, 12) + 3) / position.zoom}
+                      fill="none"
+                      stroke={isHighlighted ? "hsl(var(--accent))" : location.color}
+                      strokeWidth={(isHighlighted ? 2.5 : 1.5) / position.zoom}
+                      opacity={isHighlighted ? 0.8 : 0.45}
+                      className="animate-ping"
+                      style={{ animationDuration: `${isHighlighted ? 1 : 2 + index * 0.2}s` }}
+                    />
+                    {/* Main dot - larger and more visible */}
+                    <circle
+                      r={isHighlighted ? baseRadius * 1.3 : baseRadius}
+                      fill={isHighlighted ? "hsl(var(--accent))" : location.color}
+                      className={`cursor-pointer transition-all duration-300 hover:opacity-80 ${isHighlighted ? 'highlight-marker' : ''}`}
+                      style={{
+                        filter: isHighlighted 
+                          ? undefined 
+                          : `drop-shadow(0 0 ${location.members > 500 ? 12 : 6}px ${location.color})`,
+                      }}
+                    />
+                    {/* Inner glow */}
+                    <circle
+                      r={(Math.min(location.members / 300, 5) + 1.5) / position.zoom}
+                      fill="white"
+                      opacity={isHighlighted ? 1 : 0.7}
+                    />
+                    
+                    {/* Tooltip */}
+                    {(hoveredLocation === location.name || isHighlighted) && (
+                      <g transform={`scale(${1 / position.zoom})`}>
+                        <rect
+                          x={-55}
+                          y={-60}
+                          width={110}
+                          height={50}
+                          rx={8}
+                          fill={isHighlighted ? "hsl(var(--accent))" : "hsl(var(--popover))"}
+                          stroke={isHighlighted ? "hsl(var(--accent))" : "hsl(var(--border))"}
+                          strokeWidth={1}
+                          style={{ filter: isHighlighted ? "drop-shadow(0 0 15px hsl(var(--accent)))" : "drop-shadow(0 4px 8px rgba(0,0,0,0.2))" }}
+                        />
+                        <text
+                          textAnchor="middle"
+                          y={-38}
+                          className={`font-semibold ${isHighlighted ? 'fill-accent-foreground' : 'fill-foreground'}`}
+                          style={{ fontSize: "11px" }}
+                        >
+                          {location.flag} {location.name}
+                        </text>
+                        <text
+                          textAnchor="middle"
+                          y={-22}
+                          className={isHighlighted ? 'fill-accent-foreground/80' : 'fill-muted-foreground'}
+                          style={{ fontSize: "9px" }}
+                        >
+                          {location.members.toLocaleString()} members
+                        </text>
+                      </g>
+                    )}
+                  </Marker>
+                );
+              })}
             </ZoomableGroup>
           </ComposableMap>
         </div>
@@ -1121,7 +1179,10 @@ export const HeroSection = () => {
       <CountryDetailModal
         location={selectedLocation}
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setHighlightedLocation(null);
+        }}
       />
     </section>
   );
