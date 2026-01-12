@@ -1,8 +1,9 @@
-import { memo, useState, useMemo, useCallback } from "react";
+import { memo, useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { ComposableMap, Geographies, Geography, Marker, Line, ZoomableGroup } from "react-simple-maps";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Globe, Users, Sparkles, TrendingUp, MessageSquare, Heart, Award, Calendar, Loader2, ZoomIn, ZoomOut, RotateCcw, Move } from "lucide-react";
+import { ArrowRight, Globe, Users, Sparkles, TrendingUp, MessageSquare, Heart, Award, Calendar, Loader2, ZoomIn, ZoomOut, RotateCcw, Move, Search, X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
@@ -629,6 +630,59 @@ export const HeroSection = () => {
     light: { strokeWidth: 0.5, opacity: 0.2, dashArray: "2,4" },
   }), []);
 
+  // Search functionality
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState<LocationData[]>([]);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+    if (query.trim().length === 0) {
+      setSearchResults([]);
+      return;
+    }
+    const filtered = displayLocations.filter(loc =>
+      loc.name.toLowerCase().includes(query.toLowerCase()) ||
+      loc.region.toLowerCase().includes(query.toLowerCase())
+    );
+    setSearchResults(filtered);
+  }, [displayLocations]);
+
+  const handleSearchSelect = useCallback((location: LocationData) => {
+    setSearchQuery("");
+    setSearchResults([]);
+    setIsSearchOpen(false);
+    setSelectedLocation(location);
+    animateToLocation(location.coordinates, 4, () => {
+      setIsModalOpen(true);
+    });
+  }, [animateToLocation]);
+
+  const toggleSearch = useCallback(() => {
+    setIsSearchOpen(prev => {
+      if (!prev) {
+        setTimeout(() => searchInputRef.current?.focus(), 100);
+      }
+      return !prev;
+    });
+    setSearchQuery("");
+    setSearchResults([]);
+  }, []);
+
+  // Close search on escape
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isSearchOpen) {
+        setIsSearchOpen(false);
+        setSearchQuery("");
+        setSearchResults([]);
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isSearchOpen]);
+
   const handleMarkerClick = (location: LocationData) => {
     setSelectedLocation(location);
     // Animate zoom to the clicked location, then open modal
@@ -877,6 +931,72 @@ export const HeroSection = () => {
               ))}
             </ZoomableGroup>
           </ComposableMap>
+        </div>
+        
+        {/* Search Controls */}
+        <div className="absolute top-4 left-4 md:top-8 md:left-8 z-30 flex flex-col items-start gap-2">
+          <div className="flex items-center gap-2">
+            <Button
+              size="icon"
+              variant="secondary"
+              className="w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-lg hover:bg-primary hover:text-primary-foreground transition-all"
+              onClick={toggleSearch}
+            >
+              {isSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
+            </Button>
+            
+            {isSearchOpen && (
+              <div className="relative animate-fade-in">
+                <Input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder={t("Search country or region...", "দেশ বা অঞ্চল খুঁজুন...")}
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  className="w-56 md:w-72 bg-background/95 backdrop-blur-sm border-border shadow-lg pl-3 pr-8"
+                />
+                {searchQuery && (
+                  <button 
+                    onClick={() => { setSearchQuery(""); setSearchResults([]); }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+          
+          {/* Search Results Dropdown */}
+          {isSearchOpen && searchResults.length > 0 && (
+            <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl max-h-64 overflow-y-auto w-56 md:w-72 animate-fade-in">
+              {searchResults.map((location) => (
+                <button
+                  key={location.name}
+                  onClick={() => handleSearchSelect(location)}
+                  className="w-full px-4 py-3 text-left hover:bg-primary/10 transition-colors flex items-center gap-3 border-b border-border/50 last:border-b-0"
+                >
+                  <span className="text-xl">{location.flag}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-foreground truncate">{location.name}</div>
+                    <div className="text-xs text-muted-foreground">{location.region} • {location.members.toLocaleString()} members</div>
+                  </div>
+                  {location.isHub && (
+                    <span className="px-1.5 py-0.5 bg-primary/20 text-primary text-[10px] rounded-full">Hub</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+          
+          {/* No Results Message */}
+          {isSearchOpen && searchQuery.length > 0 && searchResults.length === 0 && (
+            <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl p-4 w-56 md:w-72 animate-fade-in">
+              <p className="text-sm text-muted-foreground text-center">
+                {t("No countries found", "কোন দেশ পাওয়া যায়নি")}
+              </p>
+            </div>
+          )}
         </div>
         
         {/* Zoom Controls */}
