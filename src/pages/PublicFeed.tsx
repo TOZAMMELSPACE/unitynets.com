@@ -10,112 +10,17 @@ import {
   Eye,
   TrendingUp,
   Users,
-  Newspaper,
   Sparkles,
   Loader2,
-  HandHeart,
-  GraduationCap,
-  Shield
+  ArrowRight,
+  FileText
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-
-interface DemoPost {
-  id: string;
-  author: {
-    name: string;
-    nameBn: string;
-    avatar: string;
-    role: string;
-    roleBn: string;
-  };
-  content: string;
-  contentBn: string;
-  likes: number;
-  comments: number;
-  views: number;
-  timeAgo: string;
-  timeAgoBn: string;
-  communityTag?: string;
-}
-
-const demoPosts: DemoPost[] = [
-  {
-    id: "1",
-    author: {
-      name: "Tozammel Haque",
-      nameBn: "তোজাম্মেল হক",
-      avatar: "",
-      role: "Community Leader",
-      roleBn: "কমিউনিটি লিডার"
-    },
-    content: "Welcome to UnityNets! 🎉 This platform is built for trust, learning, and unity. Let's build a stronger community together! #UnityNets #Bangladesh",
-    contentBn: "UnityNets-এ স্বাগতম! 🎉 এই প্ল্যাটফর্মটি বিশ্বাস, শিক্ষা এবং ঐক্যের জন্য তৈরি। আসুন একসাথে একটি শক্তিশালী কমিউনিটি গড়ি! #UnityNets #বাংলাদেশ",
-    likes: 245,
-    comments: 32,
-    views: 1250,
-    timeAgo: "2 hours ago",
-    timeAgoBn: "২ ঘন্টা আগে",
-    communityTag: "Announcements"
-  },
-  {
-    id: "2",
-    author: {
-      name: "Fatima Rahman",
-      nameBn: "ফাতিমা রহমান",
-      avatar: "",
-      role: "Educator",
-      roleBn: "শিক্ষক"
-    },
-    content: "Just completed the Python Basics course in Learning Zone! The content is amazing and completely free. Thank you UnityNets for this opportunity! 📚💻",
-    contentBn: "এইমাত্র লার্নিং জোনে পাইথন বেসিক কোর্স শেষ করলাম! কন্টেন্ট অসাধারণ এবং সম্পূর্ণ ফ্রি। এই সুযোগের জন্য UnityNets-কে ধন্যবাদ! 📚💻",
-    likes: 189,
-    comments: 28,
-    views: 890,
-    timeAgo: "5 hours ago",
-    timeAgoBn: "৫ ঘন্টা আগে",
-    communityTag: "Learning"
-  },
-  {
-    id: "3",
-    author: {
-      name: "Karim Ahmed",
-      nameBn: "করিম আহমেদ",
-      avatar: "",
-      role: "Developer",
-      roleBn: "ডেভেলপার"
-    },
-    content: "Looking for collaboration on a community project! We're building a tool to help local farmers connect with markets. Anyone interested in joining? 🌾🤝",
-    contentBn: "একটি কমিউনিটি প্রজেক্টে সহযোগিতার জন্য খুঁজছি! আমরা স্থানীয় কৃষকদের বাজারের সাথে সংযুক্ত করতে একটি টুল তৈরি করছি। কেউ যোগ দিতে আগ্রহী? 🌾🤝",
-    likes: 156,
-    comments: 45,
-    views: 720,
-    timeAgo: "8 hours ago",
-    timeAgoBn: "৮ ঘন্টা আগে",
-    communityTag: "Projects"
-  },
-  {
-    id: "4",
-    author: {
-      name: "Nusrat Jahan",
-      nameBn: "নুসরাত জাহান",
-      avatar: "",
-      role: "Student",
-      roleBn: "শিক্ষার্থী"
-    },
-    content: "The Unity Notes feature is brilliant! I can now exchange value within the community. Already earned 50 notes by helping others. This is the future! 💡",
-    contentBn: "ইউনিটি নোটস ফিচারটি অসাধারণ! এখন কমিউনিটির মধ্যে মূল্য বিনিময় করতে পারছি। ইতিমধ্যে অন্যদের সাহায্য করে ৫০ নোটস অর্জন করেছি। এটাই ভবিষ্যৎ! 💡",
-    likes: 234,
-    comments: 67,
-    views: 1100,
-    timeAgo: "1 day ago",
-    timeAgoBn: "১ দিন আগে",
-    communityTag: "Unity Notes"
-  }
-];
+import { useRealStats } from "@/hooks/useRealStats";
 
 interface DbPost {
   id: string;
@@ -134,7 +39,7 @@ interface DbPost {
   comments: { id: string }[];
 }
 
-const RealPostCard = ({ post }: { post: DbPost }) => {
+const PostCard = ({ post }: { post: DbPost }) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   
@@ -151,173 +56,126 @@ const RealPostCard = ({ post }: { post: DbPost }) => {
     const diffDays = Math.floor(diffHours / 24);
 
     if (diffMins < 1) return t("Just now", "এইমাত্র");
-    if (diffMins < 60) return t(`${diffMins} minutes ago`, `${diffMins} মিনিট আগে`);
-    if (diffHours < 24) return t(`${diffHours} hours ago`, `${diffHours} ঘন্টা আগে`);
-    return t(`${diffDays} days ago`, `${diffDays} দিন আগে`);
+    if (diffMins < 60) return t(`${diffMins}m`, `${diffMins}মি`);
+    if (diffHours < 24) return t(`${diffHours}h`, `${diffHours}ঘ`);
+    return t(`${diffDays}d`, `${diffDays}দি`);
   };
   
   return (
-    <Card className="p-6 hover:shadow-lg transition-all duration-300">
-      {/* Author Info */}
-      <div className="flex items-start gap-3 mb-4">
-        <Avatar className="w-12 h-12 border-2 border-primary/20">
+    <Card className="overflow-hidden hover:shadow-md transition-shadow">
+      {/* Author Header */}
+      <div className="flex items-center gap-3 p-4 pb-2">
+        <Avatar className="w-10 h-10 ring-2 ring-primary/10">
           <AvatarImage src={post.author?.avatar_url || ""} />
-          <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-            {(post.author?.full_name || "U").charAt(0)}
+          <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+            {(post.author?.full_name || "U").charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
         
-        <div className="flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="font-semibold">{post.author?.full_name || t("Anonymous", "অজ্ঞাতনামা")}</h4>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h4 className="font-medium text-sm truncate">
+              {post.author?.full_name || t("Anonymous", "অজ্ঞাতনামা")}
+            </h4>
+            <span className="text-xs text-muted-foreground">•</span>
+            <span className="text-xs text-muted-foreground">{formatTimeAgo(post.created_at)}</span>
           </div>
-          <p className="text-xs text-muted-foreground">{formatTimeAgo(post.created_at)}</p>
+          {post.community_tag && (
+            <Badge variant="secondary" className="text-[10px] h-5 mt-0.5">
+              {post.community_tag}
+            </Badge>
+          )}
         </div>
-        
-        {post.community_tag && (
-          <Badge variant="outline" className="text-xs">
-            {post.community_tag}
-          </Badge>
-        )}
       </div>
       
       {/* Content */}
-      <p className="text-foreground mb-4 leading-relaxed whitespace-pre-wrap">
-        {post.content}
-      </p>
+      <div className="px-4 pb-3">
+        <p className="text-sm leading-relaxed whitespace-pre-wrap line-clamp-4">
+          {post.content}
+        </p>
+      </div>
 
-      {/* Images */}
+      {/* Media */}
       {post.image_urls && post.image_urls.length > 0 && (
-        <div className="mb-4 grid gap-2 grid-cols-2">
+        <div className={`grid gap-0.5 ${post.image_urls.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
           {post.image_urls.slice(0, 4).map((img, idx) => (
-            <img 
-              key={idx} 
-              src={img} 
-              alt={`Post image ${idx + 1}`}
-              className="w-full h-40 object-cover rounded-lg"
-            />
+            <div key={idx} className="relative aspect-square overflow-hidden">
+              <img 
+                src={img} 
+                alt=""
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+              {idx === 3 && post.image_urls && post.image_urls.length > 4 && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <span className="text-white font-bold">+{post.image_urls.length - 4}</span>
+                </div>
+              )}
+            </div>
           ))}
         </div>
       )}
 
-      {/* Video */}
       {post.video_url && (
-        <div className="mb-4">
-          <video 
-            src={post.video_url} 
-            controls 
-            className="w-full rounded-lg max-h-80"
-          />
-        </div>
+        <video 
+          src={post.video_url} 
+          controls 
+          className="w-full max-h-64 object-cover"
+          preload="metadata"
+        />
       )}
       
-      {/* Stats */}
-      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4 pt-4 border-t">
-        <span className="flex items-center gap-1">
-          <Heart className="w-4 h-4" />
-          {post.likes_count}
-        </span>
-        <span className="flex items-center gap-1">
-          <MessageCircle className="w-4 h-4" />
-          {post.comments?.length || 0}
-        </span>
-        <span className="flex items-center gap-1">
-          <Eye className="w-4 h-4" />
-          {post.views_count}
-        </span>
-      </div>
-      
-      {/* Actions */}
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" className="flex-1" onClick={handleInteraction}>
-          <Heart className="w-4 h-4 mr-2" />
-          {t("Like", "লাইক")}
-        </Button>
-        <Button variant="ghost" size="sm" className="flex-1" onClick={handleInteraction}>
-          <MessageCircle className="w-4 h-4 mr-2" />
-          {t("Comment", "মন্তব্য")}
-        </Button>
-        <Button variant="ghost" size="sm" className="flex-1" onClick={handleInteraction}>
-          <Share2 className="w-4 h-4 mr-2" />
-          {t("Share", "শেয়ার")}
-        </Button>
+      {/* Stats & Actions */}
+      <div className="p-4 pt-3 space-y-3">
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <Heart className="w-3.5 h-3.5" /> {post.likes_count}
+          </span>
+          <span className="flex items-center gap-1">
+            <MessageCircle className="w-3.5 h-3.5" /> {post.comments?.length || 0}
+          </span>
+          <span className="flex items-center gap-1">
+            <Eye className="w-3.5 h-3.5" /> {post.views_count}
+          </span>
+        </div>
+        
+        <div className="flex gap-1 border-t pt-3">
+          <Button variant="ghost" size="sm" className="flex-1 h-9 text-xs" onClick={handleInteraction}>
+            <Heart className="w-4 h-4 mr-1.5" />
+            {t("Like", "লাইক")}
+          </Button>
+          <Button variant="ghost" size="sm" className="flex-1 h-9 text-xs" onClick={handleInteraction}>
+            <MessageCircle className="w-4 h-4 mr-1.5" />
+            {t("Comment", "মন্তব্য")}
+          </Button>
+          <Button variant="ghost" size="sm" className="flex-1 h-9 text-xs" onClick={handleInteraction}>
+            <Share2 className="w-4 h-4 mr-1.5" />
+            {t("Share", "শেয়ার")}
+          </Button>
+        </div>
       </div>
     </Card>
   );
 };
 
-const DemoPostCard = ({ post }: { post: DemoPost }) => {
+const EmptyState = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   
-  const handleInteraction = () => {
-    navigate('/auth?mode=signup');
-  };
-  
   return (
-    <Card className="p-6 hover:shadow-lg transition-all duration-300">
-      {/* Author Info */}
-      <div className="flex items-start gap-3 mb-4">
-        <Avatar className="w-12 h-12 border-2 border-primary/20">
-          <AvatarImage src={post.author.avatar} />
-          <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-            {post.author.name.charAt(0)}
-          </AvatarFallback>
-        </Avatar>
-        
-        <div className="flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="font-semibold">{t(post.author.name, post.author.nameBn)}</h4>
-            <Badge variant="secondary" className="text-xs">
-              {t(post.author.role, post.author.roleBn)}
-            </Badge>
-          </div>
-          <p className="text-xs text-muted-foreground">{t(post.timeAgo, post.timeAgoBn)}</p>
-        </div>
-        
-        {post.communityTag && (
-          <Badge variant="outline" className="text-xs">
-            {post.communityTag}
-          </Badge>
-        )}
+    <Card className="p-8 text-center">
+      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+        <FileText className="w-8 h-8 text-muted-foreground" />
       </div>
-      
-      {/* Content */}
-      <p className="text-foreground mb-4 leading-relaxed">
-        {t(post.content, post.contentBn)}
+      <h3 className="font-semibold text-lg mb-2">
+        {t("No posts yet", "এখনও কোনো পোস্ট নেই")}
+      </h3>
+      <p className="text-muted-foreground text-sm mb-4">
+        {t("Be the first to share something with the community!", "কমিউনিটিতে প্রথম কিছু শেয়ার করুন!")}
       </p>
-      
-      {/* Stats */}
-      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4 pt-4 border-t">
-        <span className="flex items-center gap-1">
-          <Heart className="w-4 h-4" />
-          {post.likes}
-        </span>
-        <span className="flex items-center gap-1">
-          <MessageCircle className="w-4 h-4" />
-          {post.comments}
-        </span>
-        <span className="flex items-center gap-1">
-          <Eye className="w-4 h-4" />
-          {post.views}
-        </span>
-      </div>
-      
-      {/* Actions */}
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" className="flex-1" onClick={handleInteraction}>
-          <Heart className="w-4 h-4 mr-2" />
-          {t("Like", "লাইক")}
-        </Button>
-        <Button variant="ghost" size="sm" className="flex-1" onClick={handleInteraction}>
-          <MessageCircle className="w-4 h-4 mr-2" />
-          {t("Comment", "মন্তব্য")}
-        </Button>
-        <Button variant="ghost" size="sm" className="flex-1" onClick={handleInteraction}>
-          <Share2 className="w-4 h-4 mr-2" />
-          {t("Share", "শেয়ার")}
-        </Button>
-      </div>
+      <Button onClick={() => navigate('/auth?mode=signup')}>
+        {t("Join & Post", "জয়েন করে পোস্ট করুন")}
+      </Button>
     </Card>
   );
 };
@@ -327,7 +185,7 @@ export default function PublicFeed() {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<DbPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(true);
+  const { activeUsers, totalPosts, isLoading: statsLoading } = useRealStats();
 
   useEffect(() => {
     fetchPosts();
@@ -337,7 +195,6 @@ export default function PublicFeed() {
     try {
       setLoading(true);
       
-      // Fetch posts first
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select(`
@@ -359,32 +216,26 @@ export default function PublicFeed() {
       
       if (!postsData || postsData.length === 0) {
         setPosts([]);
-        setHasMore(false);
         return;
       }
 
-      // Get unique user IDs
       const userIds = [...new Set(postsData.map(p => p.user_id))];
       
-      // Fetch profiles for those users
       const { data: profilesData } = await supabase
         .from('profiles')
         .select('user_id, full_name, avatar_url')
         .in('user_id', userIds);
 
-      // Create a map of user_id to profile
       const profilesMap = new Map(
         (profilesData || []).map(p => [p.user_id, p])
       );
 
-      // Combine posts with author info
       const postsWithAuthors: DbPost[] = postsData.map(post => ({
         ...post,
         author: profilesMap.get(post.user_id) || { full_name: null, avatar_url: null }
       }));
 
       setPosts(postsWithAuthors);
-      setHasMore(postsData.length >= 20);
     } catch (err) {
       console.error('Error fetching posts:', err);
     } finally {
@@ -392,198 +243,119 @@ export default function PublicFeed() {
     }
   };
 
+  const formatStat = (num: number): string => {
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toString();
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4">
-          {/* Welcome Message */}
-          <Card className="mb-8 p-8 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 border-primary/20 overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-            
-            <div className="relative z-10 text-center max-w-3xl mx-auto">
-              <div className="flex justify-center gap-3 mb-6">
-                <div className="p-3 bg-primary/10 rounded-full">
-                  <Shield className="w-6 h-6 text-primary" />
-                </div>
-                <div className="p-3 bg-accent/10 rounded-full">
-                  <GraduationCap className="w-6 h-6 text-accent" />
-                </div>
-                <div className="p-3 bg-primary/10 rounded-full">
-                  <HandHeart className="w-6 h-6 text-primary" />
-                </div>
-              </div>
-              
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">
-                <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                  {t("Welcome to UnityNets!", "UnityNets-এ স্বাগতম!")}
-                </span>
+      <main className="pt-20 pb-12">
+        {/* Hero Banner */}
+        <div className="bg-gradient-to-br from-primary/10 via-background to-accent/10 border-b">
+          <div className="container mx-auto px-4 py-8 md:py-12">
+            <div className="max-w-2xl mx-auto text-center">
+              <h1 className="text-2xl md:text-3xl font-bold mb-3">
+                {t("Community Feed", "কমিউনিটি ফিড")}
               </h1>
-              
-              <p className="text-lg text-muted-foreground mb-6">
+              <p className="text-muted-foreground text-sm md:text-base mb-6">
                 {t(
-                  "A trusted community where we learn together, grow together, and build a stronger Bangladesh. Trust • Learn • Unite",
-                  "একটি বিশ্বস্ত কমিউনিটি যেখানে আমরা একসাথে শিখি, একসাথে বেড়ে উঠি এবং একটি শক্তিশালী বাংলাদেশ গড়ি। বিশ্বাস • শিক্ষা • ঐক্য"
+                  "See what our community is sharing and discussing",
+                  "দেখুন আমাদের কমিউনিটি কি শেয়ার করছে"
                 )}
               </p>
               
-              <div className="flex flex-wrap justify-center gap-4 mb-6">
-                <div className="flex items-center gap-2 text-sm bg-background/50 px-4 py-2 rounded-full">
-                  <Users className="w-4 h-4 text-primary" />
-                  <span>{t("1000+ Members", "১০০০+ সদস্য")}</span>
+              {/* Stats */}
+              <div className="flex justify-center gap-6 mb-6">
+                <div className="text-center">
+                  <div className="text-xl md:text-2xl font-bold text-primary">
+                    {statsLoading ? "..." : formatStat(activeUsers)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{t("Members", "সদস্য")}</div>
                 </div>
-                <div className="flex items-center gap-2 text-sm bg-background/50 px-4 py-2 rounded-full">
-                  <GraduationCap className="w-4 h-4 text-accent" />
-                  <span>{t("Free Learning", "ফ্রি শিক্ষা")}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm bg-background/50 px-4 py-2 rounded-full">
-                  <HandHeart className="w-4 h-4 text-primary" />
-                  <span>{t("Community Support", "কমিউনিটি সাপোর্ট")}</span>
+                <div className="w-px bg-border" />
+                <div className="text-center">
+                  <div className="text-xl md:text-2xl font-bold text-accent">
+                    {statsLoading ? "..." : formatStat(totalPosts)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{t("Posts", "পোস্ট")}</div>
                 </div>
               </div>
               
-              <Button 
-                size="lg" 
-                onClick={() => navigate('/auth?mode=signup')}
-                className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                {t("Join Our Community", "কমিউনিটিতে যোগ দিন")}
+              <Button onClick={() => navigate('/auth?mode=signup')} className="gap-2">
+                <Sparkles className="w-4 h-4" />
+                {t("Join Community", "কমিউনিটিতে যোগ দিন")}
+                <ArrowRight className="w-4 h-4" />
               </Button>
             </div>
-          </Card>
-
-          {/* Header */}
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-              <Newspaper className="w-4 h-4 mr-2" />
-              {t("Community Feed", "কমিউনিটি ফিড")}
-            </Badge>
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                {t("What's Happening", "কি চলছে")}
-              </span>
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              {t(
-                "See what the UnityNets community is sharing, learning, and building together",
-                "দেখুন UnityNets কমিউনিটি কি শেয়ার করছে, শিখছে এবং একসাথে তৈরি করছে"
-              )}
-            </p>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="container mx-auto px-4 py-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Main Feed */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* CTA Card */}
-              <Card className="p-6 bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-primary" />
+            <div className="lg:col-span-8 space-y-4">
+              {/* Join CTA - Mobile */}
+              <Card className="p-4 bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20 lg:hidden">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-5 h-5 text-primary" />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{t("Join the Conversation", "কথোপকথনে যোগ দিন")}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {t("Sign up to share your thoughts and connect with the community", "সাইন আপ করুন আপনার চিন্তা শেয়ার করতে এবং কমিউনিটির সাথে সংযুক্ত হতে")}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-sm">{t("Join the conversation", "কথোপকথনে যোগ দিন")}</h3>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {t("Share your thoughts", "আপনার চিন্তা শেয়ার করুন")}
                     </p>
                   </div>
-                  <Button onClick={() => navigate('/auth?mode=signup')}>
-                    {t("Join Now", "জয়েন করুন")}
+                  <Button size="sm" onClick={() => navigate('/auth?mode=signup')}>
+                    {t("Join", "জয়েন")}
                   </Button>
                 </div>
               </Card>
 
               {/* Loading State */}
               {loading && (
-                <div className="flex justify-center py-12">
+                <div className="flex justify-center py-16">
                   <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 </div>
               )}
               
-              {/* Real Posts from Database */}
+              {/* Posts */}
               {!loading && posts.length > 0 && posts.map((post) => (
-                <RealPostCard key={post.id} post={post} />
+                <PostCard key={post.id} post={post} />
               ))}
 
-              {/* Demo Posts (shown if no real posts or as fallback) */}
-              {!loading && posts.length === 0 && demoPosts.map((post) => (
-                <DemoPostCard key={post.id} post={post} />
-              ))}
+              {/* Empty State */}
+              {!loading && posts.length === 0 && <EmptyState />}
               
               {/* Load More CTA */}
-              <Card className="p-8 text-center bg-muted/50">
-                <h3 className="font-semibold text-lg mb-2">
-                  {t("Want to see more?", "আরও দেখতে চান?")}
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  {t("Join UnityNets to access the full community feed", "পূর্ণ কমিউনিটি ফিড অ্যাক্সেস করতে UnityNets-এ যোগ দিন")}
-                </p>
-                <Button size="lg" onClick={() => navigate('/auth?mode=signup')}>
-                  {t("Create Free Account", "ফ্রি অ্যাকাউন্ট তৈরি করুন")}
-                </Button>
-              </Card>
+              {!loading && posts.length > 0 && (
+                <Card className="p-6 text-center bg-muted/30">
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t("Want to see more and interact?", "আরও দেখতে ও ইন্টারেক্ট করতে চান?")}
+                  </p>
+                  <Button onClick={() => navigate('/auth?mode=signup')}>
+                    {t("Create Free Account", "ফ্রি অ্যাকাউন্ট তৈরি করুন")}
+                  </Button>
+                </Card>
+              )}
             </div>
 
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Community Stats */}
-              <Card className="p-6">
-                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                  {t("Community Stats", "কমিউনিটি স্ট্যাটস")}
-                </h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <span className="text-sm text-muted-foreground">{t("Active Members", "সক্রিয় সদস্য")}</span>
-                    <span className="font-bold text-xl text-primary">1,000+</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <span className="text-sm text-muted-foreground">{t("Posts Today", "আজকের পোস্ট")}</span>
-                    <span className="font-bold text-xl text-primary">150+</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <span className="text-sm text-muted-foreground">{t("Unity Notes Exchanged", "ইউনিটি নোটস বিনিময়")}</span>
-                    <span className="font-bold text-xl text-primary">5,000+</span>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Trending Topics */}
-              <Card className="p-6">
-                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-accent" />
-                  {t("Trending Topics", "ট্রেন্ডিং টপিক")}
-                </h3>
-                
-                <div className="space-y-2">
-                  {["#UnityNets", "#Learning", "#Bangladesh", "#Community", "#FreeCourses"].map((tag, idx) => (
-                    <Button
-                      key={idx}
-                      variant="ghost"
-                      className="w-full justify-start text-sm"
-                      onClick={() => navigate('/auth?mode=signup')}
-                    >
-                      <span className="text-primary mr-2">{idx + 1}</span>
-                      {tag}
-                    </Button>
-                  ))}
-                </div>
-              </Card>
-
+            {/* Sidebar - Desktop Only */}
+            <div className="hidden lg:block lg:col-span-4 space-y-4">
               {/* Join CTA */}
-              <Card className="p-6 bg-gradient-to-br from-primary to-accent text-primary-foreground">
-                <div className="text-center space-y-4">
-                  <Users className="w-12 h-12 mx-auto opacity-80" />
-                  <h3 className="font-bold text-lg">
+              <Card className="p-5 bg-gradient-to-br from-primary to-accent text-primary-foreground">
+                <div className="text-center space-y-3">
+                  <Users className="w-10 h-10 mx-auto opacity-90" />
+                  <h3 className="font-bold">
                     {t("Join Our Community", "আমাদের কমিউনিটিতে যোগ দিন")}
                   </h3>
                   <p className="text-sm opacity-90">
                     {t(
-                      "Connect with thousands of members, share knowledge, and grow together",
-                      "হাজার হাজার সদস্যের সাথে সংযুক্ত হন, জ্ঞান শেয়ার করুন এবং একসাথে বেড়ে উঠুন"
+                      "Connect, share and grow together",
+                      "সংযুক্ত হন, শেয়ার করুন এবং একসাথে বেড়ে উঠুন"
                     )}
                   </p>
                   <Button 
@@ -593,6 +365,52 @@ export default function PublicFeed() {
                   >
                     {t("Get Started Free", "ফ্রিতে শুরু করুন")}
                   </Button>
+                </div>
+              </Card>
+
+              {/* Community Stats */}
+              <Card className="p-5">
+                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  {t("Community Stats", "কমিউনিটি স্ট্যাটস")}
+                </h3>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <span className="text-sm text-muted-foreground">{t("Members", "সদস্য")}</span>
+                    <span className="font-bold text-primary">
+                      {statsLoading ? "..." : formatStat(activeUsers)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <span className="text-sm text-muted-foreground">{t("Total Posts", "মোট পোস্ট")}</span>
+                    <span className="font-bold text-primary">
+                      {statsLoading ? "..." : formatStat(totalPosts)}
+                    </span>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Trending Topics */}
+              <Card className="p-5">
+                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-accent" />
+                  {t("Trending", "ট্রেন্ডিং")}
+                </h3>
+                
+                <div className="space-y-1">
+                  {["#UnityNets", "#Learning", "#Community", "#Growth"].map((tag, idx) => (
+                    <Button
+                      key={idx}
+                      variant="ghost"
+                      size="sm"
+                      className="w-full justify-start text-sm h-9"
+                      onClick={() => navigate('/auth?mode=signup')}
+                    >
+                      <span className="text-primary mr-2 text-xs">{idx + 1}</span>
+                      {tag}
+                    </Button>
+                  ))}
                 </div>
               </Card>
             </div>
