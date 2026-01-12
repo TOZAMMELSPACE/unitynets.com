@@ -621,9 +621,10 @@ export const HeroSection = () => {
     return merged;
   }, [realLocations, hasData]);
 
-  const totalMembers = hasData ? realTotalMembers : memberLocations.reduce((sum, loc) => sum + loc.members, 0);
+  // Always use real data from database, fallback to 0 if not loaded yet
+  const totalMembers = realTotalMembers || 0;
   const totalPosts = realTotalPosts || 0;
-  const displayCountriesCount = hasData ? countriesCount : memberLocations.length;
+  const displayCountriesCount = countriesCount || 0;
 
   const lineStyles = useMemo(() => ({
     strong: { strokeWidth: 1.5, opacity: 0.5, dashArray: "none" },
