@@ -16,8 +16,6 @@ export const Navbar = () => {
   const navLinks = [
     { name: t("Home", "হোম"), path: "/" },
     { name: t("About", "মিশন"), path: "/about" },
-    { name: t("How it works", "কিভাবে কাজ করে"), path: "/#how-it-works" },
-    { name: t("Unity Notes", "ইউনিটি নোটস"), path: "/unity-note" },
     { name: t("Learning Zone", "লার্নিং জোন"), path: "/learning-zone" },
     { name: t("Donation", "ডোনেশন"), path: "/donation" },
     { name: t("Feed", "ফিড"), path: "/feed" },
