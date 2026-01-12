@@ -8,10 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { UserPlus, LogIn, Eye, EyeOff, FileText, Shield, Users, Scale, Lock, Heart, AlertTriangle, Phone, Globe, Mail, Sparkles, ArrowRight, Star, Zap, TrendingUp } from "lucide-react";
+import { UserPlus, LogIn, Eye, EyeOff, FileText, Shield, Users, Scale, Lock, Heart, AlertTriangle, Phone, Globe, Mail, Sparkles, ArrowRight, Zap, TrendingUp } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useRealStats } from "@/hooks/useRealStats";
 
 interface LoginProps {
   users: User[];
@@ -46,8 +47,15 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
   const [showTerms, setShowTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { language, toggleLanguage, t } = useLanguage();
+  const { activeUsers, totalPosts, isLoading: statsLoading } = useRealStats();
 
   const isEnglish = language === "en";
+  
+  // Format stats for display
+  const formatStat = (num: number): string => {
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K+`;
+    return `${num}+`;
+  };
 
   // Memoize schemas based on language
   const signupSchema = useMemo(() => createSignupSchema(isEnglish), [isEnglish]);
@@ -183,12 +191,16 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
           <div className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-white/10">
             <div className="flex gap-6 lg:gap-10">
               <div>
-                <p className="text-xl lg:text-3xl font-bold text-white">50+</p>
+                <p className="text-xl lg:text-3xl font-bold text-white">
+                  {statsLoading ? "..." : formatStat(activeUsers)}
+                </p>
                 <p className="text-xs lg:text-sm text-white/60">{t("Active Users", "সক্রিয় ব্যবহারকারী")}</p>
               </div>
               <div>
-                <p className="text-xl lg:text-3xl font-bold text-white">100+</p>
-                <p className="text-xs lg:text-sm text-white/60">{t("Unity Notes", "ইউনিটি নোট")}</p>
+                <p className="text-xl lg:text-3xl font-bold text-white">
+                  {statsLoading ? "..." : formatStat(totalPosts)}
+                </p>
+                <p className="text-xs lg:text-sm text-white/60">{t("Posts", "পোস্ট")}</p>
               </div>
               <div>
                 <p className="text-xl lg:text-3xl font-bold text-white">{t("Growing", "বৃদ্ধি")}</p>
@@ -245,13 +257,17 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
             {/* Mobile Stats */}
             <div className="flex justify-center gap-4 py-2 px-3 bg-[hsl(220,15%,10%)] rounded-lg border border-[hsl(220,15%,16%)]">
               <div className="text-center">
-                <p className="text-sm font-bold text-[hsl(220,10%,95%)]">50+</p>
+                <p className="text-sm font-bold text-[hsl(220,10%,95%)]">
+                  {statsLoading ? "..." : formatStat(activeUsers)}
+                </p>
                 <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Active Users", "সক্রিয় ব্যবহারকারী")}</p>
               </div>
               <div className="w-px bg-[hsl(220,15%,20%)]" />
               <div className="text-center">
-                <p className="text-sm font-bold text-[hsl(220,10%,95%)]">100+</p>
-                <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Unity Notes", "ইউনিটি নোট")}</p>
+                <p className="text-sm font-bold text-[hsl(220,10%,95%)]">
+                  {statsLoading ? "..." : formatStat(totalPosts)}
+                </p>
+                <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Posts", "পোস্ট")}</p>
               </div>
               <div className="w-px bg-[hsl(220,15%,20%)]" />
               <div className="text-center">
