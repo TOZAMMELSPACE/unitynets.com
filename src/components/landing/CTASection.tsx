@@ -1,12 +1,20 @@
 import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Sparkles, Users, Globe } from "lucide-react";
+import { ArrowRight, Sparkles, Users, Globe, FileText } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useRealStats } from "@/hooks/useRealStats";
 
 export const CTASection = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { activeUsers, totalPosts, isLoading } = useRealStats();
+
+  // Format stats for display
+  const formatStat = (num: number): string => {
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K+`;
+    return `${num}+`;
+  };
 
   return (
     <section className="py-16 md:py-24 relative overflow-hidden">
@@ -66,11 +74,15 @@ export const CTASection = () => {
           <div className="flex flex-wrap justify-center gap-8">
             <div className="flex items-center gap-2 text-white/80">
               <Users className="w-5 h-5" />
-              <span>{t("10,000+ Active Members", "১০,০০০+ সক্রিয় সদস্য")}</span>
+              <span>
+                {isLoading ? "..." : formatStat(activeUsers)} {t("Active Members", "সক্রিয় সদস্য")}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-white/80">
-              <Globe className="w-5 h-5" />
-              <span>{t("50+ Countries Worldwide", "৫০+ দেশে বিস্তৃত")}</span>
+              <FileText className="w-5 h-5" />
+              <span>
+                {isLoading ? "..." : formatStat(totalPosts)} {t("Posts Shared", "পোস্ট শেয়ার")}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-white/80">
               <Sparkles className="w-5 h-5" />
