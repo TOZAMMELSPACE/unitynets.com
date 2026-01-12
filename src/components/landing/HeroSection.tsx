@@ -588,20 +588,19 @@ export const HeroSection = () => {
     }
   }, [isAnimating]);
 
-  // Merge real data with fallback data
+  // Only show countries with real registered users from database
   const displayLocations = useMemo(() => {
-    if (!hasData) {
-      return memberLocations;
+    // If no real data yet, return empty array (no fake markers)
+    if (!hasData || realLocations.length === 0) {
+      return [];
     }
 
-    const merged: LocationData[] = [];
-    const seenNames = new Set<string>();
-
-    realLocations.forEach(realLoc => {
+    // Convert real locations to full LocationData format
+    return realLocations.map(realLoc => {
+      // Find matching fallback for additional details like skills
       const fallback = memberLocations.find(m => m.name === realLoc.name);
-      seenNames.add(realLoc.name);
       
-      merged.push({
+      return {
         name: realLoc.name,
         coordinates: realLoc.coordinates,
         members: realLoc.members,
@@ -610,15 +609,13 @@ export const HeroSection = () => {
         flag: realLoc.flag,
         region: realLoc.region,
         joinedDate: fallback?.joinedDate || "2024",
-        activeMembers: fallback?.activeMembers || Math.floor(realLoc.members * 0.65),
-        postsThisMonth: fallback?.postsThisMonth || Math.floor(realLoc.members * 0.3),
-        topSkills: fallback?.topSkills || ["Community Building", "Networking"],
-        highlights: fallback?.highlights || ["Active community members"],
-        growthRate: fallback?.growthRate || 20,
-      });
+        activeMembers: Math.floor(realLoc.members * 0.65),
+        postsThisMonth: Math.floor(realLoc.members * 0.3),
+        topSkills: fallback?.topSkills || ["Community Building", "Skill Sharing", "Networking"],
+        highlights: fallback?.highlights || ["Growing community", "Active members"],
+        growthRate: fallback?.growthRate || 15,
+      } as LocationData;
     });
-
-    return merged;
   }, [realLocations, hasData]);
 
   // Always use real data from database, fallback to 0 if not loaded yet
