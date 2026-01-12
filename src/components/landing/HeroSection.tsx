@@ -496,9 +496,45 @@ export const HeroSection = () => {
   
   // Zoom and pan state
   const [position, setPosition] = useState({ coordinates: [60, 20] as [number, number], zoom: 1 });
+  const [isAnimating, setIsAnimating] = useState(false);
   
   // Fetch real location data from database
   const { locations: realLocations, totalMembers: realTotalMembers, countriesCount, loading, hasData } = useLocationStats();
+  
+  // Smooth zoom to location animation
+  const animateToLocation = useCallback((coordinates: [number, number], targetZoom: number = 3, onComplete?: () => void) => {
+    setIsAnimating(true);
+    
+    const startCoords = position.coordinates;
+    const startZoom = position.zoom;
+    const duration = 800; // ms
+    const startTime = Date.now();
+    
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeOutCubic(progress);
+      
+      const newCoords: [number, number] = [
+        startCoords[0] + (coordinates[0] - startCoords[0]) * eased,
+        startCoords[1] + (coordinates[1] - startCoords[1]) * eased
+      ];
+      const newZoom = startZoom + (targetZoom - startZoom) * eased;
+      
+      setPosition({ coordinates: newCoords, zoom: newZoom });
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setIsAnimating(false);
+        onComplete?.();
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }, [position.coordinates, position.zoom]);
   
   // Zoom controls
   const handleZoomIn = useCallback(() => {
@@ -512,12 +548,44 @@ export const HeroSection = () => {
   }, [position.zoom]);
 
   const handleReset = useCallback(() => {
-    setPosition({ coordinates: [60, 20], zoom: 1 });
-  }, []);
+    setIsAnimating(true);
+    const startCoords = position.coordinates;
+    const startZoom = position.zoom;
+    const targetCoords: [number, number] = [60, 20];
+    const targetZoom = 1;
+    const duration = 600;
+    const startTime = Date.now();
+    
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeOutCubic(progress);
+      
+      const newCoords: [number, number] = [
+        startCoords[0] + (targetCoords[0] - startCoords[0]) * eased,
+        startCoords[1] + (targetCoords[1] - startCoords[1]) * eased
+      ];
+      const newZoom = startZoom + (targetZoom - startZoom) * eased;
+      
+      setPosition({ coordinates: newCoords, zoom: newZoom });
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setIsAnimating(false);
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }, [position.coordinates, position.zoom]);
 
   const handleMoveEnd = useCallback((pos: { coordinates: [number, number]; zoom: number }) => {
-    setPosition(pos);
-  }, []);
+    if (!isAnimating) {
+      setPosition(pos);
+    }
+  }, [isAnimating]);
 
   // Merge real data with fallback data
   const displayLocations = useMemo(() => {
@@ -563,7 +631,10 @@ export const HeroSection = () => {
 
   const handleMarkerClick = (location: LocationData) => {
     setSelectedLocation(location);
-    setIsModalOpen(true);
+    // Animate zoom to the clicked location, then open modal
+    animateToLocation(location.coordinates, 4, () => {
+      setIsModalOpen(true);
+    });
   };
 
   return (
