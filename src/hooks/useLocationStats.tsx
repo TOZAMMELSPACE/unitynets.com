@@ -129,52 +129,84 @@ export const useLocationStats = () => {
   const [rawStats, setRawStats] = useState<LocationStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalMembers, setTotalMembers] = useState(0);
+  const [totalPosts, setTotalPosts] = useState(0);
+
+  const fetchStats = async () => {
+    try {
+      // Fetch all profiles with locations
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('location')
+        .not('location', 'is', null)
+        .not('location', 'eq', '');
+
+      if (error) {
+        console.error('Error fetching location stats:', error);
+        return;
+      }
+
+      // Count by location
+      const locationCounts: Record<string, number> = {};
+      data?.forEach(profile => {
+        if (profile.location) {
+          const loc = profile.location.toLowerCase().trim();
+          locationCounts[loc] = (locationCounts[loc] || 0) + 1;
+        }
+      });
+
+      const stats = Object.entries(locationCounts).map(([location, count]) => ({
+        location,
+        count,
+      }));
+
+      setRawStats(stats);
+
+      // Get total member count
+      const { count: memberCount } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+      
+      setTotalMembers(memberCount || 0);
+
+      // Get total posts count
+      const { count: postCount } = await supabase
+        .from('posts')
+        .select('*', { count: 'exact', head: true });
+      
+      setTotalPosts(postCount || 0);
+    } catch (err) {
+      console.error('Error in fetchLocationStats:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchLocationStats = async () => {
-      try {
-        // Fetch all profiles with locations
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('location')
-          .not('location', 'is', null)
-          .not('location', 'eq', '');
+    fetchStats();
 
-        if (error) {
-          console.error('Error fetching location stats:', error);
-          return;
-        }
+    // Set up real-time subscriptions for live updates
+    const profilesChannel = supabase
+      .channel("location-stats-profiles")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "profiles" },
+        () => fetchStats()
+      )
+      .subscribe();
 
-        // Count by location
-        const locationCounts: Record<string, number> = {};
-        data?.forEach(profile => {
-          if (profile.location) {
-            const loc = profile.location.toLowerCase().trim();
-            locationCounts[loc] = (locationCounts[loc] || 0) + 1;
-          }
-        });
+    const postsChannel = supabase
+      .channel("location-stats-posts")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "posts" },
+        () => fetchStats()
+      )
+      .subscribe();
 
-        const stats = Object.entries(locationCounts).map(([location, count]) => ({
-          location,
-          count,
-        }));
-
-        setRawStats(stats);
-
-        // Get total member count
-        const { count } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true });
-        
-        setTotalMembers(count || 0);
-      } catch (err) {
-        console.error('Error in fetchLocationStats:', err);
-      } finally {
-        setLoading(false);
-      }
+    return () => {
+      supabase.removeChannel(profilesChannel);
+      supabase.removeChannel(postsChannel);
     };
-
-    fetchLocationStats();
   }, []);
 
   // Aggregate stats by country
@@ -223,6 +255,7 @@ export const useLocationStats = () => {
   return {
     locations: aggregatedLocations,
     totalMembers,
+    totalPosts,
     countriesCount,
     loading,
     hasData: aggregatedLocations.length > 0,
