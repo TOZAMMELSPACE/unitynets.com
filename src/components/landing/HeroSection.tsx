@@ -3,7 +3,7 @@ import { ComposableMap, Geographies, Geography, Marker, Line, ZoomableGroup } fr
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Globe, Users, Sparkles, TrendingUp, MessageSquare, Heart, Award, Calendar, Loader2, ZoomIn, ZoomOut, RotateCcw, Move, Search, X } from "lucide-react";
+import { ArrowRight, Globe, Users, Sparkles, TrendingUp, MessageSquare, Heart, Award, Calendar, Loader2, ZoomIn, ZoomOut, RotateCcw, Move, Search, X, FileText } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
@@ -500,7 +500,7 @@ export const HeroSection = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   
   // Fetch real location data from database
-  const { locations: realLocations, totalMembers: realTotalMembers, countriesCount, loading, hasData } = useLocationStats();
+  const { locations: realLocations, totalMembers: realTotalMembers, totalPosts: realTotalPosts, countriesCount, loading, hasData } = useLocationStats();
   
   // Smooth zoom to location animation
   const animateToLocation = useCallback((coordinates: [number, number], targetZoom: number = 3, onComplete?: () => void) => {
@@ -622,6 +622,7 @@ export const HeroSection = () => {
   }, [realLocations, hasData]);
 
   const totalMembers = hasData ? realTotalMembers : memberLocations.reduce((sum, loc) => sum + loc.members, 0);
+  const totalPosts = realTotalPosts || 0;
   const displayCountriesCount = hasData ? countriesCount : memberLocations.length;
 
   const lineStyles = useMemo(() => ({
@@ -1145,20 +1146,26 @@ export const HeroSection = () => {
         </div>
 
         {/* Quick Stats Row */}
-        <div className="flex flex-wrap justify-center gap-4 md:gap-6 float-up-4">
-          <div className="flex items-center gap-2 text-foreground bg-background/70 backdrop-blur-md px-5 py-3 rounded-full border border-border/50 shadow-lg hover:scale-105 transition-transform">
-            <Users className="w-5 h-5 text-primary" />
-            <span className="font-semibold">
-              {totalMembers >= 1000 ? `${(totalMembers / 1000).toFixed(1)}K+` : `${totalMembers}+`} {t("Members", "সদস্য")}
+        <div className="flex flex-wrap justify-center gap-3 md:gap-4 float-up-4">
+          <div className="flex items-center gap-2 text-foreground bg-background/70 backdrop-blur-md px-4 py-2.5 rounded-full border border-border/50 shadow-lg hover:scale-105 transition-transform">
+            <Users className="w-4 h-4 text-primary" />
+            <span className="font-semibold text-sm">
+              {loading ? "..." : totalMembers >= 1000 ? `${(totalMembers / 1000).toFixed(1)}K+` : `${totalMembers}+`} {t("Members", "সদস্য")}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-foreground bg-background/70 backdrop-blur-md px-5 py-3 rounded-full border border-border/50 shadow-lg hover:scale-105 transition-transform">
-            <Globe className="w-5 h-5 text-accent" />
-            <span className="font-semibold">{displayCountriesCount}+ {t("Countries", "দেশে")}</span>
+          <div className="flex items-center gap-2 text-foreground bg-background/70 backdrop-blur-md px-4 py-2.5 rounded-full border border-border/50 shadow-lg hover:scale-105 transition-transform">
+            <FileText className="w-4 h-4 text-accent" />
+            <span className="font-semibold text-sm">
+              {loading ? "..." : totalPosts >= 1000 ? `${(totalPosts / 1000).toFixed(1)}K+` : `${totalPosts}+`} {t("Posts", "পোস্ট")}
+            </span>
           </div>
-          <div className="flex items-center gap-2 text-foreground bg-background/70 backdrop-blur-md px-5 py-3 rounded-full border border-border/50 shadow-lg hover:scale-105 transition-transform">
-            <Sparkles className="w-5 h-5 text-primary" />
-            <span className="font-semibold">{t("Unity Network", "ঐক্য নেটওয়ার্ক")}</span>
+          <div className="flex items-center gap-2 text-foreground bg-background/70 backdrop-blur-md px-4 py-2.5 rounded-full border border-border/50 shadow-lg hover:scale-105 transition-transform">
+            <Globe className="w-4 h-4 text-primary" />
+            <span className="font-semibold text-sm">{loading ? "..." : `${displayCountriesCount}+`} {t("Countries", "দেশে")}</span>
+          </div>
+          <div className="flex items-center gap-2 text-foreground bg-background/70 backdrop-blur-md px-4 py-2.5 rounded-full border border-border/50 shadow-lg hover:scale-105 transition-transform">
+            <Sparkles className="w-4 h-4 text-accent" />
+            <span className="font-semibold text-sm">{t("100% Free", "১০০% ফ্রি")}</span>
           </div>
         </div>
 
