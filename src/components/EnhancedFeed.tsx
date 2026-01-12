@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Post, User, Comment } from "@/lib/storage";
+import { PostWithAuthor } from "@/hooks/usePosts";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -28,7 +29,7 @@ import { useNavigate } from "react-router-dom";
 import { ImageCarousel } from "@/components/ImageCarousel";
 
 interface EnhancedFeedProps {
-  posts: Post[];
+  posts: (Post | PostWithAuthor)[];
   currentUser: User;
   onLikePost: (postId: string) => void;
   onDislikePost?: (postId: string) => void;
@@ -340,9 +341,19 @@ export const EnhancedFeed = ({
               </div>
               
               <div className="flex items-center gap-2">
-                <Badge variant={post.community === 'global' ? 'default' : 'secondary'} className="text-xs">
-                  {post.community === 'global' ? '🌍 Global' : `🏘️ ${post.community}`}
-                </Badge>
+                {'isGroupPost' in post && post.isGroupPost ? (
+                  <Badge 
+                    variant="secondary" 
+                    className="text-xs bg-primary/10 text-primary cursor-pointer hover:bg-primary/20"
+                    onClick={() => navigate(`/groups/${post.groupId}`)}
+                  >
+                    👥 {post.groupName}
+                  </Badge>
+                ) : (
+                  <Badge variant={post.community === 'global' ? 'default' : 'secondary'} className="text-xs">
+                    {post.community === 'global' ? '🌍 Global' : `🏘️ ${post.community}`}
+                  </Badge>
+                )}
                 <Button variant="ghost" size="icon" className="h-8 w-8">
                   <MoreHorizontal className="w-4 h-4" />
                 </Button>

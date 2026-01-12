@@ -44,18 +44,25 @@ export interface PostWithAuthor {
   content: string;
   images?: string[];
   videoUrl?: string;
+  videoThumbnail?: string;
   community: string;
   postType: 'text' | 'image' | 'video' | 'poll' | 'event' | 'job';
   createdAt: string;
   likes: number;
   dislikes: number;
   views: number;
+  location?: string;
+  hashtags?: string[];
   author: {
     id: string;
     name: string;
     profileImage?: string;
   };
   comments: CommentWithAuthor[];
+  // Group post fields
+  isGroupPost?: boolean;
+  groupId?: string;
+  groupName?: string;
 }
 
 export interface CommentWithAuthor {
@@ -91,7 +98,7 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
 
       const offset = reset ? 0 : postsRef.current.length;
       
-      // Fetch posts with pagination
+      // Fetch regular posts with pagination
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select('*')
@@ -100,10 +107,26 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
 
       if (postsError) throw postsError;
 
-      // Check if there are more posts
-      setHasMore(postsData?.length === POSTS_PER_PAGE);
+      // Fetch group posts (from public groups)
+      const { data: groupPostsData, error: groupPostsError } = await supabase
+        .from('group_posts')
+        .select('*, groups!inner(id, name, is_private)')
+        .eq('groups.is_private', false)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + POSTS_PER_PAGE - 1);
 
-      if (!postsData || postsData.length === 0) {
+      if (groupPostsError) {
+        console.error('Error fetching group posts:', groupPostsError);
+      }
+
+      // Combine both types of posts
+      const allPostsData = postsData || [];
+      const allGroupPostsData = groupPostsData || [];
+
+      // Check if there are more posts
+      setHasMore((allPostsData.length + allGroupPostsData.length) >= POSTS_PER_PAGE);
+
+      if (allPostsData.length === 0 && allGroupPostsData.length === 0) {
         if (reset) {
           setPosts([]);
           postsRef.current = [];
@@ -111,8 +134,11 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         return;
       }
 
-      // Get unique user IDs from posts
-      const userIds = [...new Set(postsData.map(p => p.user_id))];
+      // Get unique user IDs from all posts
+      const userIds = [...new Set([
+        ...allPostsData.map(p => p.user_id),
+        ...allGroupPostsData.map(p => p.user_id)
+      ])];
       
       // Fetch profiles for post authors
       const { data: profilesData, error: profilesError } = await supabase
@@ -128,18 +154,22 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         profilesMap.set(profile.user_id, profile);
       });
 
-      // Fetch comments for all posts
-      const postIds = postsData.map(p => p.id);
-      const { data: commentsData, error: commentsError } = await supabase
-        .from('comments')
-        .select('*')
-        .in('post_id', postIds)
-        .order('created_at', { ascending: true });
+      // Fetch comments for regular posts
+      const postIds = allPostsData.map(p => p.id);
+      let commentsData: DbComment[] = [];
+      if (postIds.length > 0) {
+        const { data, error: commentsError } = await supabase
+          .from('comments')
+          .select('*')
+          .in('post_id', postIds)
+          .order('created_at', { ascending: true });
 
-      if (commentsError) throw commentsError;
+        if (commentsError) throw commentsError;
+        commentsData = data || [];
+      }
 
       // Get unique user IDs from comments
-      const commentUserIds = [...new Set((commentsData || []).map(c => c.user_id))];
+      const commentUserIds = [...new Set(commentsData.map(c => c.user_id))];
       
       // Fetch profiles for comment authors (if not already fetched)
       const newUserIds = commentUserIds.filter(id => !profilesMap.has(id));
@@ -154,10 +184,10 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         });
       }
 
-      // Transform posts with author info and comments
-      const transformedPosts: PostWithAuthor[] = postsData.map(post => {
+      // Transform regular posts with author info and comments
+      const transformedPosts: PostWithAuthor[] = allPostsData.map(post => {
         const profile = profilesMap.get(post.user_id);
-        const postComments = (commentsData || [])
+        const postComments = commentsData
           .filter(c => c.post_id === post.id)
           .map(comment => {
             const commentProfile = profilesMap.get(comment.user_id);
@@ -191,15 +221,47 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
             profileImage: profile?.avatar_url || undefined,
           },
           comments: postComments,
+          isGroupPost: false,
         };
       });
 
+      // Transform group posts
+      const transformedGroupPosts: PostWithAuthor[] = allGroupPostsData.map((post: any) => {
+        const profile = profilesMap.get(post.user_id);
+        return {
+          id: post.id,
+          content: post.content,
+          images: post.image_urls || undefined,
+          videoUrl: undefined,
+          community: 'group',
+          postType: (post.image_urls && post.image_urls.length > 0 ? 'image' as const : 'text' as const),
+          createdAt: post.created_at,
+          likes: post.likes_count,
+          dislikes: 0,
+          views: 0,
+          author: {
+            id: post.user_id,
+            name: profile?.full_name || 'Unknown User',
+            profileImage: profile?.avatar_url || undefined,
+          },
+          comments: [],
+          isGroupPost: true,
+          groupId: post.group_id,
+          groupName: post.groups?.name || 'Unknown Group',
+        };
+      });
+
+      // Merge and sort by date
+      const allPosts = [...transformedPosts, ...transformedGroupPosts].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
       if (reset) {
-        setPosts(transformedPosts);
-        postsRef.current = transformedPosts;
+        setPosts(allPosts);
+        postsRef.current = allPosts;
       } else {
         setPosts(prev => {
-          const newPosts = [...prev, ...transformedPosts];
+          const newPosts = [...prev, ...allPosts];
           postsRef.current = newPosts;
           return newPosts;
         });
