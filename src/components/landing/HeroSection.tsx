@@ -1,8 +1,8 @@
-import { memo, useState, useMemo, useEffect } from "react";
-import { ComposableMap, Geographies, Geography, Marker, Line } from "react-simple-maps";
+import { memo, useState, useMemo, useCallback } from "react";
+import { ComposableMap, Geographies, Geography, Marker, Line, ZoomableGroup } from "react-simple-maps";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Play, Globe, Users, Sparkles, TrendingUp, MessageSquare, Heart, Award, Calendar, Loader2 } from "lucide-react";
+import { ArrowRight, Globe, Users, Sparkles, TrendingUp, MessageSquare, Heart, Award, Calendar, Loader2, ZoomIn, ZoomOut, RotateCcw, Move } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
@@ -494,8 +494,30 @@ export const HeroSection = () => {
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
+  // Zoom and pan state
+  const [position, setPosition] = useState({ coordinates: [60, 20] as [number, number], zoom: 1 });
+  
   // Fetch real location data from database
   const { locations: realLocations, totalMembers: realTotalMembers, countriesCount, loading, hasData } = useLocationStats();
+  
+  // Zoom controls
+  const handleZoomIn = useCallback(() => {
+    if (position.zoom >= 8) return;
+    setPosition(pos => ({ ...pos, zoom: pos.zoom * 1.5 }));
+  }, [position.zoom]);
+
+  const handleZoomOut = useCallback(() => {
+    if (position.zoom <= 0.5) return;
+    setPosition(pos => ({ ...pos, zoom: pos.zoom / 1.5 }));
+  }, [position.zoom]);
+
+  const handleReset = useCallback(() => {
+    setPosition({ coordinates: [60, 20], zoom: 1 });
+  }, []);
+
+  const handleMoveEnd = useCallback((pos: { coordinates: [number, number]; zoom: number }) => {
+    setPosition(pos);
+  }, []);
 
   // Merge real data with fallback data
   const displayLocations = useMemo(() => {
@@ -546,11 +568,11 @@ export const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* World Map Background */}
+      {/* World Map Background - More visible */}
       <div className="absolute inset-0">
-        {/* Gradient overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/90 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/70 z-10" />
+        {/* Lighter gradient overlay for better map visibility */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/20 to-background/60 z-10 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/30 via-transparent to-background/30 z-10 pointer-events-none" />
         
         {/* CSS for animated lines */}
         <style>{`
@@ -612,13 +634,12 @@ export const HeroSection = () => {
           }
         `}</style>
         
-        {/* Map */}
-        <div className="absolute inset-0 opacity-60">
+        {/* Map - More visible with zoom/pan */}
+        <div className="absolute inset-0 opacity-90">
           <ComposableMap
             projection="geoMercator"
             projectionConfig={{
               scale: 180,
-              center: [60, 20],
             }}
             className="w-full h-full"
             style={{ width: '100%', height: '100%' }}
@@ -642,141 +663,185 @@ export const HeroSection = () => {
               </filter>
             </defs>
 
-            <Geographies geography={geoUrl}>
-              {({ geographies }) =>
-                geographies.map((geo) => (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill="hsl(var(--muted))"
-                    stroke="hsl(var(--border))"
-                    strokeWidth={0.3}
-                    style={{
-                      default: { outline: "none" },
-                      hover: { fill: "hsl(var(--muted-foreground)/0.2)", outline: "none" },
-                      pressed: { outline: "none" },
-                    }}
-                  />
-                ))
-              }
-            </Geographies>
+            <ZoomableGroup
+              zoom={position.zoom}
+              center={position.coordinates}
+              onMoveEnd={handleMoveEnd}
+              minZoom={0.5}
+              maxZoom={8}
+            >
+              <Geographies geography={geoUrl}>
+                {({ geographies }) =>
+                  geographies.map((geo) => (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      fill="hsl(var(--primary)/0.15)"
+                      stroke="hsl(var(--primary)/0.4)"
+                      strokeWidth={0.5}
+                      style={{
+                        default: { outline: "none" },
+                        hover: { fill: "hsl(var(--primary)/0.25)", outline: "none", cursor: "grab" },
+                        pressed: { outline: "none", cursor: "grabbing" },
+                      }}
+                    />
+                  ))
+                }
+              </Geographies>
 
-            {/* Animated connection lines */}
-            {connectionLines.map((line, index) => {
-              const style = lineStyles[line.strength];
-              return (
-                <g key={`hero-line-${index}`}>
-                  <Line
-                    from={line.from}
-                    to={line.to}
-                    stroke="url(#heroLineGradientPrimary)"
-                    strokeWidth={style.strokeWidth + 1.5}
-                    strokeOpacity={style.opacity * 0.3}
-                    strokeLinecap="round"
-                    className="pulse-line"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  />
-                  <Line
-                    from={line.from}
-                    to={line.to}
-                    stroke="url(#heroLineGradientAccent)"
-                    strokeWidth={style.strokeWidth}
-                    strokeOpacity={style.opacity}
-                    strokeLinecap="round"
-                    strokeDasharray={line.strength === "strong" ? "8,4" : style.dashArray}
-                    className={line.strength === "strong" ? "animated-line" : ""}
-                    style={{ 
-                      animationDelay: `${index * 0.15}s`,
-                      filter: line.strength === "strong" ? "url(#heroGlow)" : "none"
-                    }}
-                  />
-                </g>
-              );
-            })}
+              {/* Animated connection lines */}
+              {connectionLines.map((line, index) => {
+                const style = lineStyles[line.strength];
+                return (
+                  <g key={`hero-line-${index}`}>
+                    <Line
+                      from={line.from}
+                      to={line.to}
+                      stroke="url(#heroLineGradientPrimary)"
+                      strokeWidth={(style.strokeWidth + 1.5) / position.zoom}
+                      strokeOpacity={style.opacity * 0.4}
+                      strokeLinecap="round"
+                      className="pulse-line"
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    />
+                    <Line
+                      from={line.from}
+                      to={line.to}
+                      stroke="url(#heroLineGradientAccent)"
+                      strokeWidth={style.strokeWidth / position.zoom}
+                      strokeOpacity={style.opacity * 1.2}
+                      strokeLinecap="round"
+                      strokeDasharray={line.strength === "strong" ? "8,4" : style.dashArray}
+                      className={line.strength === "strong" ? "animated-line" : ""}
+                      style={{ 
+                        animationDelay: `${index * 0.15}s`,
+                        filter: line.strength === "strong" ? "url(#heroGlow)" : "none"
+                      }}
+                    />
+                  </g>
+                );
+              })}
 
-            {/* Member markers */}
-            {displayLocations.map((location, index) => (
-              <Marker
-                key={location.name}
-                coordinates={location.coordinates}
-                onMouseEnter={() => setHoveredLocation(location.name)}
-                onMouseLeave={() => setHoveredLocation(null)}
-                onClick={() => handleMarkerClick(location)}
-                className="marker-clickable"
-              >
-                {/* Outer pulse ring for hubs */}
-                {location.isHub && (
+              {/* Member markers */}
+              {displayLocations.map((location, index) => (
+                <Marker
+                  key={location.name}
+                  coordinates={location.coordinates}
+                  onMouseEnter={() => setHoveredLocation(location.name)}
+                  onMouseLeave={() => setHoveredLocation(null)}
+                  onClick={() => handleMarkerClick(location)}
+                  className="marker-clickable"
+                >
+                  {/* Outer pulse ring for hubs */}
+                  {location.isHub && (
+                    <circle
+                      r={(Math.min(location.members / 100, 16) + 4) / position.zoom}
+                      fill="none"
+                      stroke={location.color}
+                      strokeWidth={1.5 / position.zoom}
+                      opacity={0.35}
+                      className="animate-ping"
+                      style={{ animationDuration: `${2.5 + index * 0.1}s` }}
+                    />
+                  )}
+                  {/* Pulse ring */}
                   <circle
-                    r={Math.min(location.members / 100, 16) + 4}
+                    r={(Math.min(location.members / 120, 12) + 3) / position.zoom}
                     fill="none"
                     stroke={location.color}
-                    strokeWidth={1}
-                    opacity={0.25}
+                    strokeWidth={1.5 / position.zoom}
+                    opacity={0.45}
                     className="animate-ping"
-                    style={{ animationDuration: `${2.5 + index * 0.1}s` }}
+                    style={{ animationDuration: `${2 + index * 0.2}s` }}
                   />
-                )}
-                {/* Pulse ring */}
-                <circle
-                  r={Math.min(location.members / 120, 12) + 3}
-                  fill="none"
-                  stroke={location.color}
-                  strokeWidth={1}
-                  opacity={0.35}
-                  className="animate-ping"
-                  style={{ animationDuration: `${2 + index * 0.2}s` }}
-                />
-                {/* Main dot */}
-                <circle
-                  r={Math.min(location.members / 180, 8) + 2}
-                  fill={location.color}
-                  className="cursor-pointer transition-all duration-300 hover:opacity-80"
-                  style={{
-                    filter: `drop-shadow(0 0 ${location.members > 500 ? 8 : 4}px ${location.color})`,
-                  }}
-                />
-                {/* Inner glow */}
-                <circle
-                  r={Math.min(location.members / 350, 4) + 1}
-                  fill="white"
-                  opacity={0.6}
-                />
-                
-                {/* Tooltip */}
-                {hoveredLocation === location.name && (
-                  <g>
-                    <rect
-                      x={-50}
-                      y={-55}
-                      width={100}
-                      height={45}
-                      rx={8}
-                      fill="hsl(var(--popover))"
-                      stroke="hsl(var(--border))"
-                      strokeWidth={1}
-                      style={{ filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.15))" }}
-                    />
-                    <text
-                      textAnchor="middle"
-                      y={-35}
-                      className="fill-foreground font-semibold"
-                      style={{ fontSize: "10px" }}
-                    >
-                      {location.flag} {location.name}
-                    </text>
-                    <text
-                      textAnchor="middle"
-                      y={-20}
-                      className="fill-muted-foreground"
-                      style={{ fontSize: "8px" }}
-                    >
-                      {location.members.toLocaleString()} members
-                    </text>
-                  </g>
-                )}
-              </Marker>
-            ))}
+                  {/* Main dot - larger and more visible */}
+                  <circle
+                    r={(Math.min(location.members / 150, 10) + 3) / position.zoom}
+                    fill={location.color}
+                    className="cursor-pointer transition-all duration-300 hover:opacity-80"
+                    style={{
+                      filter: `drop-shadow(0 0 ${location.members > 500 ? 12 : 6}px ${location.color})`,
+                    }}
+                  />
+                  {/* Inner glow */}
+                  <circle
+                    r={(Math.min(location.members / 300, 5) + 1.5) / position.zoom}
+                    fill="white"
+                    opacity={0.7}
+                  />
+                  
+                  {/* Tooltip */}
+                  {hoveredLocation === location.name && (
+                    <g transform={`scale(${1 / position.zoom})`}>
+                      <rect
+                        x={-55}
+                        y={-60}
+                        width={110}
+                        height={50}
+                        rx={8}
+                        fill="hsl(var(--popover))"
+                        stroke="hsl(var(--border))"
+                        strokeWidth={1}
+                        style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))" }}
+                      />
+                      <text
+                        textAnchor="middle"
+                        y={-38}
+                        className="fill-foreground font-semibold"
+                        style={{ fontSize: "11px" }}
+                      >
+                        {location.flag} {location.name}
+                      </text>
+                      <text
+                        textAnchor="middle"
+                        y={-22}
+                        className="fill-muted-foreground"
+                        style={{ fontSize: "9px" }}
+                      >
+                        {location.members.toLocaleString()} members
+                      </text>
+                    </g>
+                  )}
+                </Marker>
+              ))}
+            </ZoomableGroup>
           </ComposableMap>
+        </div>
+        
+        {/* Zoom Controls */}
+        <div className="absolute bottom-24 right-4 md:bottom-32 md:right-8 z-30 flex flex-col gap-2">
+          <Button
+            size="icon"
+            variant="secondary"
+            className="w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-lg hover:bg-primary hover:text-primary-foreground transition-all"
+            onClick={handleZoomIn}
+            disabled={position.zoom >= 8}
+          >
+            <ZoomIn className="w-4 h-4" />
+          </Button>
+          <Button
+            size="icon"
+            variant="secondary"
+            className="w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-lg hover:bg-primary hover:text-primary-foreground transition-all"
+            onClick={handleZoomOut}
+            disabled={position.zoom <= 0.5}
+          >
+            <ZoomOut className="w-4 h-4" />
+          </Button>
+          <Button
+            size="icon"
+            variant="secondary"
+            className="w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-lg hover:bg-primary hover:text-primary-foreground transition-all"
+            onClick={handleReset}
+          >
+            <RotateCcw className="w-4 h-4" />
+          </Button>
+        </div>
+        
+        {/* Pan instruction hint */}
+        <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-30 flex items-center gap-2 text-xs text-muted-foreground bg-background/70 backdrop-blur-sm px-3 py-1.5 rounded-full border border-border/50">
+          <Move className="w-3 h-3" />
+          <span>{t("Drag to pan", "টেনে আনুন")}</span>
         </div>
       </div>
 
