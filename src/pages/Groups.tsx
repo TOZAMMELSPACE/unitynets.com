@@ -1,5 +1,6 @@
 import { User } from "@/lib/storage";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Users, Plus, Lock, Globe, Crown, Calendar, Search, 
   TrendingUp, Sparkles, MessageCircle, LogOut,
@@ -43,6 +44,7 @@ const categories = [
 ];
 
 export default function Groups({ currentUser }: GroupsProps) {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -110,6 +112,7 @@ export default function Groups({ currentUser }: GroupsProps) {
     return (
       <Card 
         className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group border-0 shadow-sm"
+        onClick={() => navigate(`/groups/${group.id}`)}
       >
         <div className="relative h-32">
           <img 
@@ -172,7 +175,15 @@ export default function Groups({ currentUser }: GroupsProps) {
             <div className="pt-3 border-t border-border/50">
               {memberStatus ? (
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="flex-1">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/groups/${group.id}`);
+                    }}
+                  >
                     দেখুন
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>

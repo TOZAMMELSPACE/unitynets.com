@@ -15,6 +15,7 @@ const MessagesDB = lazy(() => import("./pages/MessagesDB"));
 const Explore = lazy(() => import("./pages/Explore"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Groups = lazy(() => import("./pages/Groups"));
+const GroupDetail = lazy(() => import("./pages/GroupDetail"));
 const Settings = lazy(() => import("./pages/Settings"));
 const UnityNote = lazy(() => import("./pages/UnityNote"));
 const UnityGovernment = lazy(() => import("./pages/UnityGovernment"));
@@ -127,6 +128,7 @@ const App = () => (
                       <Route path="/impact-report" element={<ImpactReport currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} />} />
                       <Route path="/profile" element={<Profile currentUser={props.currentUser} onSignOut={props.onSignOut} posts={props.posts} onUpdateProfile={props.onUpdateProfile} users={props.users} socialDB={props.socialDB} />} />
                       <Route path="/groups" element={<Groups currentUser={props.currentUser} onSignOut={props.onSignOut} />} />
+                      <Route path="/groups/:groupId" element={<GroupDetail currentUser={props.currentUser} onSignOut={props.onSignOut} />} />
                       <Route path="/settings" element={<Settings currentUser={props.currentUser} onSignOut={props.onSignOut} />} />
                       <Route path="/unity-government" element={<UnityGovernment currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} />} />
                       <Route path="/learning-zone" element={<LearningZone currentUser={props.currentUser} onSignOut={props.onSignOut} />} />
