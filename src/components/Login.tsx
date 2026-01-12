@@ -112,7 +112,7 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
   };
 
   const features = [
-    { icon: Users, title: t("Community Driven", "সম্প্রদায় চালিত"), desc: t("Connect with 10,000+ members", "১০,০০০+ সদস্যদের সাথে সংযুক্ত হন") },
+    { icon: Users, title: t("Community Driven", "সম্প্রদায় চালিত"), desc: t("Connect with our community", "আমাদের কমিউনিটিতে সংযুক্ত হন") },
     { icon: Zap, title: t("Unity Notes", "ইউনিটি নোট"), desc: t("Earn by sharing your skills", "দক্ষতা শেয়ার করে আয় করুন") },
     { icon: TrendingUp, title: t("Grow Together", "একসাথে বৃদ্ধি"), desc: t("Learn and build with others", "অন্যদের সাথে শিখুন ও তৈরি করুন") },
   ];
@@ -183,18 +183,18 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
           <div className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-white/10">
             <div className="flex gap-6 lg:gap-10">
               <div>
-                <p className="text-xl lg:text-3xl font-bold text-white">10K+</p>
+                <p className="text-xl lg:text-3xl font-bold text-white">50+</p>
                 <p className="text-xs lg:text-sm text-white/60">{t("Active Users", "সক্রিয় ব্যবহারকারী")}</p>
               </div>
               <div>
-                <p className="text-xl lg:text-3xl font-bold text-white">50K+</p>
+                <p className="text-xl lg:text-3xl font-bold text-white">100+</p>
                 <p className="text-xs lg:text-sm text-white/60">{t("Unity Notes", "ইউনিটি নোট")}</p>
               </div>
               <div>
-                <p className="text-xl lg:text-3xl font-bold text-white">4.9</p>
+                <p className="text-xl lg:text-3xl font-bold text-white">{t("Growing", "বৃদ্ধি")}</p>
                 <p className="text-xs lg:text-sm text-white/60 flex items-center gap-1">
-                  <Star className="w-3 h-3 fill-[hsl(174,60%,70%)] text-[hsl(174,60%,70%)]" />
-                  {t("Rating", "রেটিং")}
+                  <TrendingUp className="w-3 h-3 text-[hsl(174,60%,70%)]" />
+                  {t("Community", "কমিউনিটি")}
                 </p>
               </div>
             </div>
@@ -245,20 +245,20 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
             {/* Mobile Stats */}
             <div className="flex justify-center gap-4 py-2 px-3 bg-[hsl(220,15%,10%)] rounded-lg border border-[hsl(220,15%,16%)]">
               <div className="text-center">
-                <p className="text-sm font-bold text-[hsl(220,10%,95%)]">10K+</p>
+                <p className="text-sm font-bold text-[hsl(220,10%,95%)]">50+</p>
                 <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Active Users", "সক্রিয় ব্যবহারকারী")}</p>
               </div>
               <div className="w-px bg-[hsl(220,15%,20%)]" />
               <div className="text-center">
-                <p className="text-sm font-bold text-[hsl(220,10%,95%)]">50K+</p>
+                <p className="text-sm font-bold text-[hsl(220,10%,95%)]">100+</p>
                 <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Unity Notes", "ইউনিটি নোট")}</p>
               </div>
               <div className="w-px bg-[hsl(220,15%,20%)]" />
               <div className="text-center">
                 <p className="text-sm font-bold text-[hsl(220,10%,95%)] flex items-center gap-0.5 justify-center">
-                  4.9 <Star className="w-2.5 h-2.5 fill-[hsl(174,55%,55%)] text-[hsl(174,55%,55%)]" />
+                  {t("Growing", "বৃদ্ধি")} <TrendingUp className="w-2.5 h-2.5 text-[hsl(174,55%,55%)]" />
                 </p>
-                <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Rating", "রেটিং")}</p>
+                <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Community", "কমিউনিটি")}</p>
               </div>
             </div>
           </div>
