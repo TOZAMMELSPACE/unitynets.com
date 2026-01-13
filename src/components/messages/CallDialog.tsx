@@ -1,0 +1,215 @@
+import { useEffect, useRef } from 'react';
+import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import type { CallState } from '@/hooks/useWebRTC';
+
+interface CallDialogProps {
+  callState: CallState | null;
+  localStream: MediaStream | null;
+  remoteStream: MediaStream | null;
+  isMuted: boolean;
+  isVideoOff: boolean;
+  callDuration: number;
+  formatDuration: (seconds: number) => string;
+  onAccept: () => void;
+  onReject: () => void;
+  onEnd: () => void;
+  onToggleMute: () => void;
+  onToggleVideo: () => void;
+  otherUserName?: string;
+  otherUserAvatar?: string;
+}
+
+export function CallDialog({
+  callState,
+  localStream,
+  remoteStream,
+  isMuted,
+  isVideoOff,
+  callDuration,
+  formatDuration,
+  onAccept,
+  onReject,
+  onEnd,
+  onToggleMute,
+  onToggleVideo,
+  otherUserName,
+  otherUserAvatar,
+}: CallDialogProps) {
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Set local video stream
+  useEffect(() => {
+    if (localVideoRef.current && localStream) {
+      localVideoRef.current.srcObject = localStream;
+    }
+  }, [localStream]);
+
+  // Set remote video stream
+  useEffect(() => {
+    if (remoteVideoRef.current && remoteStream) {
+      remoteVideoRef.current.srcObject = remoteStream;
+    }
+  }, [remoteStream]);
+
+  if (!callState) return null;
+
+  const isVideoCall = callState.callType === 'video';
+  const isConnected = callState.status === 'connected';
+  const isRinging = callState.status === 'ringing';
+  const isCalling = callState.status === 'calling';
+
+  const displayName = callState.isIncoming
+    ? callState.callerName || 'অজানা'
+    : otherUserName || 'ব্যবহারকারী';
+
+  const displayAvatar = callState.isIncoming
+    ? callState.callerAvatar
+    : otherUserAvatar;
+
+  return (
+    <Dialog open={!!callState} onOpenChange={() => {}}>
+      <DialogContent
+        className="max-w-lg p-0 overflow-hidden bg-gradient-to-b from-zinc-900 to-zinc-950 border-none"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
+        <div className="relative h-[500px] flex flex-col">
+          {/* Video area */}
+          {isVideoCall && isConnected ? (
+            <>
+              {/* Remote video (full screen) */}
+              <video
+                ref={remoteVideoRef}
+                autoPlay
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+
+              {/* Local video (picture-in-picture) */}
+              <div className="absolute top-4 right-4 w-32 h-24 rounded-lg overflow-hidden bg-zinc-800 shadow-lg border border-zinc-700">
+                <video
+                  ref={localVideoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className={`w-full h-full object-cover ${isVideoOff ? 'hidden' : ''}`}
+                />
+                {isVideoOff && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-800">
+                    <VideoOff className="w-8 h-8 text-zinc-500" />
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            /* Voice call or connecting state */
+            <div className="flex-1 flex flex-col items-center justify-center p-8">
+              <div className="relative">
+                <Avatar className="w-32 h-32 border-4 border-primary/30">
+                  <AvatarImage src={displayAvatar || undefined} />
+                  <AvatarFallback className="text-4xl bg-primary/20 text-primary">
+                    {displayName.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+
+                {/* Pulsing ring for calling/ringing */}
+                {(isCalling || isRinging) && (
+                  <>
+                    <div className="absolute inset-0 rounded-full border-4 border-primary/50 animate-ping" />
+                    <div className="absolute inset-0 rounded-full border-4 border-primary/30 animate-pulse" />
+                  </>
+                )}
+              </div>
+
+              <h2 className="mt-6 text-2xl font-bold text-white text-bengali">
+                {displayName}
+              </h2>
+
+              <p className="mt-2 text-zinc-400 text-bengali">
+                {isRinging && callState.isIncoming && 'ইনকামিং কল...'}
+                {isCalling && 'কল করা হচ্ছে...'}
+                {isConnected && formatDuration(callDuration)}
+              </p>
+
+              <p className="mt-1 text-sm text-zinc-500 text-bengali">
+                {isVideoCall ? 'ভিডিও কল' : 'ভয়েস কল'}
+              </p>
+            </div>
+          )}
+
+          {/* Call controls */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+            {isRinging && callState.isIncoming ? (
+              /* Incoming call controls */
+              <div className="flex items-center justify-center gap-8">
+                <Button
+                  size="lg"
+                  variant="destructive"
+                  className="w-16 h-16 rounded-full"
+                  onClick={onReject}
+                >
+                  <PhoneOff className="w-7 h-7" />
+                </Button>
+
+                <Button
+                  size="lg"
+                  className="w-16 h-16 rounded-full bg-green-600 hover:bg-green-700"
+                  onClick={onAccept}
+                >
+                  {isVideoCall ? (
+                    <Video className="w-7 h-7" />
+                  ) : (
+                    <Phone className="w-7 h-7" />
+                  )}
+                </Button>
+              </div>
+            ) : (
+              /* Active call controls */
+              <div className="flex items-center justify-center gap-4">
+                <Button
+                  size="lg"
+                  variant={isMuted ? 'destructive' : 'secondary'}
+                  className="w-14 h-14 rounded-full"
+                  onClick={onToggleMute}
+                >
+                  {isMuted ? (
+                    <MicOff className="w-6 h-6" />
+                  ) : (
+                    <Mic className="w-6 h-6" />
+                  )}
+                </Button>
+
+                {isVideoCall && (
+                  <Button
+                    size="lg"
+                    variant={isVideoOff ? 'destructive' : 'secondary'}
+                    className="w-14 h-14 rounded-full"
+                    onClick={onToggleVideo}
+                  >
+                    {isVideoOff ? (
+                      <VideoOff className="w-6 h-6" />
+                    ) : (
+                      <Video className="w-6 h-6" />
+                    )}
+                  </Button>
+                )}
+
+                <Button
+                  size="lg"
+                  variant="destructive"
+                  className="w-14 h-14 rounded-full"
+                  onClick={onEnd}
+                >
+                  <PhoneOff className="w-6 h-6" />
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -15,8 +15,10 @@ import {
 import { Chat, ChatMessage } from '@/hooks/useChat';
 import { useChatMessages } from '@/hooks/useChatMessages';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
+import { useWebRTC } from '@/hooks/useWebRTC';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
+import { CallDialog } from './CallDialog';
 import { formatDistanceToNow } from 'date-fns';
 import { bn } from 'date-fns/locale';
 
@@ -48,6 +50,46 @@ export function ChatWindow({
   } = useChatMessages(chat.id, currentUserId);
 
   const { typingUsers, handleTyping, stopTyping } = useTypingIndicator(chat.id, currentUserId);
+
+  // WebRTC for voice/video calls
+  const {
+    callState,
+    localStream,
+    remoteStream,
+    isMuted,
+    isVideoOff,
+    callDuration,
+    formatDuration,
+    startCall,
+    acceptCall,
+    endCall,
+    toggleMute,
+    toggleVideo,
+  } = useWebRTC({ currentUserId });
+
+  // Get other user ID for direct chats
+  const getOtherUserId = () => {
+    if (chat.type === 'direct' && chat.other_user) {
+      return chat.other_user.user_id;
+    }
+    return null;
+  };
+
+  // Start voice call
+  const handleVoiceCall = () => {
+    const otherUserId = getOtherUserId();
+    if (otherUserId) {
+      startCall(chat.id, otherUserId, 'voice');
+    }
+  };
+
+  // Start video call
+  const handleVideoCall = () => {
+    const otherUserId = getOtherUserId();
+    if (otherUserId) {
+      startCall(chat.id, otherUserId, 'video');
+    }
+  };
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -180,12 +222,28 @@ export function ChatWindow({
 
         {/* Actions */}
         <div className="flex items-center gap-1">
-          <Button size="icon" variant="ghost" title="ভয়েস কল">
-            <Phone className="w-5 h-5" />
-          </Button>
-          <Button size="icon" variant="ghost" title="ভিডিও কল">
-            <Video className="w-5 h-5" />
-          </Button>
+          {chat.type === 'direct' && (
+            <>
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                title="ভয়েস কল"
+                onClick={handleVoiceCall}
+                disabled={!!callState}
+              >
+                <Phone className="w-5 h-5" />
+              </Button>
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                title="ভিডিও কল"
+                onClick={handleVideoCall}
+                disabled={!!callState}
+              >
+                <Video className="w-5 h-5" />
+              </Button>
+            </>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="icon" variant="ghost">
@@ -307,6 +365,24 @@ export function ChatWindow({
         onCancelEdit={() => setEditMessage(null)}
         onSaveEdit={handleSaveEdit}
         disabled={loading}
+      />
+
+      {/* Call Dialog */}
+      <CallDialog
+        callState={callState}
+        localStream={localStream}
+        remoteStream={remoteStream}
+        isMuted={isMuted}
+        isVideoOff={isVideoOff}
+        callDuration={callDuration}
+        formatDuration={formatDuration}
+        onAccept={acceptCall}
+        onReject={() => endCall('rejected')}
+        onEnd={() => endCall('ended')}
+        onToggleMute={toggleMute}
+        onToggleVideo={toggleVideo}
+        otherUserName={chat.other_user?.full_name}
+        otherUserAvatar={chat.other_user?.avatar_url || undefined}
       />
     </div>
   );
