@@ -17,12 +17,14 @@ export default function MessagesNew() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
-  const { chats, loading, getOrCreateDirectChat, createGroupChat } = useChat(currentUserId);
+  const { chats, loading, error, fetchChats, getOrCreateDirectChat, createGroupChat } = useChat(currentUserId);
   usePresence(currentUserId);
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       setCurrentUserId(user?.id || null);
     };
     getUser();
@@ -49,7 +51,7 @@ export default function MessagesNew() {
   const handleCreateDirectChat = async (otherUserId: string) => {
     const chatId = await getOrCreateDirectChat(otherUserId);
     if (chatId) {
-      const chat = chats.find(c => c.id === chatId);
+      const chat = chats.find((c) => c.id === chatId);
       if (chat) {
         setSelectedChat(chat);
       }
@@ -61,7 +63,7 @@ export default function MessagesNew() {
     if (chatId) {
       // Refresh chats and select the new one
       setTimeout(() => {
-        const chat = chats.find(c => c.id === chatId);
+        const chat = chats.find((c) => c.id === chatId);
         if (chat) {
           setSelectedChat(chat);
         }
@@ -102,6 +104,8 @@ export default function MessagesNew() {
           <ChatList
             chats={chats}
             loading={loading}
+            error={error}
+            onRetry={fetchChats}
             selectedChatId={null}
             currentUserId={currentUserId}
             onSelectChat={handleSelectChat}
@@ -130,6 +134,8 @@ export default function MessagesNew() {
         <ChatList
           chats={chats}
           loading={loading}
+          error={error}
+          onRetry={fetchChats}
           selectedChatId={selectedChat?.id || null}
           currentUserId={currentUserId}
           onSelectChat={handleSelectChat}
@@ -156,6 +162,9 @@ export default function MessagesNew() {
             <p className="text-muted-foreground max-w-sm text-bengali">
               বাম দিক থেকে একটি চ্যাট নির্বাচন করুন অথবা নতুন কথোপকথন শুরু করুন
             </p>
+            {error ? (
+              <p className="mt-3 text-sm text-destructive text-bengali">{error.message}</p>
+            ) : null}
           </div>
         )}
       </div>

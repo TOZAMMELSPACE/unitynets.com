@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -73,17 +73,31 @@ export interface ChatParticipant {
   };
 }
 
+export interface ChatLoadError {
+  message: string;
+  details?: string;
+  hint?: string;
+  code?: string;
+  status?: number;
+  raw?: unknown;
+}
+
 export function useChat(currentUserId: string | null) {
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<ChatLoadError | null>(null);
+  const lastToastKeyRef = useRef<string | null>(null);
   const { toast } = useToast();
 
   const fetchChats = useCallback(async () => {
     if (!currentUserId) {
       setChats([]);
+      setError(null);
       setLoading(false);
       return;
     }
+
+    setLoading(true);
 
     try {
       // Get all chat participations for current user
@@ -93,15 +107,17 @@ export function useChat(currentUserId: string | null) {
         .eq('user_id', currentUserId) as any);
 
       if (partError) throw partError;
+
       if (!participations || participations.length === 0) {
         setChats([]);
-        setLoading(false);
+        setError(null);
+        lastToastKeyRef.current = null;
         return;
       }
 
       const chatIds = (participations as any[]).map((p: any) => p.chat_id);
 
-      // Get chats with participants
+      // Get chats
       const { data: chatsData, error: chatsError } = await (supabase
         .from('chats' as any)
         .select('*')
@@ -126,24 +142,24 @@ export function useChat(currentUserId: string | null) {
             .eq('chat_id', chat.id)
             .order('created_at', { ascending: false })
             .limit(1)
-            .single() as any);
+            .maybeSingle() as any);
 
           // For direct chats, get the other user's profile
           let otherUser = null;
           const participation = (participations as any[]).find((p: any) => p.chat_id === chat.id);
-          
+
           if (chat.type === 'direct') {
             const otherParticipant = (chatParticipants as any[])?.find(
               (p: any) => p.user_id !== currentUserId
             );
-            
+
             if (otherParticipant) {
               const { data: profileData } = await supabase
                 .from('profiles')
                 .select('id, user_id, full_name, avatar_url, trust_score, is_online, last_seen')
                 .eq('user_id', otherParticipant.user_id)
                 .single();
-              
+
               otherUser = profileData;
             }
           }
@@ -156,7 +172,7 @@ export function useChat(currentUserId: string | null) {
                 .select('id, user_id, full_name, avatar_url, trust_score, is_online, last_seen')
                 .eq('user_id', p.user_id)
                 .single();
-              
+
               return { ...p, profile: profileData };
             })
           );
@@ -175,20 +191,38 @@ export function useChat(currentUserId: string | null) {
       enrichedChats.sort((a, b) => {
         const aPinned = (participations as any[]).find((p: any) => p.chat_id === a.id)?.is_pinned || false;
         const bPinned = (participations as any[]).find((p: any) => p.chat_id === b.id)?.is_pinned || false;
-        
+
         if (aPinned && !bPinned) return -1;
         if (!aPinned && bPinned) return 1;
         return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
       });
 
       setChats(enrichedChats);
-    } catch (error) {
-      console.error('Error fetching chats:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load chats',
-        variant: 'destructive',
-      });
+      setError(null);
+      lastToastKeyRef.current = null;
+    } catch (err: any) {
+      console.error('Error fetching chats:', err);
+
+      const errorInfo: ChatLoadError = {
+        message: err?.message || 'Failed to load chats',
+        details: err?.details,
+        hint: err?.hint,
+        code: err?.code,
+        status: err?.status,
+        raw: err,
+      };
+
+      setError(errorInfo);
+
+      const toastKey = `${errorInfo.code ?? ''}:${errorInfo.status ?? ''}:${errorInfo.message}:${errorInfo.details ?? ''}`;
+      if (lastToastKeyRef.current !== toastKey) {
+        lastToastKeyRef.current = toastKey;
+        toast({
+          title: 'চ্যাট লোড হয়নি',
+          description: errorInfo.message,
+          variant: 'destructive',
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -198,16 +232,16 @@ export function useChat(currentUserId: string | null) {
     if (!currentUserId) return null;
 
     try {
-      const { data, error } = await (supabase.rpc as any)('get_or_create_direct_chat', {
+      const { data, error: rpcError } = await (supabase.rpc as any)('get_or_create_direct_chat', {
         other_user_id: otherUserId,
       });
 
-      if (error) throw error;
-      
+      if (rpcError) throw rpcError;
+
       await fetchChats();
       return data;
-    } catch (error) {
-      console.error('Error creating chat:', error);
+    } catch (err) {
+      console.error('Error creating chat:', err);
       toast({
         title: 'Error',
         description: 'Failed to create chat',
@@ -224,17 +258,17 @@ export function useChat(currentUserId: string | null) {
     if (!currentUserId) return null;
 
     try {
-      const { data, error } = await (supabase.rpc as any)('create_group_chat', {
+      const { data, error: rpcError } = await (supabase.rpc as any)('create_group_chat', {
         p_group_name: groupName,
         p_member_ids: memberIds,
       });
 
-      if (error) throw error;
-      
+      if (rpcError) throw rpcError;
+
       await fetchChats();
       return data;
-    } catch (error) {
-      console.error('Error creating group chat:', error);
+    } catch (err) {
+      console.error('Error creating group chat:', err);
       toast({
         title: 'Error',
         description: 'Failed to create group',
@@ -251,7 +285,7 @@ export function useChat(currentUserId: string | null) {
     fetchChats();
 
     const channel = supabase
-      .channel('chats-updates')
+      .channel(`chats-updates:${currentUserId}`)
       .on(
         'postgres_changes',
         {
@@ -281,11 +315,19 @@ export function useChat(currentUserId: string | null) {
     };
   }, [currentUserId, fetchChats]);
 
+  const clearError = useCallback(() => {
+    setError(null);
+    lastToastKeyRef.current = null;
+  }, []);
+
   return {
     chats,
     loading,
+    error,
+    clearError,
     fetchChats,
     getOrCreateDirectChat,
     createGroupChat,
   };
 }
+
