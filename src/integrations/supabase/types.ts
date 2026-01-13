@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      call_history: {
+        Row: {
+          call_type: string
+          caller_id: string
+          chat_id: string
+          created_at: string
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          receiver_id: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          call_type: string
+          caller_id: string
+          chat_id: string
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          receiver_id: string
+          started_at?: string | null
+          status: string
+        }
+        Update: {
+          call_type?: string
+          caller_id?: string
+          chat_id?: string
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          receiver_id?: string
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_history_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       call_signals: {
         Row: {
           call_type: string
