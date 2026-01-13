@@ -14,6 +14,164 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_messages: {
+        Row: {
+          chat_id: string
+          content: string | null
+          created_at: string | null
+          deleted_at: string | null
+          edited_at: string | null
+          encrypted_content: string | null
+          id: string
+          is_deleted: boolean | null
+          is_edited: boolean | null
+          is_forwarded: boolean | null
+          is_pinned: boolean | null
+          metadata: Json | null
+          reactions: Json | null
+          read_by: string[] | null
+          reply_to_id: string | null
+          sender_id: string
+          type: string | null
+        }
+        Insert: {
+          chat_id: string
+          content?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          edited_at?: string | null
+          encrypted_content?: string | null
+          id?: string
+          is_deleted?: boolean | null
+          is_edited?: boolean | null
+          is_forwarded?: boolean | null
+          is_pinned?: boolean | null
+          metadata?: Json | null
+          reactions?: Json | null
+          read_by?: string[] | null
+          reply_to_id?: string | null
+          sender_id: string
+          type?: string | null
+        }
+        Update: {
+          chat_id?: string
+          content?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          edited_at?: string | null
+          encrypted_content?: string | null
+          id?: string
+          is_deleted?: boolean | null
+          is_edited?: boolean | null
+          is_forwarded?: boolean | null
+          is_pinned?: boolean | null
+          metadata?: Json | null
+          reactions?: Json | null
+          read_by?: string[] | null
+          reply_to_id?: string | null
+          sender_id?: string
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_participants: {
+        Row: {
+          chat_id: string
+          id: string
+          is_pinned: boolean | null
+          joined_at: string | null
+          last_read_at: string | null
+          muted_until: string | null
+          role: string | null
+          unread_count: number | null
+          user_id: string
+        }
+        Insert: {
+          chat_id: string
+          id?: string
+          is_pinned?: boolean | null
+          joined_at?: string | null
+          last_read_at?: string | null
+          muted_until?: string | null
+          role?: string | null
+          unread_count?: number | null
+          user_id: string
+        }
+        Update: {
+          chat_id?: string
+          id?: string
+          is_pinned?: boolean | null
+          joined_at?: string | null
+          last_read_at?: string | null
+          muted_until?: string | null
+          role?: string | null
+          unread_count?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_participants_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chats: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          group_avatar_url: string | null
+          group_description: string | null
+          group_name: string | null
+          id: string
+          is_archived: boolean | null
+          pinned_message_id: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          group_avatar_url?: string | null
+          group_description?: string | null
+          group_name?: string | null
+          id?: string
+          is_archived?: boolean | null
+          pinned_message_id?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          group_avatar_url?: string | null
+          group_description?: string | null
+          group_name?: string | null
+          id?: string
+          is_archived?: boolean | null
+          pinned_message_id?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           content: string
@@ -493,6 +651,8 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          is_online: boolean | null
+          last_seen: string | null
           location: string | null
           phone: string | null
           role: string | null
@@ -510,6 +670,8 @@ export type Database = {
           email?: string | null
           full_name: string
           id?: string
+          is_online?: boolean | null
+          last_seen?: string | null
           location?: string | null
           phone?: string | null
           role?: string | null
@@ -527,6 +689,8 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          is_online?: boolean | null
+          last_seen?: string | null
           location?: string | null
           phone?: string | null
           role?: string | null
@@ -594,6 +758,38 @@ export type Database = {
           },
         ]
       }
+      typing_indicators: {
+        Row: {
+          chat_id: string
+          id: string
+          is_typing: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          chat_id: string
+          id?: string
+          is_typing?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          chat_id?: string
+          id?: string
+          is_typing?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "typing_indicators_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       public_profiles: {
@@ -645,6 +841,15 @@ export type Database = {
     Functions: {
       analyze_post_sentiment: { Args: { p_content: string }; Returns: number }
       calculate_trust_score: { Args: { p_user_id: string }; Returns: number }
+      create_group_chat: {
+        Args: { p_group_name: string; p_member_ids: string[] }
+        Returns: string
+      }
+      get_or_create_direct_chat: {
+        Args: { other_user_id: string }
+        Returns: string
+      }
+      mark_messages_read: { Args: { p_chat_id: string }; Returns: undefined }
       update_user_trust_score: {
         Args: { p_user_id: string }
         Returns: undefined
