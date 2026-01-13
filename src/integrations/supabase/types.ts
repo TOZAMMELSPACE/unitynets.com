@@ -640,7 +640,11 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      calculate_trust_score: { Args: { p_user_id: string }; Returns: number }
+      update_user_trust_score: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
