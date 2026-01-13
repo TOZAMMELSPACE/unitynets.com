@@ -10,6 +10,7 @@ import { ArrowDown, PenTool, Shield, Rocket, Heart, AlertTriangle, ExternalLink 
 import { toast } from "sonner";
 import SEOHead from "@/components/SEOHead";
 import founderImage from "@/assets/founder.png";
+import { supabase } from "@/integrations/supabase/client";
 
 const Contribute = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,12 +54,30 @@ const Contribute = () => {
 
     setIsSubmitting(true);
 
-    // For now, just show success - we'll add database storage later
-    setTimeout(() => {
+    try {
+      const { error } = await supabase
+        .from('contributor_applications')
+        .insert({
+          full_name: formData.fullName,
+          email: formData.email,
+          country_city: formData.countryCity,
+          primary_areas: formData.primaryAreas,
+          skills_proof: formData.skillsProof,
+          weekly_hours: formData.weeklyHours,
+          why_unitynets: formData.whyUnitynets,
+          portfolio_links: formData.portfolioLinks || null
+        });
+
+      if (error) throw error;
+
       setSubmitted(true);
       toast.success("Application submitted successfully!");
+    } catch (error: any) {
+      console.error('Error submitting application:', error);
+      toast.error("Failed to submit application. Please try again.");
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   const contributionAreas = [
