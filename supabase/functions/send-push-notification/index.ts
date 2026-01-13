@@ -6,52 +6,15 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Web Push utilities
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray;
-}
-
-async function sendWebPush(subscription: any, payload: string, vapidKeys: { publicKey: string; privateKey: string }) {
-  const endpoint = subscription.endpoint;
-  const p256dh = subscription.p256dh;
-  const auth = subscription.auth;
-
-  console.log('Sending push to endpoint:', endpoint);
-
-  // Use web-push compatible approach with fetch
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/octet-stream',
-      'Content-Encoding': 'aes128gcm',
-      'TTL': '86400',
-    },
-    body: payload,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Push failed: ${response.status} ${response.statusText}`);
-  }
-
-  return response;
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { title, body, url, postId, excludeUserId } = await req.json();
+    const { title, body, url, postId, excludeUserId, targetUserId, type } = await req.json();
 
-    console.log('Sending push notification:', { title, body, url, postId, excludeUserId });
+    console.log('Sending push notification:', { title, body, url, postId, excludeUserId, targetUserId, type });
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -68,10 +31,14 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get all push subscriptions except the sender
+    // Build query based on whether we're targeting a specific user or all users
     let query = supabase.from('push_subscriptions').select('*');
     
-    if (excludeUserId) {
+    if (targetUserId) {
+      // Target specific user (e.g., for incoming call notification)
+      query = query.eq('user_id', targetUserId);
+    } else if (excludeUserId) {
+      // Exclude sender (e.g., for broadcast notifications)
       query = query.neq('user_id', excludeUserId);
     }
 
@@ -88,7 +55,8 @@ serve(async (req) => {
       title,
       body,
       url,
-      postId
+      postId,
+      type: type || 'notification',
     });
 
     // Send to all subscriptions

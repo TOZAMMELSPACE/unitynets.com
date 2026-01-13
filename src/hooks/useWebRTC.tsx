@@ -12,6 +12,7 @@ export interface CallState {
   isIncoming: boolean;
   callerName?: string;
   callerAvatar?: string;
+  startedAt?: Date;
 }
 
 interface UseWebRTCProps {
@@ -25,6 +26,9 @@ const ICE_SERVERS = [
   { urls: 'stun:stun2.l.google.com:19302' },
 ];
 
+// Call timeout in milliseconds (30 seconds)
+const CALL_TIMEOUT_MS = 30000;
+
 export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
   const [callState, setCallState] = useState<CallState | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
@@ -35,14 +39,76 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
 
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const callTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const callTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingCandidatesRef = useRef<RTCIceCandidate[]>([]);
+  const callStartTimeRef = useRef<Date | null>(null);
   const { toast } = useToast();
+
+  // Send push notification for incoming call
+  const sendCallPushNotification = useCallback(async (
+    receiverId: string,
+    callerName: string,
+    callType: 'voice' | 'video'
+  ) => {
+    try {
+      await supabase.functions.invoke('send-push-notification', {
+        body: {
+          title: 'ইনকামিং কল',
+          body: `${callerName} ${callType === 'video' ? 'ভিডিও' : 'ভয়েস'} কল করছে`,
+          url: '/messages',
+          targetUserId: receiverId,
+          type: 'incoming_call',
+        },
+      });
+    } catch (error) {
+      console.error('Error sending call push notification:', error);
+    }
+  }, []);
+
+  // Save call to history
+  const saveCallHistory = useCallback(async (
+    chatId: string,
+    callerId: string,
+    receiverId: string,
+    callType: 'voice' | 'video',
+    status: 'completed' | 'missed' | 'rejected' | 'no_answer',
+    startedAt?: Date,
+    endedAt?: Date
+  ) => {
+    try {
+      const durationSeconds = startedAt && endedAt 
+        ? Math.floor((endedAt.getTime() - startedAt.getTime()) / 1000)
+        : 0;
+
+      await (supabase
+        .from('call_history' as any)
+        .insert({
+          chat_id: chatId,
+          caller_id: callerId,
+          receiver_id: receiverId,
+          call_type: callType,
+          status,
+          started_at: startedAt?.toISOString(),
+          ended_at: endedAt?.toISOString(),
+          duration_seconds: durationSeconds,
+        }) as any);
+
+      console.log('Call history saved:', { status, durationSeconds });
+    } catch (error) {
+      console.error('Error saving call history:', error);
+    }
+  }, []);
 
   // Cleanup function
   const cleanup = useCallback(() => {
     if (callTimerRef.current) {
       clearInterval(callTimerRef.current);
       callTimerRef.current = null;
+    }
+
+    if (callTimeoutRef.current) {
+      clearTimeout(callTimeoutRef.current);
+      callTimeoutRef.current = null;
     }
 
     if (localStream) {
@@ -60,6 +126,7 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
     setIsMuted(false);
     setIsVideoOff(false);
     pendingCandidatesRef.current = [];
+    callStartTimeRef.current = null;
   }, [localStream]);
 
   // Initialize peer connection
@@ -97,6 +164,13 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
     pc.onconnectionstatechange = () => {
       console.log('Connection state:', pc.connectionState);
       if (pc.connectionState === 'connected') {
+        // Clear timeout since call connected
+        if (callTimeoutRef.current) {
+          clearTimeout(callTimeoutRef.current);
+          callTimeoutRef.current = null;
+        }
+        // Record start time
+        callStartTimeRef.current = new Date();
         // Start call timer
         callTimerRef.current = setInterval(() => {
           setCallDuration(prev => prev + 1);
@@ -118,6 +192,13 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
     if (!currentUserId) return;
 
     try {
+      // Get caller's profile for push notification
+      const { data: callerProfile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('user_id', currentUserId)
+        .single();
+
       // Get user media
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
@@ -173,6 +254,36 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
         })
         .eq('id', callId) as any);
 
+      // Send push notification to receiver
+      sendCallPushNotification(receiverId, callerProfile?.full_name || 'কেউ', callType);
+
+      // Set call timeout (30 seconds)
+      callTimeoutRef.current = setTimeout(async () => {
+        // If still calling after timeout, mark as no_answer
+        if (callState?.status === 'calling' || callState?.status === 'ringing') {
+          toast({
+            title: 'কল গ্রহণ করা হয়নি',
+            description: 'ব্যবহারকারী অফলাইন বা ব্যস্ত',
+          });
+
+          // Save as no_answer
+          await saveCallHistory(chatId, currentUserId, receiverId, callType, 'no_answer');
+
+          // Update signal status
+          await (supabase
+            .from('call_signals' as any)
+            .update({
+              status: 'no_answer',
+              ended_at: new Date().toISOString(),
+            })
+            .eq('id', callId) as any);
+
+          cleanup();
+          setCallState(null);
+          onCallEnded?.();
+        }
+      }, CALL_TIMEOUT_MS);
+
       toast({
         title: 'কল করা হচ্ছে...',
         description: callType === 'video' ? 'ভিডিও কল' : 'ভয়েস কল',
@@ -187,11 +298,17 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
         variant: 'destructive',
       });
     }
-  }, [currentUserId, createPeerConnection, cleanup, toast]);
+  }, [currentUserId, createPeerConnection, cleanup, toast, sendCallPushNotification, saveCallHistory, onCallEnded, callState?.status]);
 
   // Accept incoming call
   const acceptCall = useCallback(async () => {
     if (!callState?.id || !currentUserId) return;
+
+    // Clear timeout since call is being accepted
+    if (callTimeoutRef.current) {
+      clearTimeout(callTimeoutRef.current);
+      callTimeoutRef.current = null;
+    }
 
     try {
       // Get user media
@@ -247,7 +364,7 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
           })
           .eq('id', callState.id) as any);
 
-        setCallState(prev => prev ? { ...prev, status: 'connected' } : null);
+        setCallState(prev => prev ? { ...prev, status: 'connected', startedAt: new Date() } : null);
       }
     } catch (error) {
       console.error('Error accepting call:', error);
@@ -261,20 +378,34 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
 
   // Reject/End call
   const endCall = useCallback(async (status: 'ended' | 'rejected' | 'missed' = 'ended') => {
-    if (callState?.id) {
+    const currentCallState = callState;
+
+    if (currentCallState?.id) {
       await (supabase
         .from('call_signals' as any)
         .update({
           status,
           ended_at: new Date().toISOString(),
         })
-        .eq('id', callState.id) as any);
+        .eq('id', currentCallState.id) as any);
+
+      // Save to call history
+      const historyStatus = status === 'ended' ? 'completed' : status === 'rejected' ? 'rejected' : 'missed';
+      await saveCallHistory(
+        currentCallState.chatId,
+        currentCallState.callerId,
+        currentCallState.receiverId,
+        currentCallState.callType,
+        historyStatus,
+        callStartTimeRef.current || undefined,
+        new Date()
+      );
     }
 
     cleanup();
     setCallState(null);
     onCallEnded?.();
-  }, [callState, cleanup, onCallEnded]);
+  }, [callState, cleanup, onCallEnded, saveCallHistory]);
 
   // Toggle mute
   const toggleMute = useCallback(() => {
@@ -338,7 +469,7 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
               description: `${callerProfile?.full_name || 'কেউ'} ${signal.call_type === 'video' ? 'ভিডিও' : 'ভয়েস'} কল করছে`,
             });
           } else if (payload.eventType === 'UPDATE') {
-            if (signal.status === 'ended' || signal.status === 'rejected' || signal.status === 'missed') {
+            if (signal.status === 'ended' || signal.status === 'rejected' || signal.status === 'missed' || signal.status === 'no_answer') {
               cleanup();
               setCallState(null);
             }
@@ -357,6 +488,12 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
           const signal = payload.new as any;
 
           if (signal.status === 'accepted' && signal.signal_data?.answer) {
+            // Clear timeout
+            if (callTimeoutRef.current) {
+              clearTimeout(callTimeoutRef.current);
+              callTimeoutRef.current = null;
+            }
+
             // Answer received, set remote description
             const pc = peerConnectionRef.current;
             if (pc && pc.signalingState === 'have-local-offer') {
@@ -373,14 +510,19 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
                 }
               }
 
-              setCallState(prev => prev ? { ...prev, status: 'connected' } : null);
+              setCallState(prev => prev ? { ...prev, status: 'connected', startedAt: new Date() } : null);
             }
-          } else if (signal.status === 'rejected' || signal.status === 'ended' || signal.status === 'missed') {
+          } else if (signal.status === 'rejected' || signal.status === 'ended' || signal.status === 'missed' || signal.status === 'no_answer') {
             cleanup();
             setCallState(null);
-            toast({
-              title: signal.status === 'rejected' ? 'কল প্রত্যাখ্যান করা হয়েছে' : 'কল শেষ হয়েছে',
-            });
+
+            const message = signal.status === 'rejected' 
+              ? 'কল প্রত্যাখ্যান করা হয়েছে' 
+              : signal.status === 'no_answer'
+              ? 'কল গ্রহণ করা হয়নি'
+              : 'কল শেষ হয়েছে';
+
+            toast({ title: message });
           }
         }
       )

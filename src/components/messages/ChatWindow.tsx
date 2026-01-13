@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Phone, Video, MoreVertical, Users, Pin, Bell, BellOff, Trash2, LogOut } from 'lucide-react';
+import { ArrowLeft, Phone, Video, MoreVertical, Users, Pin, Bell, BellOff, Trash2, LogOut, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Chat, ChatMessage } from '@/hooks/useChat';
 import { useChatMessages } from '@/hooks/useChatMessages';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
@@ -19,6 +25,7 @@ import { useWebRTC } from '@/hooks/useWebRTC';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
 import { CallDialog } from './CallDialog';
+import { CallHistory } from './CallHistory';
 import { formatDistanceToNow } from 'date-fns';
 import { bn } from 'date-fns/locale';
 
@@ -37,6 +44,7 @@ export function ChatWindow({
 }: ChatWindowProps) {
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [editMessage, setEditMessage] = useState<ChatMessage | null>(null);
+  const [showCallHistory, setShowCallHistory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -251,6 +259,12 @@ export function ChatWindow({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {chat.type === 'direct' && (
+                <DropdownMenuItem onClick={() => setShowCallHistory(true)}>
+                  <History className="w-4 h-4 mr-2" />
+                  <span className="text-bengali">কল হিস্ট্রি</span>
+                </DropdownMenuItem>
+              )}
               {chat.type === 'group' && (
                 <DropdownMenuItem>
                   <Users className="w-4 h-4 mr-2" />
@@ -384,6 +398,19 @@ export function ChatWindow({
         otherUserName={chat.other_user?.full_name}
         otherUserAvatar={chat.other_user?.avatar_url || undefined}
       />
+
+      {/* Call History Dialog */}
+      <Dialog open={showCallHistory} onOpenChange={setShowCallHistory}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-bengali flex items-center gap-2">
+              <History className="w-5 h-5" />
+              কল হিস্ট্রি
+            </DialogTitle>
+          </DialogHeader>
+          <CallHistory chatId={chat.id} currentUserId={currentUserId} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
