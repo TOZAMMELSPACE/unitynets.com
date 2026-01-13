@@ -11,7 +11,7 @@ import { ThemeProvider } from "@/hooks/useTheme";
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Notifications = lazy(() => import("./pages/Notifications"));
-const MessagesDB = lazy(() => import("./pages/MessagesDB"));
+const MessagesNew = lazy(() => import("./pages/MessagesNew"));
 const Explore = lazy(() => import("./pages/Explore"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Groups = lazy(() => import("./pages/Groups"));
@@ -130,7 +130,7 @@ const App = () => (
                     <Routes>
                       <Route path="/home" element={<Index {...props} />} />
                       <Route path="/notifications" element={<Notifications currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} socialActions={props.socialActions} socialDB={props.socialDB} setUsers={props.setUsers} />} />
-                      <Route path="/messages" element={<MessagesDB currentUserId={props.currentUserId} />} />
+                      <Route path="/messages" element={<MessagesNew />} />
                       <Route path="/explore" element={<Explore currentUser={props.currentUser} currentUserId={props.currentUserId} users={props.users} onSignOut={props.onSignOut} socialActions={props.socialActions} socialDB={props.socialDB} setUsers={props.setUsers} />} />
                       <Route path="/unity-note" element={<UnityNote currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} />} />
                       <Route path="/impact-report" element={<ImpactReport currentUser={props.currentUser} users={props.users} onSignOut={props.onSignOut} />} />
