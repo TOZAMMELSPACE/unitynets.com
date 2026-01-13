@@ -448,6 +448,7 @@ export type Database = {
           id: string
           image_urls: string[] | null
           likes_count: number | null
+          sentiment_score: number | null
           updated_at: string
           user_id: string
           video_url: string | null
@@ -461,6 +462,7 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           likes_count?: number | null
+          sentiment_score?: number | null
           updated_at?: string
           user_id: string
           video_url?: string | null
@@ -474,6 +476,7 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           likes_count?: number | null
+          sentiment_score?: number | null
           updated_at?: string
           user_id?: string
           video_url?: string | null
@@ -640,6 +643,7 @@ export type Database = {
       }
     }
     Functions: {
+      analyze_post_sentiment: { Args: { p_content: string }; Returns: number }
       calculate_trust_score: { Args: { p_user_id: string }; Returns: number }
       update_user_trust_score: {
         Args: { p_user_id: string }
