@@ -168,7 +168,7 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
               <span className="text-[hsl(174,60%,70%)]">{t("Grow Together", "একসাথে বাড়ি")}</span>
             </h2>
             <p className="text-sm lg:text-lg text-white/70 max-w-md leading-relaxed">
-              {t("Join Bangladesh's largest community platform for mutual growth and skill sharing.", "পারস্পরিক বৃদ্ধি ও দক্ষতা শেয়ারিংয়ের জন্য বাংলাদেশের বৃহত্তম কমিউনিটি প্ল্যাটফর্মে যোগ দিন।")}
+              {t("Join a global community platform for mutual growth and skill sharing, starting from South Asia.", "পারস্পরিক বৃদ্ধি ও দক্ষতা শেয়ারিংয়ের জন্য দক্ষিণ এশিয়া থেকে শুরু হওয়া একটি বিশ্বব্যাপী কমিউনিটি প্ল্যাটফর্মে যোগ দিন।")}
             </p>
           </div>
 
@@ -237,7 +237,7 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
                 {t("Build Together,", "একসাথে গড়ি,")} <span className="text-[hsl(174,55%,55%)]">{t("Grow Together", "একসাথে বাড়ি")}</span>
               </h2>
               <p className="text-xs sm:text-sm text-[hsl(220,10%,55%)] mt-1 max-w-xs mx-auto">
-                {t("Join Bangladesh's largest community platform for mutual growth and skill sharing.", "পারস্পরিক বৃদ্ধি ও দক্ষতা শেয়ারিংয়ের জন্য বাংলাদেশের বৃহত্তম কমিউনিটি প্ল্যাটফর্মে যোগ দিন।")}
+                {t("Join a global community platform for mutual growth and skill sharing, starting from South Asia.", "পারস্পরিক বৃদ্ধি ও দক্ষতা শেয়ারিংয়ের জন্য দক্ষিণ এশিয়া থেকে শুরু হওয়া একটি বিশ্বব্যাপী কমিউনিটি প্ল্যাটফর্মে যোগ দিন।")}
               </p>
             </div>
 

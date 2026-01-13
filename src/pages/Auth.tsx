@@ -41,8 +41,8 @@ const Auth = () => {
     <>
       <SEOHead
         title={defaultMode === 'signup' ? "Sign Up - Create Account" : "Login - Sign In"}
-        description="Join UnityNets - বাংলাদেশের প্রথম trust-based community platform। Create your account to connect with local communities, share knowledge, and build trust."
-        keywords="UnityNets login, sign up, create account, register, community platform, বাংলাদেশ"
+        description="Join UnityNets - a trust-based community platform starting from South Asia. Create your account to connect with global communities, share knowledge, and build trust."
+        keywords="UnityNets login, sign up, create account, register, community platform, South Asia, global"
         canonicalUrl="https://unitynets.com/auth"
         noIndex={true}
       />
