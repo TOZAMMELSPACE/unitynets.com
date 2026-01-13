@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -87,10 +87,10 @@ export function useChat(currentUserId: string | null) {
 
     try {
       // Get all chat participations for current user
-      const { data: participations, error: partError } = await supabase
-        .from('chat_participants')
+      const { data: participations, error: partError } = await (supabase
+        .from('chat_participants' as any)
         .select('chat_id, unread_count, is_pinned')
-        .eq('user_id', currentUserId);
+        .eq('user_id', currentUserId) as any);
 
       if (partError) throw partError;
       if (!participations || participations.length === 0) {
@@ -99,49 +99,42 @@ export function useChat(currentUserId: string | null) {
         return;
       }
 
-      const chatIds = participations.map(p => p.chat_id);
+      const chatIds = (participations as any[]).map((p: any) => p.chat_id);
 
       // Get chats with participants
-      const { data: chatsData, error: chatsError } = await supabase
-        .from('chats')
-        .select(`
-          *,
-          chat_participants (
-            id,
-            chat_id,
-            user_id,
-            role,
-            muted_until,
-            is_pinned,
-            unread_count,
-            last_read_at,
-            joined_at
-          )
-        `)
+      const { data: chatsData, error: chatsError } = await (supabase
+        .from('chats' as any)
+        .select('*')
         .in('id', chatIds)
-        .order('updated_at', { ascending: false });
+        .order('updated_at', { ascending: false }) as any);
 
       if (chatsError) throw chatsError;
 
-      // For each chat, get the last message and other user info
+      // For each chat, get participants and last message
       const enrichedChats = await Promise.all(
-        (chatsData || []).map(async (chat) => {
+        ((chatsData as any[]) || []).map(async (chat: any) => {
+          // Get participants
+          const { data: chatParticipants } = await (supabase
+            .from('chat_participants' as any)
+            .select('*')
+            .eq('chat_id', chat.id) as any);
+
           // Get last message
-          const { data: lastMessageData } = await supabase
-            .from('chat_messages')
+          const { data: lastMessageData } = await (supabase
+            .from('chat_messages' as any)
             .select('*')
             .eq('chat_id', chat.id)
             .order('created_at', { ascending: false })
             .limit(1)
-            .single();
+            .single() as any);
 
           // For direct chats, get the other user's profile
           let otherUser = null;
-          const participation = participations.find(p => p.chat_id === chat.id);
+          const participation = (participations as any[]).find((p: any) => p.chat_id === chat.id);
           
           if (chat.type === 'direct') {
-            const otherParticipant = chat.chat_participants?.find(
-              (p: ChatParticipant) => p.user_id !== currentUserId
+            const otherParticipant = (chatParticipants as any[])?.find(
+              (p: any) => p.user_id !== currentUserId
             );
             
             if (otherParticipant) {
@@ -157,7 +150,7 @@ export function useChat(currentUserId: string | null) {
 
           // Get profiles for all participants
           const participantsWithProfiles = await Promise.all(
-            (chat.chat_participants || []).map(async (p: ChatParticipant) => {
+            ((chatParticipants as any[]) || []).map(async (p: any) => {
               const { data: profileData } = await supabase
                 .from('profiles')
                 .select('id, user_id, full_name, avatar_url, trust_score, is_online, last_seen')
@@ -180,8 +173,8 @@ export function useChat(currentUserId: string | null) {
 
       // Sort: pinned first, then by updated_at
       enrichedChats.sort((a, b) => {
-        const aPinned = participations.find(p => p.chat_id === a.id)?.is_pinned || false;
-        const bPinned = participations.find(p => p.chat_id === b.id)?.is_pinned || false;
+        const aPinned = (participations as any[]).find((p: any) => p.chat_id === a.id)?.is_pinned || false;
+        const bPinned = (participations as any[]).find((p: any) => p.chat_id === b.id)?.is_pinned || false;
         
         if (aPinned && !bPinned) return -1;
         if (!aPinned && bPinned) return 1;
@@ -205,7 +198,7 @@ export function useChat(currentUserId: string | null) {
     if (!currentUserId) return null;
 
     try {
-      const { data, error } = await supabase.rpc('get_or_create_direct_chat', {
+      const { data, error } = await (supabase.rpc as any)('get_or_create_direct_chat', {
         other_user_id: otherUserId,
       });
 
@@ -231,7 +224,7 @@ export function useChat(currentUserId: string | null) {
     if (!currentUserId) return null;
 
     try {
-      const { data, error } = await supabase.rpc('create_group_chat', {
+      const { data, error } = await (supabase.rpc as any)('create_group_chat', {
         p_group_name: groupName,
         p_member_ids: memberIds,
       });
@@ -276,7 +269,6 @@ export function useChat(currentUserId: string | null) {
           event: '*',
           schema: 'public',
           table: 'chat_participants',
-          filter: `user_id=eq.${currentUserId}`,
         },
         () => {
           fetchChats();

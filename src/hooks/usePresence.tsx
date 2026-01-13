@@ -13,7 +13,7 @@ export function usePresence(currentUserId: string | null) {
         .update({
           is_online: isOnline,
           last_seen: new Date().toISOString(),
-        })
+        } as any)
         .eq('user_id', currentUserId);
     } catch (error) {
       console.error('Error updating presence:', error);
