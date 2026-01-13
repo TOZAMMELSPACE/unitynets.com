@@ -14,10 +14,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ChatMessage } from '@/hooks/useChat';
-import { supabase } from '@/integrations/supabase/client';
+import { uploadChatMedia, compressImage } from '@/lib/chatMediaUpload';
 import { useToast } from '@/hooks/use-toast';
 
 interface MessageInputProps {
+  chatId: string;
   onSend: (content: string, type?: 'text' | 'image' | 'video' | 'voice' | 'file', metadata?: Record<string, unknown>, replyToId?: string) => void;
   onTyping: () => void;
   replyTo: ChatMessage | null;
@@ -31,6 +32,7 @@ interface MessageInputProps {
 const EMOJI_LIST = ['😀', '😂', '😍', '🥰', '😊', '🙏', '👍', '❤️', '🔥', '💯', '✨', '🎉', '👏', '💪', '🤔', '😢'];
 
 export function MessageInput({
+  chatId,
   onSend,
   onTyping,
   replyTo,
@@ -91,21 +93,25 @@ export function MessageInput({
     setIsUploading(true);
 
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `chat-media/${fileName}`;
+      let fileToUpload: File | Blob = file;
 
-      const { error: uploadError } = await supabase.storage
-        .from('post-images')
-        .upload(filePath, file);
+      // Compress images before upload
+      if (type === 'image' && file.type.startsWith('image/')) {
+        try {
+          fileToUpload = await compressImage(file, 1920, 0.85);
+        } catch (compressError) {
+          console.warn('Image compression failed, uploading original:', compressError);
+        }
+      }
 
-      if (uploadError) throw uploadError;
+      // Upload to chat-media bucket with chat_id path
+      const url = await uploadChatMedia(fileToUpload, chatId, type);
 
-      const { data: urlData } = supabase.storage
-        .from('post-images')
-        .getPublicUrl(filePath);
+      if (!url) {
+        throw new Error('Upload failed');
+      }
 
-      onSend(urlData.publicUrl, type, {
+      onSend(url, type, {
         fileName: file.name,
         fileSize: file.size,
         mimeType: file.type,
@@ -141,23 +147,16 @@ export function MessageInput({
       mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         
-        // Upload audio
+        // Upload audio to chat-media bucket
         setIsUploading(true);
         try {
-          const fileName = `voice-${Date.now()}.webm`;
-          const filePath = `chat-media/${fileName}`;
+          const url = await uploadChatMedia(audioBlob, chatId, 'voice');
 
-          const { error: uploadError } = await supabase.storage
-            .from('post-images')
-            .upload(filePath, audioBlob);
+          if (!url) {
+            throw new Error('Voice upload failed');
+          }
 
-          if (uploadError) throw uploadError;
-
-          const { data: urlData } = supabase.storage
-            .from('post-images')
-            .getPublicUrl(filePath);
-
-          onSend(urlData.publicUrl, 'voice', {
+          onSend(url, 'voice', {
             duration: recordingTime,
           }, replyTo?.id);
 

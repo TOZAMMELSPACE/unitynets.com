@@ -298,6 +298,7 @@ export function ChatWindow({
 
       {/* Input */}
       <MessageInput
+        chatId={chat.id}
         onSend={handleSend}
         onTyping={handleTyping}
         replyTo={replyTo}
