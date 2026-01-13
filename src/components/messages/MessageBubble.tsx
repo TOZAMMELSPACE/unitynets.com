@@ -227,10 +227,10 @@ export function MessageBubble({
 
         {/* Bubble */}
         <div
-          className={`relative px-4 py-2 rounded-2xl ${
+          className={`relative px-4 py-2 rounded-2xl shadow-sm ${
             isOwn
-              ? 'bg-primary text-primary-foreground rounded-br-md'
-              : 'bg-muted rounded-bl-md'
+              ? 'wa-bubble-out rounded-br-md'
+              : 'wa-bubble-in rounded-bl-md'
           }`}
         >
           {/* Sender name for group chats */}
@@ -247,8 +247,8 @@ export function MessageBubble({
           {renderContent()}
 
           {/* Footer */}
-          <div className={`flex items-center gap-1.5 mt-1 text-xs ${
-            isOwn ? 'justify-end text-primary-foreground/70' : 'text-muted-foreground'
+          <div className={`flex items-center gap-1.5 mt-1 text-xs text-muted-foreground ${
+            isOwn ? 'justify-end' : ''
           }`}>
             {message.is_edited && (
               <span className="text-bengali">সম্পাদিত</span>

@@ -134,9 +134,9 @@ export function ChatWindow({
   }, [] as { message: ChatMessage; showAvatar: boolean }[]);
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-[hsl(var(--wa-chat))]">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-border bg-background">
+      <div className="flex items-center gap-3 p-4 border-b border-[hsl(var(--wa-border))] bg-[hsl(var(--wa-sidebar))]">
         <Button size="icon" variant="ghost" onClick={onBack} className="md:hidden">
           <ArrowLeft className="w-5 h-5" />
         </Button>
@@ -157,7 +157,7 @@ export function ChatWindow({
               </AvatarFallback>
             </Avatar>
             {chat.type === 'direct' && chat.other_user?.is_online && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-background" />
             )}
           </div>
 
@@ -225,7 +225,7 @@ export function ChatWindow({
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+      <ScrollArea className="flex-1 wa-chat-wallpaper p-4" ref={scrollRef}>
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3, 4, 5].map(i => (

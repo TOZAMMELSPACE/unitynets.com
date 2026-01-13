@@ -90,7 +90,7 @@ export default function MessagesNew() {
   // Mobile view
   if (isMobile) {
     return (
-      <div className="h-[calc(100vh-8rem)]">
+      <div className="wa h-[calc(100vh-8rem)]">
         {selectedChat ? (
           <ChatWindow
             chat={selectedChat}
@@ -124,7 +124,7 @@ export default function MessagesNew() {
 
   // Desktop view
   return (
-    <div className="h-[calc(100vh-8rem)] flex rounded-xl overflow-hidden border border-border bg-background">
+    <div className="wa h-[calc(100vh-8rem)] flex rounded-xl overflow-hidden border border-[hsl(var(--wa-border))] bg-[hsl(var(--wa-sidebar))]">
       {/* Left sidebar - Chat list */}
       <div className="w-[350px] border-r border-border">
         <ChatList

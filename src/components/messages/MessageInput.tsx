@@ -226,7 +226,7 @@ export function MessageInput({
   };
 
   return (
-    <div className="border-t border-border bg-background p-3">
+    <div className="border-t border-[hsl(var(--wa-border))] bg-[hsl(var(--wa-sidebar))] p-3">
       {/* Reply/Edit preview */}
       {(replyTo || editMessage) && (
         <div className="flex items-center gap-3 mb-3 p-2 bg-muted rounded-lg">
@@ -258,10 +258,10 @@ export function MessageInput({
           </Button>
           
           <div className="flex-1 flex items-center gap-3">
-            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+            <div className="w-3 h-3 bg-destructive rounded-full animate-pulse" />
             <span className="text-sm font-medium">{formatRecordingTime(recordingTime)}</span>
             <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
-              <div className="h-full bg-red-500 animate-pulse" style={{ width: '100%' }} />
+              <div className="h-full bg-destructive animate-pulse" style={{ width: '100%' }} />
             </div>
           </div>
 
@@ -335,16 +335,16 @@ export function MessageInput({
 
           {/* Message input */}
           <div className="flex-1">
-            <Textarea
-              ref={textareaRef}
-              value={message}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-              placeholder="মেসেজ লিখুন..."
-              className="min-h-[44px] max-h-32 resize-none text-bengali"
-              disabled={disabled || isUploading}
-              rows={1}
-            />
+              <Textarea
+                ref={textareaRef}
+                value={message}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                placeholder="মেসেজ লিখুন..."
+                className="min-h-[44px] max-h-32 resize-none text-bengali rounded-full bg-background/70 border border-[hsl(var(--wa-border))] px-4 py-3 focus-visible:ring-2 focus-visible:ring-primary/30"
+                disabled={disabled || isUploading}
+                rows={1}
+              />
           </div>
 
           {/* Send or Voice */}

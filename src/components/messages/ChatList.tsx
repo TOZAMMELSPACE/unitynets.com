@@ -120,9 +120,9 @@ export function ChatList({
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-[hsl(var(--wa-sidebar))]">
       {/* Header */}
-      <div className="p-4 border-b border-border space-y-3">
+      <div className="p-4 border-b border-[hsl(var(--wa-border))] space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-bengali">চ্যাট</h2>
           <div className="flex gap-2">
@@ -141,14 +141,14 @@ export function ChatList({
             placeholder="চ্যাট খুঁজুন..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 text-bengali"
+            className="pl-10 text-bengali input-premium rounded-full bg-background/70"
           />
         </div>
       </div>
 
       {/* Chat List */}
       <ScrollArea className="flex-1">
-        <div className="divide-y divide-border">
+        <div className="divide-y divide-[hsl(var(--wa-border))]">
           {filteredChats.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -160,9 +160,9 @@ export function ChatList({
               <div
                 key={chat.id}
                 onClick={() => onSelectChat(chat)}
-                className={`flex items-center gap-3 p-4 cursor-pointer transition-colors hover:bg-muted/50 ${
-                  selectedChatId === chat.id ? 'bg-muted' : ''
-                }`}
+                 className={`flex items-center gap-3 p-4 cursor-pointer border-l-4 border-transparent transition-colors hover:bg-background/60 ${
+                   selectedChatId === chat.id ? 'bg-background/70 border-primary pl-3' : ''
+                 }`}
               >
                 {/* Avatar */}
                 <div className="relative">
@@ -179,7 +179,7 @@ export function ChatList({
                   
                   {/* Online indicator for direct chats */}
                   {chat.type === 'direct' && chat.other_user?.is_online && (
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-background" />
                   )}
                 </div>
 
