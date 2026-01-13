@@ -158,7 +158,7 @@ Terms of use:
       titleBn: "৭. ভেরিফিকেশন ও Trust Score",
       titleEn: "7. Verification & Trust Score",
       contentBn: `আপনার বিশ্বাসযোগ্যতা বাড়াতে:
-• NID দিয়ে পরিচয় যাচাই করুন
+• সরকারি পরিচয়পত্র দিয়ে পরিচয় যাচাই করুন
 • মোবাইল নম্বর যাচাই করুন
 • প্রোফাইল ছবি যোগ করুন
 • সেবা প্রদানে সক্রিয় থাকুন
@@ -167,7 +167,7 @@ Terms of use:
 • Trust Score বাড়লে আরো সুবিধা পাবেন
 • জাল ভেরিফিকেশন করলে অ্যাকাউন্ট বন্ধ হবে`,
       contentEn: `To increase your trustworthiness:
-• Verify identity with NID
+• Verify identity with government-issued ID
 • Verify your mobile number
 • Add a profile picture
 • Stay active in service provision
@@ -218,15 +218,15 @@ Terms of use:
       icon: Gavel,
       titleBn: "১০. আইনি বিষয়াবলী",
       titleEn: "10. Legal Matters",
-      contentBn: `• এই শর্তাবলী বাংলাদেশের আইন দ্বারা পরিচালিত
-• যেকোনো বিরোধ ঢাকার আদালতে নিষ্পত্তি হবে
+      contentBn: `• এই শর্তাবলী আন্তর্জাতিক মান অনুযায়ী পরিচালিত
+• যেকোনো বিরোধ সালিশের মাধ্যমে নিষ্পত্তি হবে
 • UnityNets যেকোনো সময় শর্তাবলী পরিবর্তন করতে পারে
 • গুরুত্বপূর্ণ পরিবর্তন হলে আপনাকে জানানো হবে
 • শর্তাবলী ভঙ্গ করলে অ্যাকাউন্ট স্থগিত বা বন্ধ হতে পারে
 • আমরা কোনো পূর্ব নোটিশ ছাড়াই সেবা বন্ধ করার অধিকার রাখি
 • এই প্ল্যাটফর্ম ব্যবহার করে আপনি এই শর্তাবলী মেনে নিচ্ছেন`,
-      contentEn: `• These terms are governed by the laws of Bangladesh
-• Any disputes will be resolved in Dhaka courts
+      contentEn: `• These terms are governed by international standards
+• Any disputes will be resolved through arbitration
 • UnityNets may modify terms at any time
 • You will be notified of significant changes
 • Violation of terms may result in account suspension
@@ -294,17 +294,17 @@ Terms of use:
       icon: Globe,
       titleBn: "১৪. আন্তর্জাতিক ব্যবহার",
       titleEn: "14. International Usage",
-      contentBn: `বিদেশ থেকে ব্যবহারে:
-• এই প্ল্যাটফর্ম প্রাথমিকভাবে বাংলাদেশের জন্য
-• বিদেশ থেকে ব্যবহারে স্থানীয় আইন মেনে চলুন
+      contentBn: `বিশ্বব্যাপী ব্যবহারে:
+• এই প্ল্যাটফর্ম দক্ষিণ এশিয়া থেকে শুরু করে সারা বিশ্বের জন্য
+• আপনার দেশের স্থানীয় আইন মেনে চলুন
 • VPN ব্যবহারে সীমাবদ্ধতা থাকতে পারে
-• কিছু সেবা শুধুমাত্র বাংলাদেশে প্রযোজ্য
+• কিছু সেবা নির্দিষ্ট অঞ্চলে প্রযোজ্য হতে পারে
 • বিভিন্ন দেশে বিভিন্ন নিয়ম প্রযোজ্য হতে পারে`,
-      contentEn: `For usage from abroad:
-• This platform is primarily for Bangladesh
-• Follow local laws when using from abroad
+      contentEn: `For global usage:
+• This platform serves users worldwide, starting from South Asia
+• Follow your local laws when using the platform
 • VPN usage may have restrictions
-• Some services only apply in Bangladesh
+• Some services may apply to specific regions
 • Different rules may apply in different countries`
     },
     {
