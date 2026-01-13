@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePosts, PostWithAuthor } from "@/hooks/usePosts";
 import { useProfiles, LegacyUser } from "@/hooks/useProfiles";
 import { useSocialDB } from "@/hooks/useSocialDB";
+import { GlobalCallHandler } from "@/components/messages/GlobalCallHandler";
 
 interface AppLayoutProps {
   children: (props: {
@@ -331,6 +332,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       
       {/* Mobile bottom navigation */}
       <BottomNavigation />
+
+      {/* Global incoming call handler */}
+      <GlobalCallHandler currentUserId={user?.id || null} />
     </div>
   );
 };
