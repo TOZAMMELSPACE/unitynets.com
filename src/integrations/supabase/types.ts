@@ -849,6 +849,14 @@ export type Database = {
         Args: { other_user_id: string }
         Returns: string
       }
+      is_chat_admin: {
+        Args: { p_chat_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      is_chat_member: {
+        Args: { p_chat_id: string; p_user_id: string }
+        Returns: boolean
+      }
       mark_messages_read: { Args: { p_chat_id: string }; Returns: undefined }
       update_user_trust_score: {
         Args: { p_user_id: string }
