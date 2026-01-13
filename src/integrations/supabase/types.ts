@@ -49,6 +49,51 @@ export type Database = {
           },
         ]
       }
+      contributor_applications: {
+        Row: {
+          country_city: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          portfolio_links: string | null
+          primary_areas: string[]
+          skills_proof: string
+          status: string
+          updated_at: string
+          weekly_hours: string
+          why_unitynets: string
+        }
+        Insert: {
+          country_city: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          portfolio_links?: string | null
+          primary_areas: string[]
+          skills_proof: string
+          status?: string
+          updated_at?: string
+          weekly_hours: string
+          why_unitynets: string
+        }
+        Update: {
+          country_city?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          portfolio_links?: string | null
+          primary_areas?: string[]
+          skills_proof?: string
+          status?: string
+          updated_at?: string
+          weekly_hours?: string
+          why_unitynets?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string
