@@ -21,8 +21,8 @@ export function useTypingIndicator(chatId: string | null, currentUserId: string 
 
     try {
       if (isTyping) {
-        await supabase
-          .from('typing_indicators')
+        await (supabase
+          .from('typing_indicators' as any)
           .upsert({
             chat_id: chatId,
             user_id: currentUserId,
@@ -30,7 +30,7 @@ export function useTypingIndicator(chatId: string | null, currentUserId: string 
             updated_at: new Date().toISOString(),
           }, {
             onConflict: 'chat_id,user_id',
-          });
+          }) as any);
 
         // Auto-stop typing after 5 seconds
         if (typingTimeoutRef.current) {
@@ -40,11 +40,11 @@ export function useTypingIndicator(chatId: string | null, currentUserId: string 
           setTyping(false);
         }, 5000);
       } else {
-        await supabase
-          .from('typing_indicators')
+        await (supabase
+          .from('typing_indicators' as any)
           .delete()
           .eq('chat_id', chatId)
-          .eq('user_id', currentUserId);
+          .eq('user_id', currentUserId) as any);
       }
     } catch (error) {
       console.error('Error updating typing status:', error);
@@ -68,20 +68,20 @@ export function useTypingIndicator(chatId: string | null, currentUserId: string 
 
     // Fetch current typing users
     const fetchTypingUsers = async () => {
-      const { data: typingData } = await supabase
-        .from('typing_indicators')
+      const { data: typingData } = await (supabase
+        .from('typing_indicators' as any)
         .select('user_id')
         .eq('chat_id', chatId)
-        .neq('user_id', currentUserId);
+        .neq('user_id', currentUserId) as any);
 
-      if (typingData && typingData.length > 0) {
-        const userIds = typingData.map(t => t.user_id);
+      if (typingData && (typingData as any[]).length > 0) {
+        const userIds = (typingData as any[]).map((t: any) => t.user_id);
         const { data: profiles } = await supabase
           .from('profiles')
           .select('user_id, full_name, avatar_url')
           .in('user_id', userIds);
 
-        setTypingUsers(profiles || []);
+        setTypingUsers((profiles as TypingUser[]) || []);
       } else {
         setTypingUsers([]);
       }
@@ -117,7 +117,7 @@ export function useTypingIndicator(chatId: string | null, currentUserId: string 
             if (profile) {
               setTypingUsers(prev => {
                 if (prev.some(u => u.user_id === profile.user_id)) return prev;
-                return [...prev, profile];
+                return [...prev, profile as TypingUser];
               });
             }
           }

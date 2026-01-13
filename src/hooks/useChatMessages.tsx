@@ -24,17 +24,18 @@ export function useChatMessages(chatId: string | null, currentUserId: string | n
     }
 
     try {
-      const { data, error } = await supabase
-        .from('chat_messages')
+      // Use any type temporarily until Supabase types are regenerated
+      const { data, error } = await (supabase
+        .from('chat_messages' as any)
         .select('*')
         .eq('chat_id', chatId)
         .order('created_at', { ascending: false })
-        .range(offsetRef.current, offsetRef.current + pageSize - 1);
+        .range(offsetRef.current, offsetRef.current + pageSize - 1) as any);
 
       if (error) throw error;
 
       // Fetch sender profiles
-      const senderIds = [...new Set(data?.map(m => m.sender_id) || [])];
+      const senderIds = [...new Set((data as any[])?.map((m: any) => m.sender_id) || [])];
       const { data: profiles } = await supabase
         .from('profiles')
         .select('id, user_id, full_name, avatar_url, trust_score')
@@ -43,19 +44,19 @@ export function useChatMessages(chatId: string | null, currentUserId: string | n
       const profileMap = new Map(profiles?.map(p => [p.user_id, p]));
 
       // Fetch reply-to messages if any
-      const replyToIds = data?.filter(m => m.reply_to_id).map(m => m.reply_to_id) || [];
+      const replyToIds = (data as any[])?.filter((m: any) => m.reply_to_id).map((m: any) => m.reply_to_id) || [];
       let replyMap = new Map<string, ChatMessage>();
       
       if (replyToIds.length > 0) {
-        const { data: replyMessages } = await supabase
-          .from('chat_messages')
+        const { data: replyMessages } = await (supabase
+          .from('chat_messages' as any)
           .select('*')
-          .in('id', replyToIds);
+          .in('id', replyToIds) as any);
         
-        replyMap = new Map(replyMessages?.map(m => [m.id, m as ChatMessage]));
+        replyMap = new Map((replyMessages as any[])?.map((m: any) => [m.id, m as ChatMessage]));
       }
 
-      const enrichedMessages = (data || []).map(m => ({
+      const enrichedMessages = ((data as any[]) || []).map((m: any) => ({
         ...m,
         sender: profileMap.get(m.sender_id),
         reply_to: m.reply_to_id ? replyMap.get(m.reply_to_id) : null,
@@ -67,11 +68,11 @@ export function useChatMessages(chatId: string | null, currentUserId: string | n
         setMessages(prev => [...enrichedMessages.reverse(), ...prev]);
       }
 
-      setHasMore((data?.length || 0) === pageSize);
-      offsetRef.current += data?.length || 0;
+      setHasMore(((data as any[])?.length || 0) === pageSize);
+      offsetRef.current += (data as any[])?.length || 0;
 
       // Mark messages as read
-      await supabase.rpc('mark_messages_read', { p_chat_id: chatId });
+      await (supabase.rpc as any)('mark_messages_read', { p_chat_id: chatId });
     } catch (error) {
       console.error('Error fetching messages:', error);
     } finally {
@@ -112,24 +113,19 @@ export function useChatMessages(chatId: string | null, currentUserId: string | n
     setMessages(prev => [...prev, tempMessage]);
 
     try {
-      const insertData: Record<string, unknown> = {
-        chat_id: chatId,
-        sender_id: currentUserId,
-        type,
-        content,
-        metadata,
-        read_by: [currentUserId],
-      };
-      
-      if (replyToId) {
-        insertData.reply_to_id = replyToId;
-      }
-
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .insert(insertData)
+      const { data, error } = await (supabase
+        .from('chat_messages' as any)
+        .insert({
+          chat_id: chatId,
+          sender_id: currentUserId,
+          type,
+          content,
+          metadata,
+          read_by: [currentUserId],
+          reply_to_id: replyToId || null,
+        })
         .select()
-        .single();
+        .single() as any);
 
       if (error) throw error;
 
@@ -152,15 +148,15 @@ export function useChatMessages(chatId: string | null, currentUserId: string | n
 
   const editMessage = useCallback(async (messageId: string, newContent: string) => {
     try {
-      const { error } = await supabase
-        .from('chat_messages')
+      const { error } = await (supabase
+        .from('chat_messages' as any)
         .update({
           content: newContent,
           is_edited: true,
           edited_at: new Date().toISOString(),
         })
         .eq('id', messageId)
-        .eq('sender_id', currentUserId);
+        .eq('sender_id', currentUserId) as any);
 
       if (error) throw error;
 
@@ -181,15 +177,15 @@ export function useChatMessages(chatId: string | null, currentUserId: string | n
 
   const deleteMessage = useCallback(async (messageId: string) => {
     try {
-      const { error } = await supabase
-        .from('chat_messages')
+      const { error } = await (supabase
+        .from('chat_messages' as any)
         .update({
           is_deleted: true,
           deleted_at: new Date().toISOString(),
           content: null,
         })
         .eq('id', messageId)
-        .eq('sender_id', currentUserId);
+        .eq('sender_id', currentUserId) as any);
 
       if (error) throw error;
 
@@ -241,10 +237,10 @@ export function useChatMessages(chatId: string | null, currentUserId: string | n
         }
       });
 
-      const { error } = await supabase
-        .from('chat_messages')
+      const { error } = await (supabase
+        .from('chat_messages' as any)
         .update({ reactions: newReactions })
-        .eq('id', messageId);
+        .eq('id', messageId) as any);
 
       if (error) throw error;
 
@@ -306,7 +302,7 @@ export function useChatMessages(chatId: string | null, currentUserId: string | n
           });
 
           // Mark as read if chat is open
-          await supabase.rpc('mark_messages_read', { p_chat_id: chatId });
+          await (supabase.rpc as any)('mark_messages_read', { p_chat_id: chatId });
         }
       )
       .on(
