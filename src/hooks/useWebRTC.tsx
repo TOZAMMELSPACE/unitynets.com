@@ -24,6 +24,8 @@ const ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
   { urls: 'stun:stun2.l.google.com:19302' },
+  { urls: 'stun:stun3.l.google.com:19302' },
+  { urls: 'stun:stun4.l.google.com:19302' },
 ];
 
 // Call timeout in milliseconds (30 seconds)
@@ -40,8 +42,10 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const callTimerRef = useRef<NodeJS.Timeout | null>(null);
   const callTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const pendingCandidatesRef = useRef<RTCIceCandidate[]>([]);
+  const iceCandidatesQueueRef = useRef<RTCIceCandidate[]>([]);
   const callStartTimeRef = useRef<Date | null>(null);
+  const callIdRef = useRef<string | null>(null);
+  const isCallConnectedRef = useRef(false);
   const { toast } = useToast();
 
   // Send push notification for incoming call
@@ -101,6 +105,8 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
 
   // Cleanup function
   const cleanup = useCallback(() => {
+    console.log('Cleaning up WebRTC...');
+    
     if (callTimerRef.current) {
       clearInterval(callTimerRef.current);
       callTimerRef.current = null;
@@ -112,7 +118,10 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
     }
 
     if (localStream) {
-      localStream.getTracks().forEach(track => track.stop());
+      localStream.getTracks().forEach(track => {
+        track.stop();
+        console.log('Stopped track:', track.kind);
+      });
       setLocalStream(null);
     }
 
@@ -125,63 +134,179 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
     setCallDuration(0);
     setIsMuted(false);
     setIsVideoOff(false);
-    pendingCandidatesRef.current = [];
+    iceCandidatesQueueRef.current = [];
     callStartTimeRef.current = null;
+    callIdRef.current = null;
+    isCallConnectedRef.current = false;
   }, [localStream]);
 
+  // Send ICE candidate to peer
+  const sendIceCandidate = useCallback(async (candidate: RTCIceCandidate, callId: string) => {
+    try {
+      const { data: currentSignal } = await (supabase
+        .from('call_signals' as any)
+        .select('signal_data')
+        .eq('id', callId)
+        .single() as any);
+
+      const signalData = (currentSignal?.signal_data as any) || {};
+      const candidates = signalData.candidates || [];
+      candidates.push(candidate.toJSON());
+
+      await (supabase
+        .from('call_signals' as any)
+        .update({
+          signal_data: { ...signalData, candidates },
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', callId) as any);
+
+      console.log('ICE candidate sent:', candidate.candidate?.substring(0, 50));
+    } catch (error) {
+      console.error('Error sending ICE candidate:', error);
+    }
+  }, []);
+
+  // Start call duration timer
+  const startCallTimer = useCallback(() => {
+    if (callTimerRef.current) return; // Already running
+    
+    callStartTimeRef.current = new Date();
+    isCallConnectedRef.current = true;
+    
+    callTimerRef.current = setInterval(() => {
+      setCallDuration(prev => prev + 1);
+    }, 1000);
+    
+    console.log('Call timer started');
+  }, []);
+
   // Initialize peer connection
-  const createPeerConnection = useCallback(async (callId: string) => {
-    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+  const createPeerConnection = useCallback((callId: string) => {
+    console.log('Creating peer connection for call:', callId);
+    
+    const pc = new RTCPeerConnection({ 
+      iceServers: ICE_SERVERS,
+      iceCandidatePoolSize: 10,
+    });
+    
     peerConnectionRef.current = pc;
+    callIdRef.current = callId;
 
-    pc.onicecandidate = async (event) => {
-      if (event.candidate && callId) {
-        // Send ICE candidate to peer via database
-        const { data: currentSignal } = await (supabase
-          .from('call_signals' as any)
-          .select('signal_data')
-          .eq('id', callId)
-          .single() as any);
-
-        const signalData = (currentSignal?.signal_data as any) || {};
-        const candidates = signalData.candidates || [];
-        candidates.push(event.candidate.toJSON());
-
-        await (supabase
-          .from('call_signals' as any)
-          .update({
-            signal_data: { ...signalData, candidates },
-          })
-          .eq('id', callId) as any);
+    // ICE candidate event
+    pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        console.log('New ICE candidate:', event.candidate.candidate?.substring(0, 50));
+        sendIceCandidate(event.candidate, callId);
       }
     };
 
-    pc.ontrack = (event) => {
-      console.log('Received remote track:', event.track.kind);
-      setRemoteStream(event.streams[0]);
+    pc.onicegatheringstatechange = () => {
+      console.log('ICE gathering state:', pc.iceGatheringState);
     };
 
-    pc.onconnectionstatechange = () => {
-      console.log('Connection state:', pc.connectionState);
-      if (pc.connectionState === 'connected') {
+    // Track event - when remote stream is received
+    pc.ontrack = (event) => {
+      console.log('Received remote track:', event.track.kind, 'streams:', event.streams.length);
+      
+      if (event.streams && event.streams[0]) {
+        console.log('Setting remote stream with tracks:', event.streams[0].getTracks().map(t => t.kind));
+        setRemoteStream(event.streams[0]);
+      } else {
+        // If no streams, create a new one
+        const stream = new MediaStream([event.track]);
+        setRemoteStream(prevStream => {
+          if (prevStream) {
+            prevStream.addTrack(event.track);
+            return prevStream;
+          }
+          return stream;
+        });
+      }
+    };
+
+    // ICE connection state change
+    pc.oniceconnectionstatechange = () => {
+      console.log('ICE connection state:', pc.iceConnectionState);
+      
+      if (pc.iceConnectionState === 'connected' || pc.iceConnectionState === 'completed') {
         // Clear timeout since call connected
         if (callTimeoutRef.current) {
           clearTimeout(callTimeoutRef.current);
           callTimeoutRef.current = null;
         }
-        // Record start time
-        callStartTimeRef.current = new Date();
-        // Start call timer
-        callTimerRef.current = setInterval(() => {
-          setCallDuration(prev => prev + 1);
-        }, 1000);
-      } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+        
+        if (!isCallConnectedRef.current) {
+          startCallTimer();
+          setCallState(prev => prev ? { ...prev, status: 'connected', startedAt: new Date() } : null);
+        }
+      } else if (pc.iceConnectionState === 'disconnected') {
+        console.log('ICE disconnected, attempting to reconnect...');
+        // Don't end immediately, might reconnect
+      } else if (pc.iceConnectionState === 'failed') {
+        console.log('ICE connection failed');
+        toast({
+          title: 'কল সংযোগ ব্যর্থ',
+          description: 'নেটওয়ার্ক সমস্যা হতে পারে',
+          variant: 'destructive',
+        });
         endCall();
       }
     };
 
+    // Connection state change
+    pc.onconnectionstatechange = () => {
+      console.log('Connection state:', pc.connectionState);
+      
+      if (pc.connectionState === 'connected') {
+        if (!isCallConnectedRef.current) {
+          startCallTimer();
+        }
+      } else if (pc.connectionState === 'failed' || pc.connectionState === 'closed') {
+        if (isCallConnectedRef.current) {
+          endCall();
+        }
+      }
+    };
+
     return pc;
-  }, []);
+  }, [sendIceCandidate, startCallTimer, toast]);
+
+  // End call function - defined early to avoid circular dependency
+  const endCall = useCallback(async (status: 'ended' | 'rejected' | 'missed' = 'ended') => {
+    const currentCallState = callState;
+    const currentCallId = callIdRef.current || currentCallState?.id;
+
+    console.log('Ending call:', currentCallId, 'status:', status);
+
+    if (currentCallId) {
+      await (supabase
+        .from('call_signals' as any)
+        .update({
+          status,
+          ended_at: new Date().toISOString(),
+        })
+        .eq('id', currentCallId) as any);
+
+      // Save to call history
+      if (currentCallState) {
+        const historyStatus = status === 'ended' ? 'completed' : status === 'rejected' ? 'rejected' : 'missed';
+        await saveCallHistory(
+          currentCallState.chatId,
+          currentCallState.callerId,
+          currentCallState.receiverId,
+          currentCallState.callType,
+          historyStatus,
+          callStartTimeRef.current || undefined,
+          new Date()
+        );
+      }
+    }
+
+    cleanup();
+    setCallState(null);
+    onCallEnded?.();
+  }, [callState, cleanup, onCallEnded, saveCallHistory]);
 
   // Start a call
   const startCall = useCallback(async (
@@ -192,6 +317,8 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
     if (!currentUserId) return;
 
     try {
+      console.log('Starting call:', { chatId, receiverId, callType });
+      
       // Get caller's profile for push notification
       const { data: callerProfile } = await supabase
         .from('profiles')
@@ -199,11 +326,23 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
         .eq('user_id', currentUserId)
         .single();
 
-      // Get user media
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: callType === 'video',
-      });
+      // Get user media with specific constraints
+      const constraints: MediaStreamConstraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+        video: callType === 'video' ? {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: 'user',
+        } : false,
+      };
+
+      console.log('Requesting media with constraints:', constraints);
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log('Got local stream with tracks:', stream.getTracks().map(t => `${t.kind}: ${t.enabled}`));
       setLocalStream(stream);
 
       // Create call signal in database
@@ -222,6 +361,7 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
       if (error) throw error;
 
       const callId = callSignal.id;
+      console.log('Call signal created:', callId);
 
       // Set call state
       setCallState({
@@ -235,32 +375,60 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
       });
 
       // Create peer connection
-      const pc = await createPeerConnection(callId);
+      const pc = createPeerConnection(callId);
 
-      // Add local tracks
+      // Add local tracks to peer connection
       stream.getTracks().forEach(track => {
+        console.log('Adding track to peer connection:', track.kind);
         pc.addTrack(track, stream);
       });
 
       // Create and set offer
-      const offer = await pc.createOffer();
+      const offer = await pc.createOffer({
+        offerToReceiveAudio: true,
+        offerToReceiveVideo: callType === 'video',
+      });
+      
+      console.log('Created offer:', offer.type);
       await pc.setLocalDescription(offer);
 
-      // Store offer in database
+      // Wait for ICE gathering to complete or timeout
+      await new Promise<void>((resolve) => {
+        if (pc.iceGatheringState === 'complete') {
+          resolve();
+        } else {
+          const checkState = () => {
+            if (pc.iceGatheringState === 'complete') {
+              pc.removeEventListener('icegatheringstatechange', checkState);
+              resolve();
+            }
+          };
+          pc.addEventListener('icegatheringstatechange', checkState);
+          // Timeout after 2 seconds
+          setTimeout(resolve, 2000);
+        }
+      });
+
+      // Store offer in database (with gathered ICE candidates in SDP)
+      const finalOffer = pc.localDescription;
       await (supabase
         .from('call_signals' as any)
         .update({
-          signal_data: { offer: offer },
+          signal_data: { offer: finalOffer },
         })
         .eq('id', callId) as any);
+
+      console.log('Offer stored in database');
 
       // Send push notification to receiver
       sendCallPushNotification(receiverId, callerProfile?.full_name || 'কেউ', callType);
 
       // Set call timeout (30 seconds)
       callTimeoutRef.current = setTimeout(async () => {
-        // If still calling after timeout, mark as no_answer
-        if (callState?.status === 'calling' || callState?.status === 'ringing') {
+        const currentStatus = peerConnectionRef.current?.connectionState;
+        console.log('Call timeout reached, current status:', currentStatus);
+        
+        if (!isCallConnectedRef.current) {
           toast({
             title: 'কল গ্রহণ করা হয়নি',
             description: 'ব্যবহারকারী অফলাইন বা ব্যস্ত',
@@ -298,11 +466,13 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
         variant: 'destructive',
       });
     }
-  }, [currentUserId, createPeerConnection, cleanup, toast, sendCallPushNotification, saveCallHistory, onCallEnded, callState?.status]);
+  }, [currentUserId, createPeerConnection, cleanup, toast, sendCallPushNotification, saveCallHistory, onCallEnded]);
 
   // Accept incoming call
   const acceptCall = useCallback(async () => {
     if (!callState?.id || !currentUserId) return;
+
+    console.log('Accepting call:', callState.id);
 
     // Clear timeout since call is being accepted
     if (callTimeoutRef.current) {
@@ -311,18 +481,31 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
     }
 
     try {
-      // Get user media
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: callState.callType === 'video',
-      });
+      // Get user media with specific constraints
+      const constraints: MediaStreamConstraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+        video: callState.callType === 'video' ? {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: 'user',
+        } : false,
+      };
+
+      console.log('Requesting media for answer:', constraints);
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log('Got local stream with tracks:', stream.getTracks().map(t => `${t.kind}: ${t.enabled}`));
       setLocalStream(stream);
 
       // Create peer connection
-      const pc = await createPeerConnection(callState.id);
+      const pc = createPeerConnection(callState.id);
 
-      // Add local tracks
+      // Add local tracks to peer connection
       stream.getTracks().forEach(track => {
+        console.log('Adding track to peer connection:', track.kind);
         pc.addTrack(track, stream);
       });
 
@@ -333,11 +516,16 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
         .eq('id', callState.id)
         .single() as any);
 
+      console.log('Got signal data:', signalData?.signal_data ? 'yes' : 'no');
+
       if (signalData?.signal_data?.offer) {
+        // Set remote description (offer)
+        console.log('Setting remote description (offer)');
         await pc.setRemoteDescription(new RTCSessionDescription(signalData.signal_data.offer));
 
-        // Add any pending ICE candidates
+        // Add any pending ICE candidates from caller
         if (signalData.signal_data.candidates) {
+          console.log('Adding', signalData.signal_data.candidates.length, 'ICE candidates from caller');
           for (const candidate of signalData.signal_data.candidates) {
             try {
               await pc.addIceCandidate(new RTCIceCandidate(candidate));
@@ -347,11 +535,29 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
           }
         }
 
-        // Create and set answer
+        // Create answer
         const answer = await pc.createAnswer();
+        console.log('Created answer:', answer.type);
         await pc.setLocalDescription(answer);
 
+        // Wait for ICE gathering
+        await new Promise<void>((resolve) => {
+          if (pc.iceGatheringState === 'complete') {
+            resolve();
+          } else {
+            const checkState = () => {
+              if (pc.iceGatheringState === 'complete') {
+                pc.removeEventListener('icegatheringstatechange', checkState);
+                resolve();
+              }
+            };
+            pc.addEventListener('icegatheringstatechange', checkState);
+            setTimeout(resolve, 2000);
+          }
+        });
+
         // Update database with answer and status
+        const finalAnswer = pc.localDescription;
         await (supabase
           .from('call_signals' as any)
           .update({
@@ -359,11 +565,12 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
             started_at: new Date().toISOString(),
             signal_data: {
               ...signalData.signal_data,
-              answer: answer,
+              answer: finalAnswer,
             },
           })
           .eq('id', callState.id) as any);
 
+        console.log('Answer stored in database');
         setCallState(prev => prev ? { ...prev, status: 'connected', startedAt: new Date() } : null);
       }
     } catch (error) {
@@ -376,42 +583,13 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
     }
   }, [callState, currentUserId, createPeerConnection, cleanup, toast]);
 
-  // Reject/End call
-  const endCall = useCallback(async (status: 'ended' | 'rejected' | 'missed' = 'ended') => {
-    const currentCallState = callState;
-
-    if (currentCallState?.id) {
-      await (supabase
-        .from('call_signals' as any)
-        .update({
-          status,
-          ended_at: new Date().toISOString(),
-        })
-        .eq('id', currentCallState.id) as any);
-
-      // Save to call history
-      const historyStatus = status === 'ended' ? 'completed' : status === 'rejected' ? 'rejected' : 'missed';
-      await saveCallHistory(
-        currentCallState.chatId,
-        currentCallState.callerId,
-        currentCallState.receiverId,
-        currentCallState.callType,
-        historyStatus,
-        callStartTimeRef.current || undefined,
-        new Date()
-      );
-    }
-
-    cleanup();
-    setCallState(null);
-    onCallEnded?.();
-  }, [callState, cleanup, onCallEnded, saveCallHistory]);
-
   // Toggle mute
   const toggleMute = useCallback(() => {
     if (localStream) {
-      localStream.getAudioTracks().forEach(track => {
+      const audioTracks = localStream.getAudioTracks();
+      audioTracks.forEach(track => {
         track.enabled = !track.enabled;
+        console.log('Audio track enabled:', track.enabled);
       });
       setIsMuted(!isMuted);
     }
@@ -420,8 +598,10 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
   // Toggle video
   const toggleVideo = useCallback(() => {
     if (localStream) {
-      localStream.getVideoTracks().forEach(track => {
+      const videoTracks = localStream.getVideoTracks();
+      videoTracks.forEach(track => {
         track.enabled = !track.enabled;
+        console.log('Video track enabled:', track.enabled);
       });
       setIsVideoOff(!isVideoOff);
     }
@@ -430,6 +610,8 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
   // Listen for incoming calls and call updates
   useEffect(() => {
     if (!currentUserId) return;
+
+    console.log('Setting up call signal listeners for user:', currentUserId);
 
     const channel = supabase
       .channel(`calls:${currentUserId}`)
@@ -443,6 +625,7 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
         },
         async (payload) => {
           const signal = payload.new as any;
+          console.log('Received signal (as receiver):', payload.eventType, signal.status);
 
           if (payload.eventType === 'INSERT' && signal.status === 'ringing') {
             // Incoming call
@@ -486,31 +669,40 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
         },
         async (payload) => {
           const signal = payload.new as any;
+          console.log('Received signal (as caller):', signal.status);
 
           if (signal.status === 'accepted' && signal.signal_data?.answer) {
+            console.log('Call accepted, setting remote description');
+            
             // Clear timeout
             if (callTimeoutRef.current) {
               clearTimeout(callTimeoutRef.current);
               callTimeoutRef.current = null;
             }
 
-            // Answer received, set remote description
+            // Set remote description (answer)
             const pc = peerConnectionRef.current;
             if (pc && pc.signalingState === 'have-local-offer') {
-              await pc.setRemoteDescription(new RTCSessionDescription(signal.signal_data.answer));
+              try {
+                await pc.setRemoteDescription(new RTCSessionDescription(signal.signal_data.answer));
+                console.log('Remote description set successfully');
 
-              // Add any ICE candidates
-              if (signal.signal_data.candidates) {
-                for (const candidate of signal.signal_data.candidates) {
-                  try {
-                    await pc.addIceCandidate(new RTCIceCandidate(candidate));
-                  } catch (e) {
-                    console.warn('Error adding ICE candidate:', e);
+                // Add any ICE candidates from receiver
+                if (signal.signal_data.receiverCandidates) {
+                  console.log('Adding receiver ICE candidates:', signal.signal_data.receiverCandidates.length);
+                  for (const candidate of signal.signal_data.receiverCandidates) {
+                    try {
+                      await pc.addIceCandidate(new RTCIceCandidate(candidate));
+                    } catch (e) {
+                      console.warn('Error adding receiver ICE candidate:', e);
+                    }
                   }
                 }
-              }
 
-              setCallState(prev => prev ? { ...prev, status: 'connected', startedAt: new Date() } : null);
+                setCallState(prev => prev ? { ...prev, status: 'connected', startedAt: new Date() } : null);
+              } catch (error) {
+                console.error('Error setting remote description:', error);
+              }
             }
           } else if (signal.status === 'rejected' || signal.status === 'ended' || signal.status === 'missed' || signal.status === 'no_answer') {
             cleanup();
@@ -529,9 +721,48 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
       .subscribe();
 
     return () => {
+      console.log('Removing call signal channel');
       supabase.removeChannel(channel);
     };
   }, [currentUserId, cleanup, toast]);
+
+  // Poll for new ICE candidates periodically
+  useEffect(() => {
+    if (!callState?.id || !peerConnectionRef.current) return;
+
+    const pollCandidates = async () => {
+      try {
+        const { data: signalData } = await (supabase
+          .from('call_signals' as any)
+          .select('signal_data')
+          .eq('id', callState.id)
+          .single() as any);
+
+        const candidates = signalData?.signal_data?.candidates || [];
+        const pc = peerConnectionRef.current;
+        
+        if (pc && pc.remoteDescription) {
+          for (const candidate of candidates) {
+            const candidateStr = JSON.stringify(candidate);
+            if (!iceCandidatesQueueRef.current.find(c => JSON.stringify(c) === candidateStr)) {
+              try {
+                await pc.addIceCandidate(new RTCIceCandidate(candidate));
+                iceCandidatesQueueRef.current.push(candidate);
+                console.log('Added polled ICE candidate');
+              } catch (e) {
+                // Ignore duplicate candidates
+              }
+            }
+          }
+        }
+      } catch (error) {
+        // Ignore errors
+      }
+    };
+
+    const interval = setInterval(pollCandidates, 1000);
+    return () => clearInterval(interval);
+  }, [callState?.id]);
 
   // Format call duration
   const formatDuration = (seconds: number) => {

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -40,18 +40,60 @@ export function CallDialog({
 }: CallDialogProps) {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement>(null);
+  const [hasRemoteVideo, setHasRemoteVideo] = useState(false);
 
   // Set local video stream
   useEffect(() => {
     if (localVideoRef.current && localStream) {
+      console.log('Setting local video stream');
       localVideoRef.current.srcObject = localStream;
+      localVideoRef.current.play().catch(e => console.log('Local video play error:', e));
     }
   }, [localStream]);
 
-  // Set remote video stream
+  // Set remote video/audio stream
   useEffect(() => {
-    if (remoteVideoRef.current && remoteStream) {
-      remoteVideoRef.current.srcObject = remoteStream;
+    if (remoteStream) {
+      console.log('Remote stream received with tracks:', remoteStream.getTracks().map(t => `${t.kind}: ${t.enabled}`));
+      
+      const videoTracks = remoteStream.getVideoTracks();
+      const audioTracks = remoteStream.getAudioTracks();
+      
+      setHasRemoteVideo(videoTracks.length > 0 && videoTracks[0].enabled);
+      
+      // Set video element
+      if (remoteVideoRef.current && videoTracks.length > 0) {
+        console.log('Setting remote video stream');
+        remoteVideoRef.current.srcObject = remoteStream;
+        remoteVideoRef.current.play().catch(e => console.log('Remote video play error:', e));
+      }
+      
+      // Set audio element (separate to ensure audio works)
+      if (remoteAudioRef.current && audioTracks.length > 0) {
+        console.log('Setting remote audio stream');
+        remoteAudioRef.current.srcObject = remoteStream;
+        remoteAudioRef.current.play().catch(e => console.log('Remote audio play error:', e));
+      }
+    }
+  }, [remoteStream]);
+
+  // Track remote video availability
+  useEffect(() => {
+    if (!remoteStream) return;
+    
+    const videoTrack = remoteStream.getVideoTracks()[0];
+    if (videoTrack) {
+      const handleMute = () => setHasRemoteVideo(false);
+      const handleUnmute = () => setHasRemoteVideo(true);
+      
+      videoTrack.addEventListener('mute', handleMute);
+      videoTrack.addEventListener('unmute', handleUnmute);
+      
+      return () => {
+        videoTrack.removeEventListener('mute', handleMute);
+        videoTrack.removeEventListener('unmute', handleUnmute);
+      };
     }
   }, [remoteStream]);
 
@@ -77,19 +119,22 @@ export function CallDialog({
         onInteractOutside={(e) => e.preventDefault()}
       >
         <div className="relative h-[500px] flex flex-col">
+          {/* Hidden audio element for remote audio (ensures audio plays) */}
+          <audio ref={remoteAudioRef} autoPlay playsInline className="hidden" />
+
           {/* Video area */}
-          {isVideoCall && isConnected ? (
+          {isVideoCall && isConnected && hasRemoteVideo ? (
             <>
               {/* Remote video (full screen) */}
               <video
                 ref={remoteVideoRef}
                 autoPlay
                 playsInline
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover bg-zinc-900"
               />
 
               {/* Local video (picture-in-picture) */}
-              <div className="absolute top-4 right-4 w-32 h-24 rounded-lg overflow-hidden bg-zinc-800 shadow-lg border border-zinc-700">
+              <div className="absolute top-4 right-4 w-32 h-24 rounded-lg overflow-hidden bg-zinc-800 shadow-lg border border-zinc-700 z-10">
                 <video
                   ref={localVideoRef}
                   autoPlay
@@ -107,6 +152,10 @@ export function CallDialog({
           ) : (
             /* Voice call or connecting state */
             <div className="flex-1 flex flex-col items-center justify-center p-8">
+              {/* Hidden video refs for voice calls to still receive streams */}
+              <video ref={remoteVideoRef} autoPlay playsInline className="hidden" />
+              <video ref={localVideoRef} autoPlay playsInline muted className="hidden" />
+              
               <div className="relative">
                 <Avatar className="w-32 h-32 border-4 border-primary/30">
                   <AvatarImage src={displayAvatar || undefined} />
@@ -122,19 +171,30 @@ export function CallDialog({
                     <div className="absolute inset-0 rounded-full border-4 border-primary/30 animate-pulse" />
                   </>
                 )}
+                
+                {/* Connected indicator */}
+                {isConnected && (
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-zinc-900 flex items-center justify-center">
+                    <Phone className="w-3 h-3 text-white" />
+                  </div>
+                )}
               </div>
 
-              <h2 className="mt-6 text-2xl font-bold text-white text-bengali">
+              <h2 className="mt-6 text-2xl font-bold text-white">
                 {displayName}
               </h2>
 
-              <p className="mt-2 text-zinc-400 text-bengali">
+              <p className="mt-2 text-zinc-400">
                 {isRinging && callState.isIncoming && 'ইনকামিং কল...'}
                 {isCalling && 'কল করা হচ্ছে...'}
-                {isConnected && formatDuration(callDuration)}
+                {isConnected && (
+                  <span className="text-green-400 font-mono text-lg">
+                    {formatDuration(callDuration)}
+                  </span>
+                )}
               </p>
 
-              <p className="mt-1 text-sm text-zinc-500 text-bengali">
+              <p className="mt-1 text-sm text-zinc-500">
                 {isVideoCall ? 'ভিডিও কল' : 'ভয়েস কল'}
               </p>
             </div>
