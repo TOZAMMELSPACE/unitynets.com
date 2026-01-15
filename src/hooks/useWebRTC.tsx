@@ -140,32 +140,51 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
     isCallConnectedRef.current = false;
   }, [localStream]);
 
-  // Send ICE candidate to peer
+  // Send ICE candidate to peer - store in appropriate field based on role
   const sendIceCandidate = useCallback(async (candidate: RTCIceCandidate, callId: string) => {
     try {
       const { data: currentSignal } = await (supabase
         .from('call_signals' as any)
-        .select('signal_data')
+        .select('signal_data, caller_id')
         .eq('id', callId)
         .single() as any);
 
       const signalData = (currentSignal?.signal_data as any) || {};
-      const candidates = signalData.candidates || [];
-      candidates.push(candidate.toJSON());
+      
+      // Determine if this user is caller or receiver
+      const isCaller = currentSignal?.caller_id === currentUserId;
+      
+      if (isCaller) {
+        // Caller stores in 'candidates'
+        const candidates = signalData.candidates || [];
+        candidates.push(candidate.toJSON());
+        
+        await (supabase
+          .from('call_signals' as any)
+          .update({
+            signal_data: { ...signalData, candidates },
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', callId) as any);
+      } else {
+        // Receiver stores in 'receiverCandidates'
+        const receiverCandidates = signalData.receiverCandidates || [];
+        receiverCandidates.push(candidate.toJSON());
+        
+        await (supabase
+          .from('call_signals' as any)
+          .update({
+            signal_data: { ...signalData, receiverCandidates },
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', callId) as any);
+      }
 
-      await (supabase
-        .from('call_signals' as any)
-        .update({
-          signal_data: { ...signalData, candidates },
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', callId) as any);
-
-      console.log('ICE candidate sent:', candidate.candidate?.substring(0, 50));
+      console.log('ICE candidate sent (as', isCaller ? 'caller' : 'receiver', '):', candidate.candidate?.substring(0, 50));
     } catch (error) {
       console.error('Error sending ICE candidate:', error);
     }
-  }, []);
+  }, [currentUserId]);
 
   // Start call duration timer
   const startCallTimer = useCallback(() => {
@@ -556,21 +575,44 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
           }
         });
 
-        // Update database with answer and status
+        // Wait for ICE gathering to get some candidates
+        await new Promise<void>((resolve) => {
+          const checkCandidates = () => {
+            // Wait until we have at least one candidate or timeout
+            setTimeout(resolve, 1500);
+          };
+          checkCandidates();
+        });
+
+        // Update database with answer, status, and receiver's ICE candidates
         const finalAnswer = pc.localDescription;
+        
+        // Collect receiver's ICE candidates
+        const receiverCandidates: RTCIceCandidateInit[] = [];
+        
+        // Re-fetch signal data to get latest state
+        const { data: latestSignalData } = await (supabase
+          .from('call_signals' as any)
+          .select('signal_data')
+          .eq('id', callState.id)
+          .single() as any);
+
         await (supabase
           .from('call_signals' as any)
           .update({
             status: 'accepted',
             started_at: new Date().toISOString(),
             signal_data: {
-              ...signalData.signal_data,
+              ...latestSignalData?.signal_data,
               answer: finalAnswer,
+              receiverCandidates: iceCandidatesQueueRef.current.map(c => 
+                typeof c.toJSON === 'function' ? c.toJSON() : c
+              ),
             },
           })
           .eq('id', callState.id) as any);
 
-        console.log('Answer stored in database');
+        console.log('Answer stored in database with receiver candidates');
         setCallState(prev => prev ? { ...prev, status: 'connected', startedAt: new Date() } : null);
       }
     } catch (error) {
@@ -613,21 +655,25 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
 
     console.log('Setting up call signal listeners for user:', currentUserId);
 
-    const channel = supabase
-      .channel(`calls:${currentUserId}`)
+    // Channel for receiving calls (as receiver)
+    const receiverChannel = supabase
+      .channel(`calls-receiver:${currentUserId}`)
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'INSERT',
           schema: 'public',
           table: 'call_signals',
-          filter: `receiver_id=eq.${currentUserId}`,
         },
         async (payload) => {
           const signal = payload.new as any;
-          console.log('Received signal (as receiver):', payload.eventType, signal.status);
+          
+          // Only process if this user is the receiver
+          if (signal.receiver_id !== currentUserId) return;
+          
+          console.log('Received incoming call signal:', signal.id, signal.status);
 
-          if (payload.eventType === 'INSERT' && signal.status === 'ringing') {
+          if (signal.status === 'ringing') {
             // Incoming call
             const { data: callerProfile } = await supabase
               .from('profiles')
@@ -651,11 +697,6 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
               title: 'ইনকামিং কল',
               description: `${callerProfile?.full_name || 'কেউ'} ${signal.call_type === 'video' ? 'ভিডিও' : 'ভয়েস'} কল করছে`,
             });
-          } else if (payload.eventType === 'UPDATE') {
-            if (signal.status === 'ended' || signal.status === 'rejected' || signal.status === 'missed' || signal.status === 'no_answer') {
-              cleanup();
-              setCallState(null);
-            }
           }
         }
       )
@@ -665,93 +706,117 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
           event: 'UPDATE',
           schema: 'public',
           table: 'call_signals',
-          filter: `caller_id=eq.${currentUserId}`,
         },
         async (payload) => {
           const signal = payload.new as any;
-          console.log('Received signal (as caller):', signal.status);
-
-          if (signal.status === 'accepted' && signal.signal_data?.answer) {
-            console.log('Call accepted, setting remote description');
-            
-            // Clear timeout
-            if (callTimeoutRef.current) {
-              clearTimeout(callTimeoutRef.current);
-              callTimeoutRef.current = null;
+          
+          // Handle updates for receiver
+          if (signal.receiver_id === currentUserId) {
+            console.log('Received signal update (as receiver):', signal.status);
+            if (signal.status === 'ended' || signal.status === 'rejected' || signal.status === 'missed' || signal.status === 'no_answer') {
+              cleanup();
+              setCallState(null);
             }
+          }
+          
+          // Handle updates for caller
+          if (signal.caller_id === currentUserId) {
+            console.log('Received signal update (as caller):', signal.status);
 
-            // Set remote description (answer)
-            const pc = peerConnectionRef.current;
-            if (pc && pc.signalingState === 'have-local-offer') {
-              try {
-                await pc.setRemoteDescription(new RTCSessionDescription(signal.signal_data.answer));
-                console.log('Remote description set successfully');
+            if (signal.status === 'accepted' && signal.signal_data?.answer) {
+              console.log('Call accepted, setting remote description');
+              
+              // Clear timeout
+              if (callTimeoutRef.current) {
+                clearTimeout(callTimeoutRef.current);
+                callTimeoutRef.current = null;
+              }
 
-                // Add any ICE candidates from receiver
-                if (signal.signal_data.receiverCandidates) {
-                  console.log('Adding receiver ICE candidates:', signal.signal_data.receiverCandidates.length);
-                  for (const candidate of signal.signal_data.receiverCandidates) {
-                    try {
-                      await pc.addIceCandidate(new RTCIceCandidate(candidate));
-                    } catch (e) {
-                      console.warn('Error adding receiver ICE candidate:', e);
+              // Set remote description (answer)
+              const pc = peerConnectionRef.current;
+              if (pc && pc.signalingState === 'have-local-offer') {
+                try {
+                  await pc.setRemoteDescription(new RTCSessionDescription(signal.signal_data.answer));
+                  console.log('Remote description set successfully');
+
+                  // Add any ICE candidates from receiver
+                  if (signal.signal_data.receiverCandidates) {
+                    console.log('Adding receiver ICE candidates:', signal.signal_data.receiverCandidates.length);
+                    for (const candidate of signal.signal_data.receiverCandidates) {
+                      try {
+                        await pc.addIceCandidate(new RTCIceCandidate(candidate));
+                      } catch (e) {
+                        console.warn('Error adding receiver ICE candidate:', e);
+                      }
                     }
                   }
+
+                  setCallState(prev => prev ? { ...prev, status: 'connected', startedAt: new Date() } : null);
+                } catch (error) {
+                  console.error('Error setting remote description:', error);
                 }
-
-                setCallState(prev => prev ? { ...prev, status: 'connected', startedAt: new Date() } : null);
-              } catch (error) {
-                console.error('Error setting remote description:', error);
               }
+            } else if (signal.status === 'rejected' || signal.status === 'ended' || signal.status === 'missed' || signal.status === 'no_answer') {
+              cleanup();
+              setCallState(null);
+
+              const message = signal.status === 'rejected' 
+                ? 'কল প্রত্যাখ্যান করা হয়েছে' 
+                : signal.status === 'no_answer'
+                ? 'কল গ্রহণ করা হয়নি'
+                : 'কল শেষ হয়েছে';
+
+              toast({ title: message });
             }
-          } else if (signal.status === 'rejected' || signal.status === 'ended' || signal.status === 'missed' || signal.status === 'no_answer') {
-            cleanup();
-            setCallState(null);
-
-            const message = signal.status === 'rejected' 
-              ? 'কল প্রত্যাখ্যান করা হয়েছে' 
-              : signal.status === 'no_answer'
-              ? 'কল গ্রহণ করা হয়নি'
-              : 'কল শেষ হয়েছে';
-
-            toast({ title: message });
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Call signal channel status:', status);
+      });
 
     return () => {
       console.log('Removing call signal channel');
-      supabase.removeChannel(channel);
+      supabase.removeChannel(receiverChannel);
     };
   }, [currentUserId, cleanup, toast]);
 
-  // Poll for new ICE candidates periodically
+  // Poll for new ICE candidates periodically from the other party
   useEffect(() => {
-    if (!callState?.id || !peerConnectionRef.current) return;
+    if (!callState?.id || !peerConnectionRef.current || !currentUserId) return;
 
     const pollCandidates = async () => {
       try {
         const { data: signalData } = await (supabase
           .from('call_signals' as any)
-          .select('signal_data')
+          .select('signal_data, caller_id')
           .eq('id', callState.id)
           .single() as any);
 
-        const candidates = signalData?.signal_data?.candidates || [];
         const pc = peerConnectionRef.current;
+        if (!pc || !pc.remoteDescription) return;
+
+        // Determine which candidates to poll based on role
+        const isCaller = signalData?.caller_id === currentUserId;
         
-        if (pc && pc.remoteDescription) {
-          for (const candidate of candidates) {
-            const candidateStr = JSON.stringify(candidate);
-            if (!iceCandidatesQueueRef.current.find(c => JSON.stringify(c) === candidateStr)) {
-              try {
-                await pc.addIceCandidate(new RTCIceCandidate(candidate));
-                iceCandidatesQueueRef.current.push(candidate);
-                console.log('Added polled ICE candidate');
-              } catch (e) {
-                // Ignore duplicate candidates
-              }
+        // Caller reads receiver's candidates, receiver reads caller's candidates
+        const candidatesToAdd = isCaller 
+          ? (signalData?.signal_data?.receiverCandidates || [])
+          : (signalData?.signal_data?.candidates || []);
+        
+        for (const candidate of candidatesToAdd) {
+          const candidateStr = JSON.stringify(candidate);
+          const alreadyAdded = iceCandidatesQueueRef.current.some(
+            c => JSON.stringify(c) === candidateStr
+          );
+          
+          if (!alreadyAdded) {
+            try {
+              await pc.addIceCandidate(new RTCIceCandidate(candidate));
+              iceCandidatesQueueRef.current.push(candidate);
+              console.log('Added polled ICE candidate from', isCaller ? 'receiver' : 'caller');
+            } catch (e) {
+              // Ignore duplicate candidates
             }
           }
         }
@@ -760,9 +825,10 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
       }
     };
 
-    const interval = setInterval(pollCandidates, 1000);
+    // Poll more frequently at the beginning
+    const interval = setInterval(pollCandidates, 500);
     return () => clearInterval(interval);
-  }, [callState?.id]);
+  }, [callState?.id, currentUserId]);
 
   // Format call duration
   const formatDuration = (seconds: number) => {
