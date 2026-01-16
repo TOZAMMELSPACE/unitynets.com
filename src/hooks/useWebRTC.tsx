@@ -20,12 +20,29 @@ interface UseWebRTCProps {
   onCallEnded?: () => void;
 }
 
-const ICE_SERVERS = [
+// ICE servers with STUN and free TURN servers for better connectivity
+const ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
   { urls: 'stun:stun2.l.google.com:19302' },
   { urls: 'stun:stun3.l.google.com:19302' },
   { urls: 'stun:stun4.l.google.com:19302' },
+  // OpenRelay TURN servers (free tier)
+  { 
+    urls: 'turn:openrelay.metered.ca:80',
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+  },
+  { 
+    urls: 'turn:openrelay.metered.ca:443',
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+  },
+  { 
+    urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+  },
 ];
 
 // Call timeout in milliseconds (30 seconds)
@@ -200,13 +217,16 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
     console.log('Call timer started');
   }, []);
 
-  // Initialize peer connection
+  // Initialize peer connection with improved settings
   const createPeerConnection = useCallback((callId: string) => {
     console.log('Creating peer connection for call:', callId);
     
     const pc = new RTCPeerConnection({ 
       iceServers: ICE_SERVERS,
       iceCandidatePoolSize: 10,
+      iceTransportPolicy: 'all', // Use both STUN and TURN
+      bundlePolicy: 'max-bundle',
+      rtcpMuxPolicy: 'require',
     });
     
     peerConnectionRef.current = pc;
@@ -226,25 +246,41 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
 
     // Track event - when remote stream is received
     pc.ontrack = (event) => {
-      console.log('Received remote track:', event.track.kind, 'streams:', event.streams.length);
+      console.log('Received remote track:', event.track.kind, 'enabled:', event.track.enabled, 'streams:', event.streams.length);
       
-      if (event.streams && event.streams[0]) {
-        console.log('Setting remote stream with tracks:', event.streams[0].getTracks().map(t => t.kind));
-        setRemoteStream(event.streams[0]);
-      } else {
-        // If no streams, create a new one
-        const stream = new MediaStream([event.track]);
-        setRemoteStream(prevStream => {
-          if (prevStream) {
-            prevStream.addTrack(event.track);
-            return prevStream;
-          }
-          return stream;
-        });
-      }
-    };
+      // Track ready state monitoring
+      event.track.onunmute = () => {
+        console.log('Remote track unmuted:', event.track.kind);
+      };
+      
+      event.track.onmute = () => {
+        console.log('Remote track muted:', event.track.kind);
+      };
+      
+      event.track.onended = () => {
+        console.log('Remote track ended:', event.track.kind);
+      };
 
-    // ICE connection state change
+      // Always create a new MediaStream with all current tracks
+      setRemoteStream(prevStream => {
+        const newStream = new MediaStream();
+        
+        // Add existing tracks from previous stream
+        if (prevStream) {
+          prevStream.getTracks().forEach(t => {
+            if (t.id !== event.track.id) {
+              newStream.addTrack(t);
+            }
+          });
+        }
+        
+        // Add the new track
+        newStream.addTrack(event.track);
+        
+        console.log('Updated remote stream with tracks:', newStream.getTracks().map(t => `${t.kind}: ${t.readyState}`));
+        return newStream;
+      });
+    };
     pc.oniceconnectionstatechange = () => {
       console.log('ICE connection state:', pc.iceConnectionState);
       
