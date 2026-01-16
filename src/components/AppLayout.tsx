@@ -11,6 +11,7 @@ import { usePosts, PostWithAuthor } from "@/hooks/usePosts";
 import { useProfiles, LegacyUser } from "@/hooks/useProfiles";
 import { useSocialDB } from "@/hooks/useSocialDB";
 import { GlobalCallHandler } from "@/components/messages/GlobalCallHandler";
+import { CallProvider } from "@/contexts/CallContext";
 
 interface AppLayoutProps {
   children: (props: {
@@ -291,50 +292,52 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     );
   }
   return (
-    <div className="relative min-h-screen w-full bg-background">
-      <LeftSidebar onCreatePost={handleCreatePost} />
-      
-      {/* Main content area */}
-      <div className="w-full lg:pl-64 min-h-screen pb-20 lg:pb-0">
-        {/* Global Header - same on all pages */}
-        <GlobalHeader 
-          currentUser={currentUser} 
-          onSignOut={handleSignOut}
-          onCreatePost={handleCreatePost}
-        />
+    <CallProvider currentUserId={user?.id || null}>
+      <div className="relative min-h-screen w-full bg-background">
+        <LeftSidebar onCreatePost={handleCreatePost} />
         
-        {/* Page Content */}
-        {children({
-            currentUser,
-            currentUserId: user?.id || null,
-            users,
-            posts,
-            comments,
-            onSignOut: handleSignOut,
-            onLogin: handleLogin,
-            onRegister: handleRegister,
-            onPostCreated: handlePostCreated,
-            onLikePost: handleLikePost,
-            onAddComment: handleAddComment,
-            onLikeComment: handleLikeComment,
-            onUpdateProfile: handleUpdateProfile,
-            onCreatePost: handleCreatePost,
-            registerCreatePostTrigger,
-            socialActions,
-            socialDB,
-            setUsers: setLocalUsers,
-            onLoadMore: loadMore,
-            hasMore,
-            loadingMore,
-            onTrackView: trackView,
-          })}
-      </div>
-      
-      {/* Mobile bottom navigation */}
-      <BottomNavigation />
+        {/* Main content area */}
+        <div className="w-full lg:pl-64 min-h-screen pb-20 lg:pb-0">
+          {/* Global Header - same on all pages */}
+          <GlobalHeader 
+            currentUser={currentUser} 
+            onSignOut={handleSignOut}
+            onCreatePost={handleCreatePost}
+          />
+          
+          {/* Page Content */}
+          {children({
+              currentUser,
+              currentUserId: user?.id || null,
+              users,
+              posts,
+              comments,
+              onSignOut: handleSignOut,
+              onLogin: handleLogin,
+              onRegister: handleRegister,
+              onPostCreated: handlePostCreated,
+              onLikePost: handleLikePost,
+              onAddComment: handleAddComment,
+              onLikeComment: handleLikeComment,
+              onUpdateProfile: handleUpdateProfile,
+              onCreatePost: handleCreatePost,
+              registerCreatePostTrigger,
+              socialActions,
+              socialDB,
+              setUsers: setLocalUsers,
+              onLoadMore: loadMore,
+              hasMore,
+              loadingMore,
+              onTrackView: trackView,
+            })}
+        </div>
+        
+        {/* Mobile bottom navigation */}
+        <BottomNavigation />
 
-      {/* Global incoming call handler */}
-      <GlobalCallHandler currentUserId={user?.id || null} />
-    </div>
+        {/* Global incoming call handler */}
+        <GlobalCallHandler currentUserId={user?.id || null} />
+      </div>
+    </CallProvider>
   );
 };

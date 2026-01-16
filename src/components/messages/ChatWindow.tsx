@@ -21,10 +21,9 @@ import {
 import { Chat, ChatMessage } from '@/hooks/useChat';
 import { useChatMessages } from '@/hooks/useChatMessages';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
-import { useWebRTC } from '@/hooks/useWebRTC';
+import { useCall } from '@/contexts/CallContext';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
-import { CallDialog } from './CallDialog';
 import { CallHistory } from './CallHistory';
 import { formatDistanceToNow } from 'date-fns';
 import { bn } from 'date-fns/locale';
@@ -59,21 +58,11 @@ export function ChatWindow({
 
   const { typingUsers, handleTyping, stopTyping } = useTypingIndicator(chat.id, currentUserId);
 
-  // WebRTC for voice/video calls
+  // Use global call context instead of local WebRTC hook
   const {
     callState,
-    localStream,
-    remoteStream,
-    isMuted,
-    isVideoOff,
-    callDuration,
-    formatDuration,
     startCall,
-    acceptCall,
-    endCall,
-    toggleMute,
-    toggleVideo,
-  } = useWebRTC({ currentUserId });
+  } = useCall();
 
   // Get other user ID for direct chats
   const getOtherUserId = () => {
@@ -381,23 +370,7 @@ export function ChatWindow({
         disabled={loading}
       />
 
-      {/* Call Dialog */}
-      <CallDialog
-        callState={callState}
-        localStream={localStream}
-        remoteStream={remoteStream}
-        isMuted={isMuted}
-        isVideoOff={isVideoOff}
-        callDuration={callDuration}
-        formatDuration={formatDuration}
-        onAccept={acceptCall}
-        onReject={() => endCall('rejected')}
-        onEnd={() => endCall('ended')}
-        onToggleMute={toggleMute}
-        onToggleVideo={toggleVideo}
-        otherUserName={chat.other_user?.full_name}
-        otherUserAvatar={chat.other_user?.avatar_url || undefined}
-      />
+      {/* Call dialog is now handled globally by GlobalCallHandler */}
 
       {/* Call History Dialog */}
       <Dialog open={showCallHistory} onOpenChange={setShowCallHistory}>
