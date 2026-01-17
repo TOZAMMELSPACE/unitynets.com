@@ -57,10 +57,10 @@ const HowItWorksSection = memo(() => {
   ];
 
   return (
-    <section id="how-it-works" className="py-20 bg-muted/30 scroll-mt-20">
-      <div className="container mx-auto px-4">
+    <section id="how-it-works" className="py-20 bg-muted/30 scroll-mt-20 overflow-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 animate-fade-in">
           <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
             {language === "bn" ? "সহজ ধাপগুলো" : "Simple Steps"}
           </span>
@@ -87,9 +87,9 @@ const HowItWorksSection = memo(() => {
                 <div className="hidden lg:block absolute top-14 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-primary/50 to-primary/10" />
               )}
               
-              <div className="bg-background rounded-2xl p-6 shadow-sm border border-border/50 hover:shadow-lg hover:border-primary/30 transition-all duration-300 h-full hover:-translate-y-1">
+              <div className="bg-background rounded-2xl p-6 shadow-sm border border-border/50 hover:shadow-xl hover:border-primary/30 transition-all duration-300 h-full hover:-translate-y-2">
                 {/* Step number badge */}
-                <div className="absolute -top-3 -left-3 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold shadow-lg ring-4 ring-background">
+                <div className="absolute -top-3 -left-3 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold shadow-lg ring-4 ring-background group-hover:scale-110 transition-transform duration-300">
                   {step.step}
                 </div>
                 

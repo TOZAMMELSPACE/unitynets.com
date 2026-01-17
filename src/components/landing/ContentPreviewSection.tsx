@@ -147,9 +147,9 @@ export const ContentPreviewSection = () => {
 
   return (
     <section className="py-12 md:py-24 bg-background">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Recent Posts Section */}
-        <div>
+        <div className="animate-fade-in">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8">
             <div>
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2">
@@ -157,7 +157,7 @@ export const ContentPreviewSection = () => {
               </h2>
               <p className="text-sm md:text-base text-muted-foreground">{t("Latest community posts", "সাম্প্রতিক কমিউনিটি পোস্ট")}</p>
             </div>
-            <Button variant="ghost" className="mt-3 md:mt-0 group text-sm" onClick={() => navigate('/public-feed')}>
+            <Button variant="ghost" className="mt-3 md:mt-0 group text-sm hover-scale" onClick={() => navigate('/public-feed')}>
               <span>{t("View All", "সব দেখুন")}</span>
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -173,11 +173,12 @@ export const ContentPreviewSection = () => {
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
-              {posts.slice(0, 8).map((post) => (
+              {posts.slice(0, 8).map((post, index) => (
                 <div
                   key={post.id}
                   onClick={() => navigate(`/post/${post.id}`)}
-                  className="group bg-card border border-border/30 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col"
+                  className="group bg-card border border-border/30 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-2 transition-all duration-300 cursor-pointer flex flex-col animate-fade-in"
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   {/* Post media thumbnail - image or video */}
                   {(post.image_urls && post.image_urls.length > 0) || post.video_url ? (

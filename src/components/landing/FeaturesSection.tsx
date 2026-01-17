@@ -53,10 +53,10 @@ export const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-background">
-      <div className="container mx-auto px-4">
+    <section className="py-16 md:py-24 bg-background overflow-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-12 md:mb-16">
+        <div className="text-center mb-12 md:mb-16 animate-fade-in">
           <h2 className="section-header mb-4">
             {t("Why Join Us?", "কেন আমাদের সাথে যোগ দিবেন?")}
           </h2>
@@ -73,7 +73,8 @@ export const FeaturesSection = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className={`group relative bg-gradient-to-br ${feature.gradient} border border-border/30 rounded-2xl p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden`}
+              className={`group relative bg-gradient-to-br ${feature.gradient} border border-border/30 rounded-2xl p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-500 overflow-hidden animate-fade-in`}
+              style={{ animationDelay: `${index * 100}ms` }}
             >
               {/* Background Glow */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

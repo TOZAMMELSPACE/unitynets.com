@@ -21,13 +21,13 @@ export const CTASection = () => {
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-accent">
         {/* Decorative elements */}
-        <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-        <div className="absolute bottom-10 right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-white/5 rounded-full blur-xl" />
+        <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse" />
+        <div className="absolute bottom-10 right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-white/5 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.5s' }} />
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-4xl mx-auto text-center animate-fade-in">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
@@ -54,7 +54,7 @@ export const CTASection = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button 
               size="lg" 
-              className="bg-white text-primary hover:bg-white/90 text-lg px-8 py-6 rounded-xl group shadow-xl"
+              className="bg-white text-primary hover:bg-white/90 text-lg px-8 py-6 rounded-xl group shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
               onClick={() => navigate('/auth?mode=signup')}
             >
               <span>{t("Register Free", "ফ্রি রেজিস্ট্রেশন করুন")}</span>
@@ -63,7 +63,7 @@ export const CTASection = () => {
             <Button 
               size="lg" 
               variant="outline"
-              className="border-white/30 text-white hover:bg-white/10 text-lg px-8 py-6 rounded-xl bg-transparent"
+              className="border-white/30 text-white hover:bg-white/10 text-lg px-8 py-6 rounded-xl bg-transparent hover:-translate-y-1 transition-all duration-300"
               onClick={() => navigate('/about')}
             >
               <span>{t("Learn Our Mission", "আমাদের মিশন জানুন")}</span>
