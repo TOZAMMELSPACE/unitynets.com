@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { ArrowDown, PenTool, Shield, Rocket, Heart, AlertTriangle, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import SEOHead from "@/components/SEOHead";
+import Navbar from "@/components/landing/Navbar";
+import Footer from "@/components/landing/Footer";
 import founderImage from "@/assets/founder.png";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -96,6 +98,8 @@ const Contribute = () => {
         keywords="UnityNets, contribute, builder, volunteer, South Asia, community, open source"
         canonicalUrl="https://unitynets.com/contribute"
       />
+      
+      <Navbar />
 
       {/* Hero Section */}
       <section className="relative py-20 md:py-32 px-4">
@@ -481,17 +485,7 @@ const Contribute = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-4 border-t border-border">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-sm text-muted-foreground">
-            100% Free • No Ads • Early Stage • Solo Founder Seeking Co-Builders
-          </p>
-          <p className="text-xs text-muted-foreground mt-2">
-            © {new Date().getFullYear()} UnityNets. Trust • Learn • Unite
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
