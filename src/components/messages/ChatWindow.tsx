@@ -161,6 +161,13 @@ export function ChatWindow({
     console.log('Forward message:', message);
   };
 
+  // Handle call back from missed call message
+  const handleCallBack = (userId: string, callType: 'voice' | 'video') => {
+    if (!callState) {
+      startCall(chat.id, userId, callType);
+    }
+  };
+
   // Group messages by sender and time
   const groupedMessages = messages.reduce((groups, message, index) => {
     const prev = messages[index - 1];
@@ -334,6 +341,7 @@ export function ChatWindow({
                 onDelete={deleteMessage}
                 onReact={addReaction}
                 onForward={handleForward}
+                onCallBack={handleCallBack}
               />
             ))}
             <div ref={bottomRef} />
