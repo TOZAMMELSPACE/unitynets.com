@@ -86,7 +86,7 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
     }
   }, []);
 
-  // Save call to history
+  // Save call to history and add message to chat
   const saveCallHistory = useCallback(async (
     chatId: string,
     callerId: string,
@@ -101,6 +101,7 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
         ? Math.floor((endedAt.getTime() - startedAt.getTime()) / 1000)
         : 0;
 
+      // Save to call_history table
       await (supabase
         .from('call_history' as any)
         .insert({
@@ -115,6 +116,58 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
         }) as any);
 
       console.log('Call history saved:', { status, durationSeconds });
+
+      // Add message to chat based on call status
+      if (status === 'completed' && durationSeconds > 0) {
+        // Completed call - show call summary
+        await supabase
+          .from('chat_messages')
+          .insert({
+            chat_id: chatId,
+            sender_id: callerId,
+            type: 'call_summary',
+            content: `কল সম্পন্ন - ${durationSeconds} সেকেন্ড`,
+            metadata: {
+              callType,
+              duration: durationSeconds,
+              status: 'completed',
+            },
+          });
+        console.log('Call summary message added to chat');
+      } else if (status === 'missed' || status === 'no_answer' || status === 'rejected') {
+        // Missed/rejected call - show missed call message
+        await supabase
+          .from('chat_messages')
+          .insert({
+            chat_id: chatId,
+            sender_id: callerId,
+            type: 'missed_call',
+            content: status === 'rejected' ? 'কল প্রত্যাখ্যান করা হয়েছে' : 'মিসড কল',
+            metadata: {
+              callType,
+              callerId,
+              receiverId,
+              status,
+            },
+          });
+        console.log('Missed call message added to chat');
+
+        // Send push notification for missed call
+        try {
+          await supabase.functions.invoke('send-push-notification', {
+            body: {
+              title: 'মিসড কল',
+              body: `আপনি একটি ${callType === 'video' ? 'ভিডিও' : 'ভয়েস'} কল মিস করেছেন`,
+              url: '/messages',
+              targetUserId: receiverId,
+              type: 'missed_call',
+            },
+          });
+          console.log('Missed call push notification sent');
+        } catch (pushError) {
+          console.error('Error sending missed call push notification:', pushError);
+        }
+      }
     } catch (error) {
       console.error('Error saving call history:', error);
     }

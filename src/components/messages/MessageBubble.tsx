@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, CheckCheck, MoreVertical, Reply, Forward, Trash2, Edit, Pin, Smile } from 'lucide-react';
+import { Check, CheckCheck, MoreVertical, Reply, Forward, Trash2, Edit, Pin, Smile, Phone, PhoneMissed, Video, Clock } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -131,6 +131,53 @@ export function MessageBubble({
           </div>
         );
 
+      case 'missed_call': {
+        const callMeta = message.metadata as { callType?: string; callerId?: string; duration?: number };
+        const isMissedByMe = callMeta?.callerId !== currentUserId;
+        return (
+          <div className={`flex items-center gap-3 px-3 py-2 rounded-lg ${isMissedByMe ? 'bg-destructive/10' : 'bg-muted/50'}`}>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isMissedByMe ? 'bg-destructive/20' : 'bg-muted'}`}>
+              <PhoneMissed className={`w-5 h-5 ${isMissedByMe ? 'text-destructive' : 'text-muted-foreground'}`} />
+            </div>
+            <div className="flex-1">
+              <p className={`font-medium text-bengali ${isMissedByMe ? 'text-destructive' : ''}`}>
+                {isMissedByMe ? 'মিসড কল' : 'কল গ্রহণ করা হয়নি'}
+              </p>
+              <p className="text-xs text-muted-foreground text-bengali">
+                {callMeta?.callType === 'video' ? 'ভিডিও কল' : 'ভয়েস কল'}
+              </p>
+            </div>
+          </div>
+        );
+      }
+
+      case 'call_summary': {
+        const summaryMeta = message.metadata as { callType?: string; duration?: number; status?: string };
+        const durationSecs = summaryMeta?.duration || 0;
+        const mins = Math.floor(durationSecs / 60);
+        const secs = durationSecs % 60;
+        const durationText = mins > 0 ? `${mins} মিনিট ${secs} সেকেন্ড` : `${secs} সেকেন্ড`;
+        
+        return (
+          <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-success/10">
+            <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+              {summaryMeta?.callType === 'video' ? (
+                <Video className="w-5 h-5 text-success" />
+              ) : (
+                <Phone className="w-5 h-5 text-success" />
+              )}
+            </div>
+            <div className="flex-1">
+              <p className="font-medium text-success text-bengali">কল সম্পন্ন</p>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Clock className="w-3 h-3" />
+                <span className="text-bengali">{durationText}</span>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       case 'system':
         return (
           <span className="text-muted-foreground text-bengali">{message.content}</span>
@@ -180,12 +227,16 @@ export function MessageBubble({
     );
   };
 
-  // System messages are centered
-  if (message.type === 'system') {
+  // System messages and call messages are centered
+  if (message.type === 'system' || message.type === 'missed_call' || message.type === 'call_summary' || message.type === 'call_started' || message.type === 'call_ended') {
     return (
       <div className="flex justify-center py-2">
-        <div className="px-4 py-2 bg-muted/50 rounded-full text-sm text-muted-foreground text-bengali">
-          {message.content}
+        <div className={`px-4 py-2 rounded-xl text-sm ${
+          message.type === 'system' 
+            ? 'bg-muted/50 rounded-full text-muted-foreground' 
+            : ''
+        }`}>
+          {renderContent()}
         </div>
       </div>
     );
