@@ -1,9 +1,10 @@
 import { memo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { FileText, MessageSquare, Eye, ArrowRight, Lock, Heart, Loader2 } from "lucide-react";
+import { FileText, MessageSquare, Eye, ArrowRight, Lock, Heart, Loader2, Clock } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface FeedPost {
   id: string;
@@ -145,63 +146,94 @@ export const ContentPreviewSection = () => {
     return language === "bn" ? views.toLocaleString('bn-BD') : views.toLocaleString();
   };
 
-  const getPostExcerpt = (content: string, maxLength: number = 80) => {
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) {
+      return language === "bn" ? "এইমাত্র" : "Just now";
+    }
+    
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return language === "bn" ? `${diffInMinutes} মিনিট আগে` : `${diffInMinutes}m ago`;
+    }
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return language === "bn" ? `${diffInHours} ঘন্টা আগে` : `${diffInHours}h ago`;
+    }
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) {
+      return language === "bn" ? `${diffInDays} দিন আগে` : `${diffInDays}d ago`;
+    }
+    
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    if (diffInWeeks < 4) {
+      return language === "bn" ? `${diffInWeeks} সপ্তাহ আগে` : `${diffInWeeks}w ago`;
+    }
+    
+    const diffInMonths = Math.floor(diffInDays / 30);
+    return language === "bn" ? `${diffInMonths} মাস আগে` : `${diffInMonths}mo ago`;
+  };
+
+  const getPostExcerpt = (content: string, maxLength: number = 60) => {
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength).trim() + '...';
   };
 
-  const getPostTitle = (content: string) => {
-    // Get first line or first 40 characters as title
-    const firstLine = content.split('\n')[0];
-    if (firstLine.length <= 50) return firstLine;
-    return firstLine.substring(0, 50).trim() + '...';
+  const getAuthorInitials = (name: string | null) => {
+    if (!name) return '?';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
   return (
-    <section className="py-16 md:py-24 bg-background">
+    <section className="py-12 md:py-24 bg-background">
       <div className="container mx-auto px-4">
         {/* Unity Notes Section */}
-        <div className="mb-16 md:mb-24">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+        <div className="mb-12 md:mb-24">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8">
             <div>
-              <h2 className="section-header mb-2">
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2">
                 {t("Recent Unity Notes", "সাম্প্রতিক ইউনিটি নোটস")}
               </h2>
-              <p className="text-muted-foreground">{t("Latest educational content", "সাম্প্রতিক শিক্ষামূলক কন্টেন্ট")}</p>
+              <p className="text-sm md:text-base text-muted-foreground">{t("Latest educational content", "সাম্প্রতিক শিক্ষামূলক কন্টেন্ট")}</p>
             </div>
-            <Button variant="ghost" className="mt-4 md:mt-0 group" onClick={() => navigate('/unity-note')}>
+            <Button variant="ghost" className="mt-3 md:mt-0 group text-sm" onClick={() => navigate('/unity-note')}>
               <span>{t("View All", "সব দেখুন")}</span>
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
             {unityNotes.map((note, index) => (
               <div
                 key={index}
-                className="group bg-card border border-border/30 rounded-xl p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
+                className="group bg-card border border-border/30 rounded-xl p-3 md:p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
               >
                 {/* Lock overlay */}
                 <div className="absolute inset-0 bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
                   <div className="text-center">
-                    <Lock className="w-8 h-8 text-primary mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">{t("Login to read", "লগইন করে পড়ুন")}</p>
+                    <Lock className="w-6 h-6 md:w-8 md:h-8 text-primary mx-auto mb-2" />
+                    <p className="text-xs md:text-sm text-muted-foreground">{t("Login to read", "লগইন করে পড়ুন")}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 mb-3">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <span className="text-xs text-muted-foreground">{t("Unity Note", "ইউনিটি নোট")}</span>
+                <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3">
+                  <FileText className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                  <span className="text-[10px] md:text-xs text-muted-foreground">{t("Unity Note", "ইউনিটি নোট")}</span>
                 </div>
-                <h3 className="font-medium text-foreground mb-2 line-clamp-2">
+                <h3 className="font-medium text-xs md:text-sm text-foreground mb-1.5 md:mb-2 line-clamp-2">
                   {note.title}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  {t("Author", "লেখক")}: {note.author}
+                <p className="text-[10px] md:text-sm text-muted-foreground mb-2 md:mb-3">
+                  {note.author}
                 </p>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Eye className="w-4 h-4" />
-                  <span>{formatViews(note.views)} {t("views", "বার দেখা হয়েছে")}</span>
+                <div className="flex items-center gap-1 text-[10px] md:text-xs text-muted-foreground">
+                  <Eye className="w-3 h-3 md:w-4 md:h-4" />
+                  <span>{formatViews(note.views)}</span>
                 </div>
               </div>
             ))}
@@ -210,14 +242,14 @@ export const ContentPreviewSection = () => {
 
         {/* Recent Posts Section */}
         <div>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8">
             <div>
-              <h2 className="section-header mb-2">
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2">
                 {t("Recent Posts from Feed", "নিউজ ফিড থেকে সাম্প্রতিক পোস্ট")}
               </h2>
-              <p className="text-muted-foreground">{t("Latest community posts", "সাম্প্রতিক কমিউনিটি পোস্ট")}</p>
+              <p className="text-sm md:text-base text-muted-foreground">{t("Latest community posts", "সাম্প্রতিক কমিউনিটি পোস্ট")}</p>
             </div>
-            <Button variant="ghost" className="mt-4 md:mt-0 group" onClick={() => navigate('/public-feed')}>
+            <Button variant="ghost" className="mt-3 md:mt-0 group text-sm" onClick={() => navigate('/public-feed')}>
               <span>{t("View All", "সব দেখুন")}</span>
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -232,41 +264,60 @@ export const ContentPreviewSection = () => {
               {t("No posts available", "কোনো পোস্ট নেই")}
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
               {posts.slice(0, 8).map((post) => (
                 <div
                   key={post.id}
                   onClick={() => navigate(`/post/${post.id}`)}
-                  className="group bg-card border border-border/30 rounded-xl p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                  className="group bg-card border border-border/30 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col"
                 >
                   {/* Post image thumbnail if available */}
                   {post.image_urls && post.image_urls.length > 0 && (
-                    <div className="mb-3 -mx-5 -mt-5 rounded-t-xl overflow-hidden">
+                    <div className="relative h-24 md:h-32 lg:h-36 overflow-hidden">
                       <img 
                         src={post.image_urls[0]} 
                         alt="Post thumbnail"
-                        className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                     </div>
                   )}
                   
-                  <div className="flex items-center gap-2 mb-3">
-                    <MessageSquare className="w-5 h-5 text-accent" />
-                    <span className="text-xs text-muted-foreground">{t("Post", "পোস্ট")}</span>
-                  </div>
-                  <h3 className="font-medium text-foreground mb-2 line-clamp-1">
-                    {getPostTitle(post.content)}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                    {getPostExcerpt(post.content)}
-                  </p>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span className="truncate max-w-[120px]">
-                      {post.author.full_name || t("Anonymous", "বেনামী")}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <Heart className="w-3.5 h-3.5 text-destructive" />
-                      <span>{post.likes_count || 0}</span>
+                  <div className="p-3 md:p-4 flex flex-col flex-1">
+                    {/* Author info with avatar */}
+                    <div className="flex items-center gap-2 mb-2 md:mb-3">
+                      <Avatar className="w-6 h-6 md:w-8 md:h-8 border-2 border-primary/20">
+                        <AvatarImage src={post.author.avatar_url || ''} alt={post.author.full_name || ''} />
+                        <AvatarFallback className="text-[10px] md:text-xs bg-primary/10 text-primary">
+                          {getAuthorInitials(post.author.full_name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] md:text-sm font-medium text-foreground truncate">
+                          {post.author.full_name || t("Anonymous", "বেনামী")}
+                        </p>
+                        <div className="flex items-center gap-1 text-[10px] md:text-xs text-muted-foreground">
+                          <Clock className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                          <span>{formatTimeAgo(post.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Post content */}
+                    <p className="text-xs md:text-sm text-foreground/80 mb-2 md:mb-3 line-clamp-2 flex-1">
+                      {getPostExcerpt(post.content)}
+                    </p>
+
+                    {/* Stats */}
+                    <div className="flex items-center justify-between text-[10px] md:text-xs text-muted-foreground pt-2 border-t border-border/30">
+                      <div className="flex items-center gap-1">
+                        <Heart className="w-3 h-3 md:w-3.5 md:h-3.5 text-destructive" />
+                        <span>{post.likes_count || 0}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Eye className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                        <span>{post.views_count || 0}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
