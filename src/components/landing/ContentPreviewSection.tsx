@@ -102,53 +102,6 @@ export const ContentPreviewSection = () => {
     }
   };
 
-  const unityNotes = [
-    { 
-      title: t("Easy Programming Guide", "প্রোগ্রামিং শেখার সহজ গাইড"), 
-      author: t("Rahul Ahmed", "রাহুল আহমেদ"), 
-      views: 1250 
-    },
-    { 
-      title: t("Freelancing A to Z", "ফ্রিল্যান্সিং শুরু করার A to Z"), 
-      author: t("Fatima Khatun", "ফাতিমা খাতুন"), 
-      views: 2340 
-    },
-    { 
-      title: t("Graphic Design Basics", "গ্রাফিক ডিজাইনের মূল বিষয়সমূহ"), 
-      author: t("Arif Hasan", "আরিফ হাসান"), 
-      views: 890 
-    },
-    { 
-      title: t("Best English Learning Tips", "ইংরেজি শেখার সেরা টিপস"), 
-      author: t("Nusrat Jahan", "নুসরাত জাহান"), 
-      views: 3100 
-    },
-    { 
-      title: t("Business Startup Plan", "ব্যবসা শুরুর পরিকল্পনা"), 
-      author: t("Karim Uddin", "করিম উদ্দিন"), 
-      views: 1560 
-    },
-    { 
-      title: t("Social Media Marketing", "সোশ্যাল মিডিয়া মার্কেটিং"), 
-      author: t("Sara Begum", "সারা বেগম"), 
-      views: 2780 
-    },
-    { 
-      title: t("Mobile App Development", "মোবাইল অ্যাপ ডেভেলপমেন্ট"), 
-      author: t("Tanvir Alam", "তানভীর আলম"), 
-      views: 1890 
-    },
-    { 
-      title: t("Digital Marketing Course", "ডিজিটাল মার্কেটিং কোর্স"), 
-      author: t("Rumana Akter", "রুমানা আক্তার"), 
-      views: 2100 
-    },
-  ];
-
-  const formatViews = (views: number) => {
-    return language === "bn" ? views.toLocaleString('bn-BD') : views.toLocaleString();
-  };
-
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -195,54 +148,6 @@ export const ContentPreviewSection = () => {
   return (
     <section className="py-12 md:py-24 bg-background">
       <div className="container mx-auto px-4">
-        {/* Unity Notes Section */}
-        <div className="mb-12 md:mb-24">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8">
-            <div>
-              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2">
-                {t("Recent Unity Notes", "সাম্প্রতিক ইউনিটি নোটস")}
-              </h2>
-              <p className="text-sm md:text-base text-muted-foreground">{t("Latest educational content", "সাম্প্রতিক শিক্ষামূলক কন্টেন্ট")}</p>
-            </div>
-            <Button variant="ghost" className="mt-3 md:mt-0 group text-sm" onClick={() => navigate('/unity-note')}>
-              <span>{t("View All", "সব দেখুন")}</span>
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
-            {unityNotes.map((note, index) => (
-              <div
-                key={index}
-                className="group bg-card border border-border/30 rounded-xl p-3 md:p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
-              >
-                {/* Lock overlay */}
-                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-                  <div className="text-center">
-                    <Lock className="w-6 h-6 md:w-8 md:h-8 text-primary mx-auto mb-2" />
-                    <p className="text-xs md:text-sm text-muted-foreground">{t("Login to read", "লগইন করে পড়ুন")}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3">
-                  <FileText className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                  <span className="text-[10px] md:text-xs text-muted-foreground">{t("Unity Note", "ইউনিটি নোট")}</span>
-                </div>
-                <h3 className="font-medium text-xs md:text-sm text-foreground mb-1.5 md:mb-2 line-clamp-2">
-                  {note.title}
-                </h3>
-                <p className="text-[10px] md:text-sm text-muted-foreground mb-2 md:mb-3">
-                  {note.author}
-                </p>
-                <div className="flex items-center gap-1 text-[10px] md:text-xs text-muted-foreground">
-                  <Eye className="w-3 h-3 md:w-4 md:h-4" />
-                  <span>{formatViews(note.views)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Recent Posts Section */}
         <div>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8">
