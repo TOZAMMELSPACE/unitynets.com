@@ -29,6 +29,7 @@ interface MessageBubbleProps {
   onDelete: (messageId: string) => void;
   onReact: (messageId: string, emoji: string) => void;
   onForward: (message: ChatMessage) => void;
+  onCallBack?: (userId: string, callType: 'voice' | 'video') => void;
 }
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
@@ -43,6 +44,7 @@ export function MessageBubble({
   onDelete,
   onReact,
   onForward,
+  onCallBack,
 }: MessageBubbleProps) {
   const [showActions, setShowActions] = useState(false);
 
@@ -132,10 +134,14 @@ export function MessageBubble({
         );
 
       case 'missed_call': {
-        const callMeta = message.metadata as { callType?: string; callerId?: string; duration?: number };
+        const callMeta = message.metadata as { callType?: string; callerId?: string; receiverId?: string; duration?: number };
         const isMissedByMe = callMeta?.callerId !== currentUserId;
+        // Determine who to call back - if I missed the call, call the caller; otherwise call the receiver
+        const callBackUserId = isMissedByMe ? callMeta?.callerId : callMeta?.receiverId;
+        const callType = (callMeta?.callType === 'video' ? 'video' : 'voice') as 'voice' | 'video';
+        
         return (
-          <div className={`flex items-center gap-3 px-3 py-2 rounded-lg ${isMissedByMe ? 'bg-destructive/10' : 'bg-muted/50'}`}>
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-xl ${isMissedByMe ? 'bg-destructive/10' : 'bg-muted/50'}`}>
             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isMissedByMe ? 'bg-destructive/20' : 'bg-muted'}`}>
               <PhoneMissed className={`w-5 h-5 ${isMissedByMe ? 'text-destructive' : 'text-muted-foreground'}`} />
             </div>
@@ -147,6 +153,21 @@ export function MessageBubble({
                 {callMeta?.callType === 'video' ? 'ভিডিও কল' : 'ভয়েস কল'}
               </p>
             </div>
+            {callBackUserId && onCallBack && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onCallBack(callBackUserId, callType)}
+                className="gap-2 text-bengali"
+              >
+                {callType === 'video' ? (
+                  <Video className="w-4 h-4" />
+                ) : (
+                  <Phone className="w-4 h-4" />
+                )}
+                কল ব্যাক
+              </Button>
+            )}
           </div>
         );
       }
