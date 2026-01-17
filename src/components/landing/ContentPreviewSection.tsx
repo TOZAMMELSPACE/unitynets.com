@@ -1,7 +1,7 @@
 import { memo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { FileText, MessageSquare, Eye, ArrowRight, Lock, Heart, Loader2, Clock } from "lucide-react";
+import { FileText, MessageSquare, Eye, ArrowRight, Lock, Heart, Loader2, Clock, Play } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,6 +13,7 @@ interface FeedPost {
   views_count: number | null;
   created_at: string;
   image_urls: string[] | null;
+  video_url: string | null;
   author: {
     full_name: string | null;
     avatar_url: string | null;
@@ -54,6 +55,7 @@ export const ContentPreviewSection = () => {
           views_count,
           created_at,
           image_urls,
+          video_url,
           user_id
         `)
         .in('id', FEATURED_POST_IDS);
@@ -88,6 +90,7 @@ export const ContentPreviewSection = () => {
           views_count: post.views_count,
           created_at: post.created_at,
           image_urls: post.image_urls,
+          video_url: post.video_url,
           author: profilesMap.get(post.user_id) || { full_name: null, avatar_url: null }
         }));
 
@@ -271,17 +274,43 @@ export const ContentPreviewSection = () => {
                   onClick={() => navigate(`/post/${post.id}`)}
                   className="group bg-card border border-border/30 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col"
                 >
-                  {/* Post image thumbnail if available */}
-                  {post.image_urls && post.image_urls.length > 0 && (
-                    <div className="relative h-24 md:h-32 lg:h-36 overflow-hidden">
-                      <img 
-                        src={post.image_urls[0]} 
-                        alt="Post thumbnail"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                  {/* Post media thumbnail - image or video */}
+                  {(post.image_urls && post.image_urls.length > 0) || post.video_url ? (
+                    <div className="relative h-24 md:h-32 lg:h-36 overflow-hidden bg-muted">
+                      {post.video_url ? (
+                        <>
+                          <video 
+                            src={post.video_url} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            muted
+                            playsInline
+                            preload="metadata"
+                          />
+                          {/* Video play indicator */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/60 flex items-center justify-center">
+                              <Play className="w-4 h-4 md:w-5 md:h-5 text-white fill-white" />
+                            </div>
+                          </div>
+                        </>
+                      ) : post.image_urls && post.image_urls.length > 0 ? (
+                        <>
+                          <img 
+                            src={post.image_urls[0]} 
+                            alt="Post thumbnail"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          {/* Multiple images indicator */}
+                          {post.image_urls.length > 1 && (
+                            <div className="absolute top-1.5 right-1.5 md:top-2 md:right-2 bg-black/60 text-white text-[10px] md:text-xs px-1.5 py-0.5 rounded">
+                              +{post.image_urls.length - 1}
+                            </div>
+                          )}
+                        </>
+                      ) : null}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
                     </div>
-                  )}
+                  ) : null}
                   
                   <div className="p-3 md:p-4 flex flex-col flex-1">
                     {/* Author info with avatar */}
