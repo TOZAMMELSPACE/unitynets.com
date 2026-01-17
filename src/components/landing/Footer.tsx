@@ -8,8 +8,8 @@ export const Footer = () => {
 
   return (
     <footer className="bg-card border-t border-border">
-      <div className="container mx-auto px-4 py-12 md:py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12 animate-fade-in">
           {/* Brand */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
