@@ -37,6 +37,7 @@ interface AppLayoutProps {
     hasMore?: boolean;
     loadingMore?: boolean;
     onTrackView?: (postId: string) => void;
+    onDeletePost?: (postId: string) => void;
   }) => React.ReactNode;
 }
 
@@ -95,7 +96,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const { user, appUser, loading: authLoading, signOut } = useAuth();
   const socialDB = useSocialDB(user?.id || null);
   // Always fetch posts from database, even for unauthenticated users
-  const { posts: dbPosts, createPost, likePost, addComment, likeComment, loadMore, hasMore, loadingMore, trackView, loading: postsLoading } = usePosts(user?.id, socialDB.createNotification);
+  const { posts: dbPosts, createPost, likePost, addComment, likeComment, loadMore, hasMore, loadingMore, trackView, deletePost, loading: postsLoading } = usePosts(user?.id, socialDB.createNotification);
   const { users: dbUsers, setUsers: setDbUsers, loading: usersLoading } = useProfiles();
   
   const [createPostTrigger, setCreatePostTrigger] = useState<(() => void) | null>(null);
@@ -329,6 +330,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
               hasMore,
               loadingMore,
               onTrackView: trackView,
+              onDeletePost: deletePost,
             })}
         </div>
         

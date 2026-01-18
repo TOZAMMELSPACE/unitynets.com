@@ -18,7 +18,6 @@ import {
   Bookmark,
   BookmarkCheck,
   Eye,
-  MoreHorizontal,
   Play,
   Volume2,
   VolumeX
@@ -27,6 +26,7 @@ import { CommentSection } from "@/components/CommentSection";
 import { ShareButton } from "@/components/ShareButton";
 import { useNavigate } from "react-router-dom";
 import { ImageCarousel } from "@/components/ImageCarousel";
+import { PostOptionsMenu } from "@/components/PostOptionsMenu";
 
 interface EnhancedFeedProps {
   posts: (Post | PostWithAuthor)[];
@@ -42,6 +42,7 @@ interface EnhancedFeedProps {
   hasMore?: boolean;
   loadingMore?: boolean;
   onTrackView?: (postId: string) => void;
+  onDeletePost?: (postId: string) => void;
 }
 
 export const EnhancedFeed = ({ 
@@ -57,7 +58,8 @@ export const EnhancedFeed = ({
   onLoadMore,
   hasMore = false,
   loadingMore = false,
-  onTrackView
+  onTrackView,
+  onDeletePost
 }: EnhancedFeedProps) => {
   const navigate = useNavigate();
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
@@ -355,9 +357,14 @@ export const EnhancedFeed = ({
                     {post.community === 'global' ? '🌍 Global' : `🏘️ ${post.community}`}
                   </Badge>
                 )}
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
+                <PostOptionsMenu
+                  postId={post.id}
+                  authorId={post.author.id}
+                  currentUserId={currentUser.id}
+                  onDelete={onDeletePost}
+                  onSave={onSavePost}
+                  isSaved={isPostSaved?.(post.id)}
+                />
               </div>
             </div>
           </div>
