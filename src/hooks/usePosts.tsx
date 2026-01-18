@@ -635,6 +635,33 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
     }
   }, [userId]);
 
+  // Delete a post
+  const deletePost = useCallback(async (postId: string) => {
+    if (!userId) return false;
+
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      // Remove from local state
+      setPosts(prev => {
+        const updated = prev.filter(post => post.id !== postId);
+        postsRef.current = updated;
+        return updated;
+      });
+
+      return true;
+    } catch (err) {
+      console.error('Error deleting post:', err);
+      return false;
+    }
+  }, [userId]);
+
   useEffect(() => {
     fetchPosts(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -653,5 +680,6 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
     addComment,
     likeComment,
     trackView,
+    deletePost,
   };
 };
