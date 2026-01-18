@@ -229,21 +229,22 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
             <div className="flex flex-col md:flex-row items-start gap-6">
               {/* Profile Image */}
               <div className="relative">
-                <div className="w-24 h-24 md:w-32 md:h-32 border-4 border-background rounded-full overflow-hidden bg-gradient-hero">
+                <div className="w-24 h-24 md:w-32 md:h-32 border-4 border-background rounded-full overflow-hidden bg-gradient-hero shadow-lg">
                   {user.profileImage ? (
                     <img
                       src={user.profileImage}
                       alt={user.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-top"
+                      style={{ objectPosition: 'center 20%' }}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-white font-bold text-2xl md:text-4xl text-bengali">
+                    <div className="w-full h-full flex items-center justify-center text-white font-bold text-2xl md:text-4xl text-bengali bg-gradient-to-br from-primary to-primary/70">
                       {user.name.charAt(0)}
                     </div>
                   )}
                 </div>
                 {user.isOnline && (
-                  <div className="absolute bottom-2 right-2 w-6 h-6 bg-success border-2 border-background rounded-full"></div>
+                  <div className="absolute bottom-2 right-2 w-6 h-6 bg-success border-2 border-background rounded-full animate-pulse"></div>
                 )}
               </div>
 
