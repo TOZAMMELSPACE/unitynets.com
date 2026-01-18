@@ -43,6 +43,7 @@ export const Feed = ({ posts, currentUser, onLikePost, onAddComment, onLikeComme
                   src={post.author.profileImage}
                   alt={`${post.author.name} profile`}
                   className="w-10 h-10 rounded-full object-cover border-2 border-border cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
+                  style={{ objectPosition: 'center 20%' }}
                   onClick={() => handleUserClick(post.author.id)}
                 />
               ) : (

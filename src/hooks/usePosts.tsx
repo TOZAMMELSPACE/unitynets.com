@@ -408,8 +408,20 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         .eq('user_id', userId)
         .maybeSingle();
 
+      // Get fresh post data from database
+      const { data: freshPost } = await supabase
+        .from('posts')
+        .select('likes_count, dislikes_count')
+        .eq('id', postId)
+        .single();
+
+      const currentLikes = freshPost?.likes_count || 0;
+      const currentDislikes = freshPost?.dislikes_count || 0;
       const currentPost = posts.find(p => p.id === postId);
       
+      let newLikesCount = currentLikes;
+      let newDislikesCount = currentDislikes;
+
       if (existingLike) {
         if (existingLike.is_like) {
           // Already liked, remove like
@@ -418,10 +430,11 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
             .delete()
             .eq('id', existingLike.id);
           
-          // Decrement likes count
+          newLikesCount = Math.max(0, currentLikes - 1);
+          
           await supabase
             .from('posts')
-            .update({ likes_count: Math.max(0, (currentPost?.likes || 1) - 1) })
+            .update({ likes_count: newLikesCount })
             .eq('id', postId);
         } else {
           // Was dislike, change to like
@@ -430,12 +443,14 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
             .update({ is_like: true })
             .eq('id', existingLike.id);
           
-          // Increment likes, decrement dislikes
+          newLikesCount = currentLikes + 1;
+          newDislikesCount = Math.max(0, currentDislikes - 1);
+          
           await supabase
             .from('posts')
             .update({ 
-              likes_count: (currentPost?.likes || 0) + 1,
-              dislikes_count: Math.max(0, (currentPost?.dislikes || 1) - 1)
+              likes_count: newLikesCount,
+              dislikes_count: newDislikesCount
             })
             .eq('id', postId);
         }
@@ -449,11 +464,11 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
             is_like: true,
           });
         
-        // Increment likes count
-        const currentPost = posts.find(p => p.id === postId);
+        newLikesCount = currentLikes + 1;
+        
         await supabase
           .from('posts')
-          .update({ likes_count: (currentPost?.likes || 0) + 1 })
+          .update({ likes_count: newLikesCount })
           .eq('id', postId);
 
         // Create notification for post owner (if not self)
@@ -462,16 +477,16 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         }
       }
 
-      // Optimistic update
+      // Update with accurate count from database
       setPosts(prev => prev.map(post => 
         post.id === postId 
-          ? { ...post, likes: post.likes + 1 }
+          ? { ...post, likes: newLikesCount, dislikes: newDislikesCount }
           : post
       ));
     } catch (err) {
       console.error('Error liking post:', err);
     }
-  }, [userId, posts]);
+  }, [userId, posts, createNotification]);
 
   const addComment = useCallback(async (postId: string, content: string) => {
     if (!userId) return null;
@@ -560,53 +575,62 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
 
   // Track unique view for a post
   const trackView = useCallback(async (postId: string) => {
-    if (!userId) return;
-
     try {
-      // First check if user already viewed this post
-      const { data: existingView } = await supabase
-        .from('post_views')
-        .select('id')
-        .eq('post_id', postId)
-        .eq('user_id', userId)
-        .maybeSingle();
+      // Generate a device fingerprint for guest users
+      const deviceFingerprint = !userId ? 
+        `guest_${navigator.userAgent.slice(0, 50)}_${screen.width}x${screen.height}` : null;
 
-      // If already viewed, don't do anything
-      if (existingView) return;
+      if (userId) {
+        // Logged in user - check by user_id
+        const { data: existingView } = await supabase
+          .from('post_views')
+          .select('id')
+          .eq('post_id', postId)
+          .eq('user_id', userId)
+          .maybeSingle();
 
-      // Insert new view
-      const { error } = await supabase
-        .from('post_views')
-        .insert({
-          post_id: postId,
-          user_id: userId,
-        });
+        if (existingView) return;
 
-      // If successful (new view), increment the views count
-      if (!error) {
-        // Get current count from database to be accurate
-        const { data: postData } = await supabase
-          .from('posts')
-          .select('views_count')
-          .eq('id', postId)
-          .single();
+        // Insert new view
+        const { error } = await supabase
+          .from('post_views')
+          .insert({
+            post_id: postId,
+            user_id: userId,
+          });
 
-        const newViewCount = (postData?.views_count || 0) + 1;
-
-        await supabase
-          .from('posts')
-          .update({ views_count: newViewCount })
-          .eq('id', postId);
-
-        // Optimistic update
-        setPosts(prev => prev.map(post => 
-          post.id === postId 
-            ? { ...post, views: newViewCount }
-            : post
-        ));
+        if (error) return;
+      } else {
+        // Guest user - check by device fingerprint using localStorage
+        const viewedPosts = JSON.parse(localStorage.getItem('viewed_posts') || '[]');
+        if (viewedPosts.includes(postId)) return;
+        
+        // Mark as viewed in localStorage
+        viewedPosts.push(postId);
+        localStorage.setItem('viewed_posts', JSON.stringify(viewedPosts));
       }
+
+      // Increment views count in database
+      const { data: postData } = await supabase
+        .from('posts')
+        .select('views_count')
+        .eq('id', postId)
+        .single();
+
+      const newViewCount = (postData?.views_count || 0) + 1;
+
+      await supabase
+        .from('posts')
+        .update({ views_count: newViewCount })
+        .eq('id', postId);
+
+      // Optimistic update
+      setPosts(prev => prev.map(post => 
+        post.id === postId 
+          ? { ...post, views: newViewCount }
+          : post
+      ));
     } catch (err) {
-      // Silently fail - duplicate view is expected behavior
       console.log('View tracking error:', err);
     }
   }, [userId]);

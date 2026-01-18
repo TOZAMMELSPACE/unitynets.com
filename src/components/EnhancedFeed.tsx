@@ -308,6 +308,7 @@ export const EnhancedFeed = ({
                     src={post.author.profileImage}
                     alt={`${post.author.name} profile`}
                     className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20 cursor-pointer hover:ring-primary/50 transition-all"
+                    style={{ objectPosition: 'center 20%' }}
                     onClick={() => navigate('/profile', { state: { userId: post.author.id } })}
                   />
                 ) : (
