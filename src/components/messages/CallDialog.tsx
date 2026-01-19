@@ -48,11 +48,13 @@ export function CallDialog({
     if (localVideoRef.current && localStream) {
       console.log('Setting local video stream');
       localVideoRef.current.srcObject = localStream;
+      // Local video is muted to prevent echo - this is correct
+      localVideoRef.current.muted = true;
       localVideoRef.current.play().catch(e => console.log('Local video play error:', e));
     }
   }, [localStream]);
 
-  // Set remote video/audio stream
+  // Set remote video/audio stream - CRITICAL: audio must NOT be muted
   useEffect(() => {
     if (remoteStream) {
       console.log('Remote stream received with tracks:', remoteStream.getTracks().map(t => `${t.kind}: ${t.enabled}`));
@@ -62,18 +64,28 @@ export function CallDialog({
       
       setHasRemoteVideo(videoTracks.length > 0 && videoTracks[0].enabled);
       
-      // Set video element
+      // Set video element - IMPORTANT: do NOT mute remote video
       if (remoteVideoRef.current && videoTracks.length > 0) {
         console.log('Setting remote video stream');
         remoteVideoRef.current.srcObject = remoteStream;
-        remoteVideoRef.current.play().catch(e => console.log('Remote video play error:', e));
+        remoteVideoRef.current.muted = false; // Ensure remote video is NOT muted
+        remoteVideoRef.current.volume = 1.0;
+        remoteVideoRef.current.play().catch(e => {
+          console.log('Remote video play error:', e);
+          // Try to play on user interaction
+        });
       }
       
-      // Set audio element (separate to ensure audio works)
+      // Set separate audio element for reliable audio playback
       if (remoteAudioRef.current && audioTracks.length > 0) {
-        console.log('Setting remote audio stream');
+        console.log('Setting remote audio stream, tracks:', audioTracks.map(t => `enabled: ${t.enabled}, muted: ${t.muted}`));
         remoteAudioRef.current.srcObject = remoteStream;
-        remoteAudioRef.current.play().catch(e => console.log('Remote audio play error:', e));
+        remoteAudioRef.current.muted = false; // CRITICAL: Ensure audio is NOT muted
+        remoteAudioRef.current.volume = 1.0;
+        remoteAudioRef.current.play().catch(e => {
+          console.log('Remote audio play error:', e);
+          // Audio autoplay might be blocked, try on next user interaction
+        });
       }
     }
   }, [remoteStream]);
@@ -119,27 +131,34 @@ export function CallDialog({
         onInteractOutside={(e) => e.preventDefault()}
       >
         <div className="relative h-[500px] flex flex-col">
-          {/* Hidden audio element for remote audio (ensures audio plays) */}
-          <audio ref={remoteAudioRef} autoPlay playsInline className="hidden" />
+          {/* Audio element for remote audio - MUST NOT be muted */}
+          <audio 
+            ref={remoteAudioRef} 
+            autoPlay 
+            playsInline 
+            className="hidden"
+            // Do NOT add muted attribute here - remote audio must be heard
+          />
 
           {/* Video area */}
           {isVideoCall && isConnected && hasRemoteVideo ? (
             <>
-              {/* Remote video (full screen) */}
+              {/* Remote video (full screen) - NOT muted for audio */}
               <video
                 ref={remoteVideoRef}
                 autoPlay
                 playsInline
+                // IMPORTANT: Do NOT add muted here - we need to hear the remote user
                 className="absolute inset-0 w-full h-full object-cover bg-zinc-900"
               />
 
-              {/* Local video (picture-in-picture) */}
+              {/* Local video (picture-in-picture) - muted to prevent echo */}
               <div className="absolute top-4 right-4 w-32 h-24 rounded-lg overflow-hidden bg-zinc-800 shadow-lg border border-zinc-700 z-10">
                 <video
                   ref={localVideoRef}
                   autoPlay
                   playsInline
-                  muted
+                  muted // Local video MUST be muted to prevent echo
                   className={`w-full h-full object-cover ${isVideoOff ? 'hidden' : ''}`}
                 />
                 {isVideoOff && (
@@ -152,7 +171,7 @@ export function CallDialog({
           ) : (
             /* Voice call or connecting state */
             <div className="flex-1 flex flex-col items-center justify-center p-8">
-              {/* Hidden video refs for voice calls to still receive streams */}
+              {/* Hidden video refs for voice calls to still receive streams - remote NOT muted */}
               <video ref={remoteVideoRef} autoPlay playsInline className="hidden" />
               <video ref={localVideoRef} autoPlay playsInline muted className="hidden" />
               
