@@ -232,13 +232,20 @@ export default function LearningZone({ currentUser, onSignOut }: LearningZonePro
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="card-enhanced p-4 lg:p-6 mb-6">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
-            {t("Learning Zone", "লার্নিং জোন")}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {t("Enhance your skills and grow with the community", "আপনার দক্ষতা বৃদ্ধি করুন এবং কমিউনিটির সাথে বেড়ে উঠুন")}
-          </p>
+        <div className="flex items-center gap-4">
+          <img 
+            src="/logo.png" 
+            alt="UnityNets Logo" 
+            className="h-10 lg:h-12 w-auto"
+          />
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              {t("Learning Zone", "লার্নিং জোন")}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {t("Enhance your skills and grow with the community", "আপনার দক্ষতা বৃদ্ধি করুন এবং কমিউনিটির সাথে বেড়ে উঠুন")}
+            </p>
+          </div>
         </div>
       </header>
 
