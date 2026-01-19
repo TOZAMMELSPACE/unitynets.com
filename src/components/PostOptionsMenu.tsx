@@ -121,8 +121,13 @@ export const PostOptionsMenu = ({
 
   const handlePrivacyChange = async (privacy: string) => {
     try {
-      // Note: This would require a privacy column in the posts table
-      // For now, show a toast message
+      const { error } = await supabase
+        .from('posts')
+        .update({ privacy })
+        .eq('id', postId);
+
+      if (error) throw error;
+      
       toast.success(`প্রাইভেসি "${PRIVACY_OPTIONS.find(p => p.value === privacy)?.label}" সেট করা হয়েছে`);
     } catch (error) {
       console.error('Error updating privacy:', error);
@@ -132,6 +137,15 @@ export const PostOptionsMenu = ({
 
   const handleCountryTarget = async (countryCode: string) => {
     try {
+      const targetCountry = countryCode === 'ALL' ? null : countryCode;
+      
+      const { error } = await supabase
+        .from('posts')
+        .update({ target_country: targetCountry })
+        .eq('id', postId);
+
+      if (error) throw error;
+      
       const country = COUNTRIES.find(c => c.code === countryCode);
       toast.success(`পোস্ট "${country?.name}" এ দেখাবে`);
     } catch (error) {
