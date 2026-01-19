@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff } from 'lucide-react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -42,6 +42,23 @@ export function CallDialog({
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const [hasRemoteVideo, setHasRemoteVideo] = useState(false);
+  const [audioBlocked, setAudioBlocked] = useState(false);
+
+  // Try to play audio (handles autoplay policy)
+  const tryPlayAudio = useCallback(async () => {
+    if (remoteAudioRef.current && remoteAudioRef.current.srcObject) {
+      try {
+        remoteAudioRef.current.muted = false;
+        remoteAudioRef.current.volume = 1.0;
+        await remoteAudioRef.current.play();
+        setAudioBlocked(false);
+        console.log('Audio playback started successfully');
+      } catch (e) {
+        console.log('Audio autoplay blocked, will try on user interaction');
+        setAudioBlocked(true);
+      }
+    }
+  }, []);
 
   // Set local video stream
   useEffect(() => {
@@ -65,30 +82,24 @@ export function CallDialog({
       setHasRemoteVideo(videoTracks.length > 0 && videoTracks[0].enabled);
       
       // Set video element - IMPORTANT: do NOT mute remote video
-      if (remoteVideoRef.current && videoTracks.length > 0) {
+      if (remoteVideoRef.current) {
         console.log('Setting remote video stream');
         remoteVideoRef.current.srcObject = remoteStream;
         remoteVideoRef.current.muted = false; // Ensure remote video is NOT muted
         remoteVideoRef.current.volume = 1.0;
         remoteVideoRef.current.play().catch(e => {
           console.log('Remote video play error:', e);
-          // Try to play on user interaction
         });
       }
       
-      // Set separate audio element for reliable audio playback
+      // Set separate audio element for reliable audio playback - THIS IS CRITICAL FOR HEARING THE OTHER PERSON
       if (remoteAudioRef.current && audioTracks.length > 0) {
-        console.log('Setting remote audio stream, tracks:', audioTracks.map(t => `enabled: ${t.enabled}, muted: ${t.muted}`));
+        console.log('Setting remote audio stream, tracks:', audioTracks.map(t => `enabled: ${t.enabled}, readyState: ${t.readyState}`));
         remoteAudioRef.current.srcObject = remoteStream;
-        remoteAudioRef.current.muted = false; // CRITICAL: Ensure audio is NOT muted
-        remoteAudioRef.current.volume = 1.0;
-        remoteAudioRef.current.play().catch(e => {
-          console.log('Remote audio play error:', e);
-          // Audio autoplay might be blocked, try on next user interaction
-        });
+        tryPlayAudio();
       }
     }
-  }, [remoteStream]);
+  }, [remoteStream, tryPlayAudio]);
 
   // Track remote video availability
   useEffect(() => {
@@ -248,6 +259,19 @@ export function CallDialog({
             ) : (
               /* Active call controls */
               <div className="flex items-center justify-center gap-4">
+                {/* Audio blocked indicator - tap to enable */}
+                {audioBlocked && (
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-14 h-14 rounded-full bg-yellow-500/20 border-yellow-500 animate-pulse"
+                    onClick={tryPlayAudio}
+                    title="অডিও চালু করতে ক্লিক করুন"
+                  >
+                    <Volume2 className="w-6 h-6 text-yellow-500" />
+                  </Button>
+                )}
+
                 <Button
                   size="lg"
                   variant={isMuted ? 'destructive' : 'secondary'}
