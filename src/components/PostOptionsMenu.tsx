@@ -37,13 +37,16 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { PostEditDialog } from "./PostEditDialog";
 
 interface PostOptionsMenuProps {
   postId: string;
   authorId: string;
   currentUserId: string;
+  postContent: string;
   onDelete?: (postId: string) => void;
   onSave?: (postId: string) => void;
+  onUpdate?: (postId: string, newContent: string) => void;
   isSaved?: boolean;
 }
 
@@ -84,11 +87,14 @@ export const PostOptionsMenu = ({
   postId,
   authorId,
   currentUserId,
+  postContent,
   onDelete,
   onSave,
+  onUpdate,
   isSaved = false,
 }: PostOptionsMenuProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const isOwner = authorId === currentUserId;
 
@@ -185,7 +191,7 @@ export const PostOptionsMenu = ({
           {isOwner && (
             <>
               {/* Edit */}
-              <DropdownMenuItem className="gap-2 cursor-pointer">
+              <DropdownMenuItem onClick={() => setShowEditDialog(true)} className="gap-2 cursor-pointer">
                 <Edit className="w-4 h-4" />
                 <span>এডিট করুন</span>
               </DropdownMenuItem>
@@ -277,6 +283,15 @@ export const PostOptionsMenu = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Dialog */}
+      <PostEditDialog
+        postId={postId}
+        initialContent={postContent}
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        onUpdate={onUpdate}
+      />
     </>
   );
 };

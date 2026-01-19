@@ -662,6 +662,35 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
     }
   }, [userId]);
 
+  // Update a post
+  const updatePost = useCallback(async (postId: string, newContent: string) => {
+    if (!userId) return false;
+
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .update({ content: newContent, updated_at: new Date().toISOString() })
+        .eq('id', postId)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      // Update local state
+      setPosts(prev => {
+        const updated = prev.map(post => 
+          post.id === postId ? { ...post, content: newContent } : post
+        );
+        postsRef.current = updated;
+        return updated;
+      });
+
+      return true;
+    } catch (err) {
+      console.error('Error updating post:', err);
+      return false;
+    }
+  }, [userId]);
+
   useEffect(() => {
     fetchPosts(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -681,5 +710,6 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
     likeComment,
     trackView,
     deletePost,
+    updatePost,
   };
 };
