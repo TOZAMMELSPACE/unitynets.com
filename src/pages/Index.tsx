@@ -36,6 +36,7 @@ interface IndexProps {
   loadingMore?: boolean;
   onTrackView?: (postId: string) => void;
   onDeletePost?: (postId: string) => void;
+  onUpdatePost?: (postId: string, newContent: string) => void;
 }
 
 const Index = ({
@@ -56,6 +57,7 @@ const Index = ({
   loadingMore,
   onTrackView,
   onDeletePost,
+  onUpdatePost,
 }: IndexProps) => {
   const [showPostForm, setShowPostForm] = useState(false);
   const [selectedPostType, setSelectedPostType] = useState<'text' | 'image' | 'video' | 'poll' | 'event' | 'job'>('text');
@@ -161,6 +163,7 @@ const Index = ({
               loadingMore={loadingMore}
               onTrackView={onTrackView}
               onDeletePost={onDeletePost}
+              onUpdatePost={onUpdatePost}
             />
           </div>
         </div>

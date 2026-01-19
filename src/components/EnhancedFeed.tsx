@@ -43,6 +43,7 @@ interface EnhancedFeedProps {
   loadingMore?: boolean;
   onTrackView?: (postId: string) => void;
   onDeletePost?: (postId: string) => void;
+  onUpdatePost?: (postId: string, newContent: string) => void;
 }
 
 export const EnhancedFeed = ({ 
@@ -59,7 +60,8 @@ export const EnhancedFeed = ({
   hasMore = false,
   loadingMore = false,
   onTrackView,
-  onDeletePost
+  onDeletePost,
+  onUpdatePost
 }: EnhancedFeedProps) => {
   const navigate = useNavigate();
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
@@ -361,8 +363,10 @@ export const EnhancedFeed = ({
                   postId={post.id}
                   authorId={post.author.id}
                   currentUserId={currentUser.id}
+                  postContent={post.content}
                   onDelete={onDeletePost}
                   onSave={onSavePost}
+                  onUpdate={onUpdatePost}
                   isSaved={isPostSaved?.(post.id)}
                 />
               </div>
