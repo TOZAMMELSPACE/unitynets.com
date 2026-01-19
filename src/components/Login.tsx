@@ -149,15 +149,11 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
         <div className="relative z-10 flex flex-col justify-center px-8 md:px-10 lg:px-12 xl:px-20">
           {/* Logo */}
           <div className="mb-6 lg:mb-10">
-            <div className="flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6">
-              <div className="w-10 lg:w-14 h-10 lg:h-14 bg-white/10 backdrop-blur-sm rounded-xl lg:rounded-2xl flex items-center justify-center border border-white/20">
-                <span className="text-lg lg:text-2xl font-bold text-white">U</span>
-              </div>
-              <div>
-                <h1 className="text-xl lg:text-3xl font-display font-bold text-white tracking-tight">UnityNets</h1>
-                <p className="text-xs lg:text-sm text-white/70">Trust • Learn • Unite</p>
-              </div>
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="UnityNets Logo" 
+              className="h-14 lg:h-20 w-auto"
+            />
           </div>
 
           {/* Tagline */}
@@ -220,14 +216,12 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
           {/* Mobile Logo & Features */}
           <div className="md:hidden mb-6 sm:mb-8">
             <div className="text-center mb-5">
-              <div className="inline-flex items-center gap-2 mb-3">
-                <div className="w-10 sm:w-12 h-10 sm:h-12 bg-[hsl(174,55%,45%)] rounded-xl flex items-center justify-center">
-                  <span className="text-lg sm:text-xl font-bold text-[hsl(220,18%,10%)]">U</span>
-                </div>
-                <div className="text-left">
-                  <h1 className="text-xl sm:text-2xl font-display font-bold text-[hsl(220,10%,95%)]">UnityNets</h1>
-                  <p className="text-xs text-[hsl(174,55%,50%)]">Trust • Learn • Unite</p>
-                </div>
+              <div className="flex justify-center mb-3">
+                <img 
+                  src="/logo.png" 
+                  alt="UnityNets Logo" 
+                  className="h-12 sm:h-14 w-auto"
+                />
               </div>
             </div>
             
