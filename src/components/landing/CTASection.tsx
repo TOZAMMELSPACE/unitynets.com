@@ -45,8 +45,8 @@ export const CTASection = () => {
           {/* Description */}
           <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
             {t(
-              "From South Asia to the whole world — we want to unite everyone. Your participation will help make our dream a reality.",
-              "দক্ষিণ এশিয়া থেকে সারা বিশ্ব — আমরা সবাইকে একত্রিত করতে চাই। আপনার অংশগ্রহণ আমাদের স্বপ্নকে বাস্তব করতে সাহায্য করবে।"
+              "We want to establish peace on Earth. Your participation will help make our dream a reality.",
+              "পৃথিবীতে শান্তি প্রতিষ্ঠা করতে চাই। আপনার অংশগ্রহণ আমাদের স্বপ্নকে বাস্তব করতে সাহায্য করবে।"
             )}
           </p>
 
