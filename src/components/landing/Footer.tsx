@@ -121,9 +121,9 @@ export const Footer = () => {
             © 2025 UnityNets. {t("All rights reserved.", "সর্বস্বত্ব সংরক্ষিত।")}
           </p>
           <p className="text-sm text-muted-foreground flex items-center gap-1">
-            <span>{t("Made with", "ভালোবাসা দিয়ে তৈরি")}</span>
+            {t("Made with", "তৈরি করা হয়েছে")}
             <Heart className="w-4 h-4 text-destructive fill-destructive" />
-            <span>{t("for the World", "সারা বিশ্বের জন্য")}</span>
+            {t("for the World", "ভালোবাসা দিয়ে সারা বিশ্বের জন্য")}
           </p>
         </div>
       </div>

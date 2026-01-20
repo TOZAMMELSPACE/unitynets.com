@@ -8,7 +8,7 @@ export const FeaturesSection = () => {
   const features = [
     {
       icon: Shield,
-      title: t("Trust", "বিশ্বাস / Trust"),
+      title: t("Trust", "বিশ্বাস"),
       description: t(
         "A safe community where every voice is heard and every member is valued.",
         "একটি নিরাপদ কমিউনিটি যেখানে প্রতিটি কণ্ঠস্বর শোনা হয় এবং প্রতিটি সদস্যের মূল্য দেওয়া হয়।"
@@ -19,7 +19,7 @@ export const FeaturesSection = () => {
     },
     {
       icon: BookOpen,
-      title: t("Learn", "শিক্ষা / Learn"),
+      title: t("Learn", "শিক্ষা"),
       description: t(
         "Thousands of free educational notes and skill sharing opportunities.",
         "হাজারো বিনামূল্যে শিক্ষামূলক নোটস এবং দক্ষতা বিনিময়। এখানে শেখা ও শেখানো দুটোই সম্মানের।"
@@ -30,7 +30,7 @@ export const FeaturesSection = () => {
     },
     {
       icon: Users,
-      title: t("Unite", "ঐক্য / Unite"),
+      title: t("Unite", "ঐক্য"),
       description: t(
         "Building a united community from South Asia to the entire world.",
         "দক্ষিণ এশিয়া থেকে শুরু করে পুরো বিশ্ব জুড়ে একটি ঐক্যবদ্ধ সম্প্রদায় গড়ার স্বপ্ন নিয়ে এগিয়ে যাচ্ছি।"
@@ -41,7 +41,7 @@ export const FeaturesSection = () => {
     },
     {
       icon: Heart,
-      title: t("Impact", "প্রভাব / Impact"),
+      title: t("Impact", "প্রভাব"),
       description: t(
         "See real stories of lives changing through our community.",
         "দেখুন কিভাবে আমাদের কমিউনিটির মাধ্যমে মানুষের জীবন বদলে যাচ্ছে। সত্যিকারের গল্প, সত্যিকারের পরিবর্তন।"

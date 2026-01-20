@@ -979,7 +979,7 @@ export const HeroSection = () => {
                           className={isHighlighted ? 'fill-accent-foreground/80' : 'fill-muted-foreground'}
                           style={{ fontSize: "9px" }}
                         >
-                          {location.members.toLocaleString()} members
+                          {location.members.toLocaleString()} {t("members", "সদস্য")}
                         </text>
                       </g>
                     )}
@@ -1036,7 +1036,7 @@ export const HeroSection = () => {
                   <span className="text-xl">{location.flag}</span>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-foreground truncate">{location.name}</div>
-                    <div className="text-xs text-muted-foreground">{location.region} • {location.members.toLocaleString()} members</div>
+                    <div className="text-xs text-muted-foreground">{location.region} • {location.members.toLocaleString()} {t("members", "সদস্য")}</div>
                   </div>
                   {location.isHub && (
                     <span className="px-1.5 py-0.5 bg-primary/20 text-primary text-[10px] rounded-full">Hub</span>
@@ -1104,11 +1104,11 @@ export const HeroSection = () => {
 
         {/* Main Heading */}
         <h1 className="hero-heading text-foreground mb-6 float-up-1 drop-shadow-lg">
-          <span className="text-primary">Trust</span>
+          <span className="text-primary">{t("Trust", "বিশ্বাস")}</span>
           <span className="text-muted-foreground mx-2 md:mx-3">•</span>
-          <span className="text-accent">Learn</span>
+          <span className="text-accent">{t("Learn", "শেখা")}</span>
           <span className="text-muted-foreground mx-2 md:mx-3">•</span>
-          <span className="text-primary">Unite</span>
+          <span className="text-primary">{t("Unite", "ঐক্য")}</span>
           <br />
           <span className="text-3xl md:text-4xl lg:text-5xl mt-3 block text-foreground/90">
             {t("Stronger Together", "একত্রে শক্তিশালী")}
@@ -1119,7 +1119,7 @@ export const HeroSection = () => {
         <p className="subheading max-w-3xl mx-auto mb-10 text-foreground/80 float-up-2 drop-shadow-sm">
           {t(
             "Build Together, Grow Together – Join the world's most trusted community platform for skill sharing and mutual growth. Building bridges of unity from South Asia to the world.",
-            "Build Together, Grow Together – জয়েন করুন বিশ্বের সবচেয়ে বিশ্বস্ত কমিউনিটি প্ল্যাটফর্মে। দক্ষতা শেয়ার ও পারস্পরিক উন্নয়নের জন্য। দক্ষিণ এশিয়া থেকে সারা বিশ্বে ঐক্যের সেতুবন্ধন।"
+            "একসাথে গড়ি, একসাথে বাড়ি – জয়েন করুন বিশ্বের সবচেয়ে বিশ্বস্ত কমিউনিটি প্ল্যাটফর্মে। দক্ষতা শেয়ার ও পারস্পরিক উন্নয়নের জন্য। দক্ষিণ এশিয়া থেকে সারা বিশ্বে ঐক্যের সেতুবন্ধন।"
           )}
         </p>
 
