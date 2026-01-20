@@ -219,10 +219,20 @@
       <!-- Initial loader shown before React hydrates -->
       <div id="initial-loader">
         <img src="/logo.png" alt="UnityNets" class="loader-logo" />
-        <p class="loader-tagline">Trust • Learn • Unite</p>
+        <p class="loader-tagline" id="loader-tagline">Trust • Learn • Unite</p>
         <div class="loader-spinner"></div>
       </div>
     </div>
+    <script>
+      // Set tagline based on language preference
+      (function() {
+        var lang = localStorage.getItem('language') || 'en';
+        var tagline = document.getElementById('loader-tagline');
+        if (tagline) {
+          tagline.textContent = lang === 'bn' ? 'বিশ্বাস • শেখা • ঐক্য' : 'Trust • Learn • Unite';
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
