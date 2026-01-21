@@ -36,7 +36,7 @@ export const CTASection = () => {
 
           {/* Heading */}
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-            {t("Be Part of Our Dream Now", "এখনই অংশ হোন আমাদের স্বপ্নের")}
+            {t("Be Part of Everyone's Dream", "সবার স্বপ্নের অংশ হোন")}
             <span className="block text-white/80 text-xl md:text-2xl mt-2 font-normal">
               {t("From South Asia to the World", "দক্ষিণ এশিয়া থেকে সারা বিশ্ব")}
             </span>
