@@ -64,10 +64,10 @@ interface ChatSession {
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/learning-chat`;
 
 const suggestedQuestions = [
+  { text: "🎯 আমি ফ্রিল্যান্সিং শিখতে চাই শুরু থেকে - একটা Learning Path দাও", icon: Lightbulb, color: "bg-green-500/10 text-green-600 dark:text-green-400", isPath: true },
+  { text: "🎯 ওয়েব ডেভেলপমেন্ট শেখার Complete Roadmap দাও", icon: Globe, color: "bg-purple-500/10 text-purple-600 dark:text-purple-400", isPath: true },
   { text: "পাইথন প্রোগ্রামিং শিখতে চাই", icon: Code, color: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
-  { text: "ওয়েব ডেভেলপমেন্ট কিভাবে শুরু করব?", icon: Globe, color: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
   { text: "AI কিভাবে কাজ করে?", icon: Sparkles, color: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-  { text: "ফ্রিল্যান্সিং শুরু করতে কি লাগে?", icon: Lightbulb, color: "bg-green-500/10 text-green-600 dark:text-green-400" },
 ];
 
 export default function PublicLearningZone() {
