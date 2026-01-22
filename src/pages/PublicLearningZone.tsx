@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Sparkles,
   Send,
@@ -34,7 +35,8 @@ import {
   Globe,
   GraduationCap,
   Menu,
-  Users
+  Users,
+  BookOpen
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -42,6 +44,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { SEOHead } from "@/components/SEOHead";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/landing/Navbar";
+import { StudyRoomsSection } from "@/components/study-rooms/StudyRoomsSection";
+import { useAuth } from "@/hooks/useAuth";
 
 interface FileAttachment {
   name: string;
@@ -77,9 +81,13 @@ const suggestedQuestions = [
 export default function PublicLearningZone() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   const STORAGE_KEY = "learning_chat_history";
   const CURRENT_SESSION_KEY = "current_session_id";
+  
+  // Active tab state
+  const [activeTab, setActiveTab] = useState<'chat' | 'study-rooms'>('chat');
   
   // Sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -835,46 +843,83 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="flex items-center justify-between px-4 py-3 border-b border-border/50">
-          <div className="flex items-center gap-2">
-            {/* Mobile menu button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden h-9 w-9"
-              onClick={() => setSidebarMobileOpen(true)}
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
+        <header className="flex flex-col border-b border-border/50">
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-2">
+              {/* Mobile menu button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden h-9 w-9"
+                onClick={() => setSidebarMobileOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              
+              {/* Desktop sidebar toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden md:flex h-9 w-9"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+              >
+                {sidebarOpen ? (
+                  <PanelLeftClose className="h-5 w-5" />
+                ) : (
+                  <PanelLeft className="h-5 w-5" />
+                )}
+              </Button>
+              
+              <h1 className="text-lg font-semibold">Learning Buddy</h1>
+            </div>
             
-            {/* Desktop sidebar toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hidden md:flex h-9 w-9"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-              {sidebarOpen ? (
-                <PanelLeftClose className="h-5 w-5" />
-              ) : (
-                <PanelLeft className="h-5 w-5" />
-              )}
-            </Button>
-            
-            <h1 className="text-lg font-semibold">Learning Buddy</h1>
+            {activeTab === 'chat' && messages.length > 0 && (
+              <Button variant="ghost" size="sm" onClick={startNewChat} className="gap-2">
+                <RotateCcw className="h-4 w-4" />
+                <span className="hidden sm:inline">{t("New Chat", "নতুন চ্যাট")}</span>
+              </Button>
+            )}
           </div>
           
-          {messages.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={startNewChat} className="gap-2">
-              <RotateCcw className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("New Chat", "নতুন চ্যাট")}</span>
-            </Button>
-          )}
+          {/* Tab Navigation */}
+          <div className="px-4 pb-2">
+            <div className="flex gap-2">
+              <Button
+                variant={activeTab === 'chat' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('chat')}
+                className="gap-2"
+              >
+                <MessageCircle className="h-4 w-4" />
+                {t('AI Chat', 'AI চ্যাট')}
+              </Button>
+              <Button
+                variant={activeTab === 'study-rooms' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('study-rooms')}
+                className="gap-2"
+              >
+                <Users className="h-4 w-4" />
+                {t('Study Rooms', 'স্টাডি রুম')}
+              </Button>
+            </div>
+          </div>
         </header>
         
-        {/* Chat Area */}
+        {/* Content Area */}
         <div className="flex-1 overflow-hidden">
-          {messages.length === 0 ? (
+          {activeTab === 'study-rooms' ? (
+            /* Study Rooms Section */
+            <div className="h-full overflow-y-auto p-4">
+              <StudyRoomsSection 
+                userId={user?.id || null} 
+                onRequestQuiz={(topic) => {
+                  setActiveTab('chat');
+                  sendMessage(`${topic} নিয়ে একটা MCQ Quiz দাও (৫টা প্রশ্ন)`);
+                }}
+              />
+            </div>
+          ) : messages.length === 0 ? (
             /* Welcome Screen */
             <div className="h-full flex flex-col items-center justify-center px-4">
               <div className="max-w-2xl w-full text-center">
@@ -1177,8 +1222,8 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
           )}
         </div>
         
-        {/* Input Area (when messages exist) */}
-        {messages.length > 0 && (
+        {/* Input Area (when messages exist and on chat tab) */}
+        {activeTab === 'chat' && messages.length > 0 && (
           <div className="border-t border-border/50 p-4">
             <div className="max-w-3xl mx-auto">
               <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
