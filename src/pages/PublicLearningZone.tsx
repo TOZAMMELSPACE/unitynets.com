@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "@/types/speech.d.ts";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -32,7 +33,8 @@ import {
   Code,
   Globe,
   GraduationCap,
-  Menu
+  Menu,
+  Users
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -74,6 +76,7 @@ const suggestedQuestions = [
 
 export default function PublicLearningZone() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   
   const STORAGE_KEY = "learning_chat_history";
   const CURRENT_SESSION_KEY = "current_session_id";
@@ -589,6 +592,78 @@ export default function PublicLearningZone() {
     return <FileText className="h-4 w-4" />;
   };
 
+  // Ask the Community - Create a post from learning content
+  const askCommunity = async (messageIndex: number) => {
+    // Find the user question that triggered this assistant response
+    let userQuestion = "";
+    for (let i = messageIndex - 1; i >= 0; i--) {
+      if (messages[i]?.role === "user") {
+        userQuestion = messages[i].content;
+        break;
+      }
+    }
+    
+    const assistantContent = messages[messageIndex]?.content || "";
+    
+    // Create a formatted post content
+    const postContent = `🎓 **Learning Zone থেকে সাহায্য চাই!**
+
+❓ **আমার প্রশ্ন:**
+${userQuestion}
+
+📚 **AI যা বলেছে:**
+${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
+
+---
+💡 এই বিষয়ে কমিউনিটি থেকে কারো অভিজ্ঞতা বা পরামর্শ থাকলে জানাবেন!
+
+#LearningZone #সাহায্যচাই`;
+
+    // Check if user is logged in
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      // Store the content in sessionStorage and redirect to auth
+      sessionStorage.setItem('pending_community_post', postContent);
+      toast({
+        title: t("Login Required", "লগইন প্রয়োজন"),
+        description: t("Please login to share with community", "কমিউনিটিতে শেয়ার করতে লগইন করুন"),
+      });
+      navigate('/auth?redirect=home&action=post');
+      return;
+    }
+
+    // Create the post directly
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .insert({
+          user_id: user.id,
+          content: postContent,
+          community_tag: 'learning',
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: t("Posted!", "পোস্ট হয়েছে!"),
+        description: t("Your question has been shared with the community", "আপনার প্রশ্ন কমিউনিটিতে শেয়ার হয়েছে"),
+      });
+      
+      // Navigate to the post
+      navigate(`/post/${data.id}`);
+    } catch (error) {
+      console.error('Error creating community post:', error);
+      toast({
+        title: t("Error", "ত্রুটি"),
+        description: t("Failed to create post", "পোস্ট তৈরি করতে ব্যর্থ"),
+        variant: "destructive"
+      });
+    }
+  };
+
   const filteredSessions = savedSessions.filter(session =>
     session.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -1037,7 +1112,7 @@ export default function PublicLearningZone() {
                       </div>
                       
                       {msg.role === "assistant" && (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 flex-wrap">
                           <Button
                             variant="ghost"
                             size="sm"
@@ -1067,6 +1142,15 @@ export default function PublicLearningZone() {
                               )}
                             </Button>
                           )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs text-muted-foreground hover:text-primary"
+                            onClick={() => askCommunity(i)}
+                          >
+                            <Users className="h-3 w-3 mr-1" />
+                            {t("Ask Community", "কমিউনিটিতে জিজ্ঞাসা")}
+                          </Button>
                         </div>
                       )}
                     </div>
