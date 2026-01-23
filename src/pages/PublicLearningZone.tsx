@@ -36,7 +36,8 @@ import {
   GraduationCap,
   Menu,
   Users,
-  BookOpen
+  BookOpen,
+  BarChart3
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -46,6 +47,7 @@ import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/landing/Navbar";
 import { StudyRoomsSection } from "@/components/study-rooms/StudyRoomsSection";
 import { useAuth } from "@/hooks/useAuth";
+import { ProgressDashboard } from "@/components/learning/ProgressDashboard";
 
 interface FileAttachment {
   name: string;
@@ -87,7 +89,7 @@ export default function PublicLearningZone() {
   const CURRENT_SESSION_KEY = "current_session_id";
   
   // Active tab state
-  const [activeTab, setActiveTab] = useState<'chat' | 'study-rooms'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'study-rooms' | 'progress'>('chat');
   
   // Sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -883,7 +885,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
           
           {/* Tab Navigation */}
           <div className="px-4 pb-2">
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto">
               <Button
                 variant={activeTab === 'chat' ? 'default' : 'ghost'}
                 size="sm"
@@ -902,13 +904,33 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                 <Users className="h-4 w-4" />
                 {t('Study Rooms', 'স্টাডি রুম')}
               </Button>
+              <Button
+                variant={activeTab === 'progress' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('progress')}
+                className="gap-2"
+              >
+                <BarChart3 className="h-4 w-4" />
+                {t('Progress', 'প্রগ্রেস')}
+              </Button>
             </div>
           </div>
         </header>
         
         {/* Content Area */}
         <div className="flex-1 overflow-hidden">
-          {activeTab === 'study-rooms' ? (
+          {activeTab === 'progress' ? (
+            /* Progress Dashboard */
+            <div className="h-full overflow-y-auto p-4">
+              <div className="max-w-2xl mx-auto">
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-primary" />
+                  {t('My Learning Progress', 'আমার লার্নিং প্রগ্রেস')}
+                </h2>
+                <ProgressDashboard />
+              </div>
+            </div>
+          ) : activeTab === 'study-rooms' ? (
             /* Study Rooms Section */
             <div className="h-full overflow-y-auto p-4">
               <StudyRoomsSection 
