@@ -48,6 +48,7 @@ import { Navbar } from "@/components/landing/Navbar";
 import { StudyRoomsSection } from "@/components/study-rooms/StudyRoomsSection";
 import { useAuth } from "@/hooks/useAuth";
 import { ProgressDashboard } from "@/components/learning/ProgressDashboard";
+import { QuizScorer, hasQuizContent } from "@/components/learning/QuizScorer";
 
 interface FileAttachment {
   name: string;
@@ -1170,6 +1171,11 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                             >
                               {msg.content}
                             </ReactMarkdown>
+                            
+                            {/* Quiz Scorer - Interactive quiz scoring */}
+                            {hasQuizContent(msg.content) && (
+                              <QuizScorer content={msg.content} />
+                            )}
                           </div>
                         ) : (
                           <p className="text-sm whitespace-pre-wrap leading-relaxed">
