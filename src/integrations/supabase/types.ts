@@ -575,6 +575,90 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_progress: {
+        Row: {
+          completed_at: string | null
+          course_id: string
+          course_title: string
+          created_at: string
+          id: string
+          is_completed: boolean
+          lessons_completed: number
+          progress_percentage: number
+          total_lessons: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          course_id: string
+          course_title: string
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          lessons_completed?: number
+          progress_percentage?: number
+          total_lessons?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          course_id?: string
+          course_title?: string
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          lessons_completed?: number
+          progress_percentage?: number
+          total_lessons?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      learning_stats: {
+        Row: {
+          courses_completed: number
+          created_at: string
+          current_level: number
+          current_streak: number
+          id: string
+          last_activity_date: string | null
+          longest_streak: number
+          quizzes_completed: number
+          total_xp: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          courses_completed?: number
+          created_at?: string
+          current_level?: number
+          current_streak?: number
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number
+          quizzes_completed?: number
+          total_xp?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          courses_completed?: number
+          created_at?: string
+          current_level?: number
+          current_streak?: number
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number
+          quizzes_completed?: number
+          total_xp?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string | null
@@ -829,6 +913,42 @@ export type Database = {
           id?: string
           p256dh?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      quiz_results: {
+        Row: {
+          correct_answers: number
+          created_at: string
+          id: string
+          quiz_topic: string
+          quiz_type: string
+          score_percentage: number
+          total_questions: number
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          correct_answers?: number
+          created_at?: string
+          id?: string
+          quiz_topic: string
+          quiz_type?: string
+          score_percentage?: number
+          total_questions?: number
+          user_id: string
+          xp_earned?: number
+        }
+        Update: {
+          correct_answers?: number
+          created_at?: string
+          id?: string
+          quiz_topic?: string
+          quiz_type?: string
+          score_percentage?: number
+          total_questions?: number
+          user_id?: string
+          xp_earned?: number
         }
         Relationships: []
       }
