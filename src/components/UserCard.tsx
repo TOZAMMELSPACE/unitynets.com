@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { UserPlus, UserCheck, UserMinus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface UserCardProps {
   user: User;
@@ -25,6 +26,7 @@ export const UserCard = ({
   onSendRequest 
 }: UserCardProps) => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const isCurrentUser = user.id === currentUserId;
 
   return (
@@ -43,20 +45,20 @@ export const UserCard = ({
             className="flex items-center gap-2 mb-1 cursor-pointer"
             onClick={() => navigate('/profile', { state: { userId: user.id } })}
           >
-            <h4 className="font-semibold text-bengali truncate">{user.name}</h4>
+            <h4 className="font-semibold truncate">{user.name}</h4>
             {user.isVerified && (
               <Badge variant="secondary" className="text-xs">✓</Badge>
             )}
           </div>
           <p className="text-sm text-muted-foreground mb-2">@{user.username}</p>
           {user.bio && (
-            <p className="text-sm text-muted-foreground text-bengali mb-2 line-clamp-2">
+            <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
               {user.bio}
             </p>
           )}
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="text-bengali">{user.followers} ফলোয়ার</span>
-            <span className="text-bengali">ট্রাস্ট: {Math.round(user.trustScore)}</span>
+            <span>{user.followers} {t('followers', 'ফলোয়ার')}</span>
+            <span>{t('Trust', 'ট্রাস্ট')}: {Math.round(user.trustScore)}</span>
           </div>
         </div>
 
@@ -70,7 +72,7 @@ export const UserCard = ({
                 className="gap-2"
               >
                 <UserCheck className="w-4 h-4" />
-                ফলোয়িং
+                {t('Following', 'ফলোয়িং')}
               </Button>
             ) : hasSentRequest ? (
               <Button
@@ -80,7 +82,7 @@ export const UserCard = ({
                 className="gap-2"
               >
                 <UserPlus className="w-4 h-4" />
-                রিকোয়েস্ট পাঠানো
+                {t('Request Sent', 'রিকোয়েস্ট পাঠানো')}
               </Button>
             ) : (
               <div className="flex gap-2">
@@ -91,7 +93,7 @@ export const UserCard = ({
                   className="gap-2"
                 >
                   <UserPlus className="w-4 h-4" />
-                  ফলো
+                  {t('Follow', 'ফলো')}
                 </Button>
               </div>
             )}
