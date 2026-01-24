@@ -38,6 +38,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PostEditDialog } from "./PostEditDialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PostOptionsMenuProps {
   postId: string;
@@ -49,39 +50,6 @@ interface PostOptionsMenuProps {
   onUpdate?: (postId: string, newContent: string) => void;
   isSaved?: boolean;
 }
-
-const COUNTRIES = [
-  { code: 'BD', name: 'বাংলাদেশ', flag: '🇧🇩' },
-  { code: 'IN', name: 'ভারত', flag: '🇮🇳' },
-  { code: 'PK', name: 'পাকিস্তান', flag: '🇵🇰' },
-  { code: 'NP', name: 'নেপাল', flag: '🇳🇵' },
-  { code: 'LK', name: 'শ্রীলঙ্কা', flag: '🇱🇰' },
-  { code: 'MM', name: 'মায়ানমার', flag: '🇲🇲' },
-  { code: 'BT', name: 'ভুটান', flag: '🇧🇹' },
-  { code: 'AF', name: 'আফগানিস্তান', flag: '🇦🇫' },
-  { code: 'US', name: 'যুক্তরাষ্ট্র', flag: '🇺🇸' },
-  { code: 'GB', name: 'যুক্তরাজ্য', flag: '🇬🇧' },
-  { code: 'CA', name: 'কানাডা', flag: '🇨🇦' },
-  { code: 'AU', name: 'অস্ট্রেলিয়া', flag: '🇦🇺' },
-  { code: 'AE', name: 'সংযুক্ত আরব আমিরাত', flag: '🇦🇪' },
-  { code: 'SA', name: 'সৌদি আরব', flag: '🇸🇦' },
-  { code: 'QA', name: 'কাতার', flag: '🇶🇦' },
-  { code: 'KW', name: 'কুয়েত', flag: '🇰🇼' },
-  { code: 'MY', name: 'মালয়েশিয়া', flag: '🇲🇾' },
-  { code: 'SG', name: 'সিঙ্গাপুর', flag: '🇸🇬' },
-  { code: 'JP', name: 'জাপান', flag: '🇯🇵' },
-  { code: 'KR', name: 'দক্ষিণ কোরিয়া', flag: '🇰🇷' },
-  { code: 'DE', name: 'জার্মানি', flag: '🇩🇪' },
-  { code: 'FR', name: 'ফ্রান্স', flag: '🇫🇷' },
-  { code: 'IT', name: 'ইতালি', flag: '🇮🇹' },
-  { code: 'ALL', name: 'সব দেশ', flag: '🌍' },
-];
-
-const PRIVACY_OPTIONS = [
-  { value: 'public', label: 'পাবলিক', icon: Globe, description: 'সবাই দেখতে পারবে' },
-  { value: 'friends', label: 'শুধু বন্ধুরা', icon: Users, description: 'শুধু বন্ধুরা দেখতে পারবে' },
-  { value: 'only_me', label: 'শুধু আমি', icon: EyeOff, description: 'শুধু আপনি দেখতে পারবেন' },
-];
 
 export const PostOptionsMenu = ({
   postId,
@@ -96,7 +64,41 @@ export const PostOptionsMenu = ({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { t } = useLanguage();
   const isOwner = authorId === currentUserId;
+
+  const COUNTRIES = [
+    { code: 'BD', name: t('Bangladesh', 'বাংলাদেশ'), flag: '🇧🇩' },
+    { code: 'IN', name: t('India', 'ভারত'), flag: '🇮🇳' },
+    { code: 'PK', name: t('Pakistan', 'পাকিস্তান'), flag: '🇵🇰' },
+    { code: 'NP', name: t('Nepal', 'নেপাল'), flag: '🇳🇵' },
+    { code: 'LK', name: t('Sri Lanka', 'শ্রীলঙ্কা'), flag: '🇱🇰' },
+    { code: 'MM', name: t('Myanmar', 'মায়ানমার'), flag: '🇲🇲' },
+    { code: 'BT', name: t('Bhutan', 'ভুটান'), flag: '🇧🇹' },
+    { code: 'AF', name: t('Afghanistan', 'আফগানিস্তান'), flag: '🇦🇫' },
+    { code: 'US', name: t('United States', 'যুক্তরাষ্ট্র'), flag: '🇺🇸' },
+    { code: 'GB', name: t('United Kingdom', 'যুক্তরাজ্য'), flag: '🇬🇧' },
+    { code: 'CA', name: t('Canada', 'কানাডা'), flag: '🇨🇦' },
+    { code: 'AU', name: t('Australia', 'অস্ট্রেলিয়া'), flag: '🇦🇺' },
+    { code: 'AE', name: t('UAE', 'সংযুক্ত আরব আমিরাত'), flag: '🇦🇪' },
+    { code: 'SA', name: t('Saudi Arabia', 'সৌদি আরব'), flag: '🇸🇦' },
+    { code: 'QA', name: t('Qatar', 'কাতার'), flag: '🇶🇦' },
+    { code: 'KW', name: t('Kuwait', 'কুয়েত'), flag: '🇰🇼' },
+    { code: 'MY', name: t('Malaysia', 'মালয়েশিয়া'), flag: '🇲🇾' },
+    { code: 'SG', name: t('Singapore', 'সিঙ্গাপুর'), flag: '🇸🇬' },
+    { code: 'JP', name: t('Japan', 'জাপান'), flag: '🇯🇵' },
+    { code: 'KR', name: t('South Korea', 'দক্ষিণ কোরিয়া'), flag: '🇰🇷' },
+    { code: 'DE', name: t('Germany', 'জার্মানি'), flag: '🇩🇪' },
+    { code: 'FR', name: t('France', 'ফ্রান্স'), flag: '🇫🇷' },
+    { code: 'IT', name: t('Italy', 'ইতালি'), flag: '🇮🇹' },
+    { code: 'ALL', name: t('All Countries', 'সব দেশ'), flag: '🌍' },
+  ];
+
+  const PRIVACY_OPTIONS = [
+    { value: 'public', label: t('Public', 'পাবলিক'), icon: Globe, description: t('Everyone can see', 'সবাই দেখতে পারবে') },
+    { value: 'friends', label: t('Friends Only', 'শুধু বন্ধুরা'), icon: Users, description: t('Only friends can see', 'শুধু বন্ধুরা দেখতে পারবে') },
+    { value: 'only_me', label: t('Only Me', 'শুধু আমি'), icon: EyeOff, description: t('Only you can see', 'শুধু আপনি দেখতে পারবেন') },
+  ];
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -108,11 +110,11 @@ export const PostOptionsMenu = ({
 
       if (error) throw error;
 
-      toast.success('পোস্ট ডিলিট হয়েছে');
+      toast.success(t('Post deleted', 'পোস্ট ডিলিট হয়েছে'));
       onDelete?.(postId);
     } catch (error) {
       console.error('Error deleting post:', error);
-      toast.error('পোস্ট ডিলিট করতে সমস্যা হয়েছে');
+      toast.error(t('Failed to delete post', 'পোস্ট ডিলিট করতে সমস্যা হয়েছে'));
     } finally {
       setIsDeleting(false);
       setShowDeleteDialog(false);
@@ -128,10 +130,11 @@ export const PostOptionsMenu = ({
 
       if (error) throw error;
       
-      toast.success(`প্রাইভেসি "${PRIVACY_OPTIONS.find(p => p.value === privacy)?.label}" সেট করা হয়েছে`);
+      const option = PRIVACY_OPTIONS.find(p => p.value === privacy);
+      toast.success(t(`Privacy set to "${option?.label}"`, `প্রাইভেসি "${option?.label}" সেট করা হয়েছে`));
     } catch (error) {
       console.error('Error updating privacy:', error);
-      toast.error('প্রাইভেসি আপডেট করতে সমস্যা হয়েছে');
+      toast.error(t('Failed to update privacy', 'প্রাইভেসি আপডেট করতে সমস্যা হয়েছে'));
     }
   };
 
@@ -147,26 +150,28 @@ export const PostOptionsMenu = ({
       if (error) throw error;
       
       const country = COUNTRIES.find(c => c.code === countryCode);
-      toast.success(`পোস্ট "${country?.name}" এ দেখাবে`);
+      toast.success(t(`Post will be shown in "${country?.name}"`, `পোস্ট "${country?.name}" এ দেখাবে`));
     } catch (error) {
       console.error('Error updating country target:', error);
-      toast.error('দেশ সেট করতে সমস্যা হয়েছে');
+      toast.error(t('Failed to set country', 'দেশ সেট করতে সমস্যা হয়েছে'));
     }
   };
 
   const handleCopyLink = () => {
     const url = `${window.location.origin}/post/${postId}`;
     navigator.clipboard.writeText(url);
-    toast.success('লিঙ্ক কপি হয়েছে');
+    toast.success(t('Link copied', 'লিঙ্ক কপি হয়েছে'));
   };
 
   const handleReport = () => {
-    toast.success('রিপোর্ট পাঠানো হয়েছে। আমরা শীঘ্রই রিভিউ করব।');
+    toast.success(t('Report submitted. We will review it soon.', 'রিপোর্ট পাঠানো হয়েছে। আমরা শীঘ্রই রিভিউ করব।'));
   };
 
   const handleSave = () => {
     onSave?.(postId);
-    toast.success(isSaved ? 'পোস্ট সেভ থেকে সরানো হয়েছে' : 'পোস্ট সেভ করা হয়েছে');
+    toast.success(isSaved 
+      ? t('Post removed from saved', 'পোস্ট সেভ থেকে সরানো হয়েছে') 
+      : t('Post saved', 'পোস্ট সেভ করা হয়েছে'));
   };
 
   return (
@@ -183,12 +188,12 @@ export const PostOptionsMenu = ({
             {isSaved ? (
               <>
                 <BookmarkCheck className="w-4 h-4 text-primary" />
-                <span>সেভ থেকে সরান</span>
+                <span>{t('Remove from Saved', 'সেভ থেকে সরান')}</span>
               </>
             ) : (
               <>
                 <Bookmark className="w-4 h-4" />
-                <span>সেভ করুন</span>
+                <span>{t('Save', 'সেভ করুন')}</span>
               </>
             )}
           </DropdownMenuItem>
@@ -196,7 +201,7 @@ export const PostOptionsMenu = ({
           {/* Copy Link */}
           <DropdownMenuItem onClick={handleCopyLink} className="gap-2 cursor-pointer">
             <Copy className="w-4 h-4" />
-            <span>লিঙ্ক কপি করুন</span>
+            <span>{t('Copy Link', 'লিঙ্ক কপি করুন')}</span>
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
@@ -207,14 +212,14 @@ export const PostOptionsMenu = ({
               {/* Edit */}
               <DropdownMenuItem onClick={() => setShowEditDialog(true)} className="gap-2 cursor-pointer">
                 <Edit className="w-4 h-4" />
-                <span>এডিট করুন</span>
+                <span>{t('Edit', 'এডিট করুন')}</span>
               </DropdownMenuItem>
 
               {/* Privacy Sub-menu */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className="gap-2">
                   <Lock className="w-4 h-4" />
-                  <span>প্রাইভেসি</span>
+                  <span>{t('Privacy', 'প্রাইভেসি')}</span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="w-48">
                   {PRIVACY_OPTIONS.map((option) => (
@@ -237,7 +242,7 @@ export const PostOptionsMenu = ({
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className="gap-2">
                   <Globe className="w-4 h-4" />
-                  <span>দেশ টার্গেট</span>
+                  <span>{t('Target Country', 'দেশ টার্গেট')}</span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="w-56 max-h-72 overflow-y-auto">
                   {COUNTRIES.map((country) => (
@@ -261,7 +266,7 @@ export const PostOptionsMenu = ({
                 className="gap-2 cursor-pointer text-destructive focus:text-destructive"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>ডিলিট করুন</span>
+                <span>{t('Delete', 'ডিলিট করুন')}</span>
               </DropdownMenuItem>
             </>
           )}
@@ -270,7 +275,7 @@ export const PostOptionsMenu = ({
           {!isOwner && (
             <DropdownMenuItem onClick={handleReport} className="gap-2 cursor-pointer text-destructive focus:text-destructive">
               <Flag className="w-4 h-4" />
-              <span>রিপোর্ট করুন</span>
+              <span>{t('Report', 'রিপোর্ট করুন')}</span>
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
@@ -280,19 +285,20 @@ export const PostOptionsMenu = ({
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-bengali">পোস্ট ডিলিট করতে চান?</AlertDialogTitle>
-            <AlertDialogDescription className="text-bengali">
-              এই পোস্টটি স্থায়ীভাবে মুছে যাবে এবং পুনরুদ্ধার করা যাবে না। আপনি কি নিশ্চিত?
+            <AlertDialogTitle>{t('Delete this post?', 'পোস্ট ডিলিট করতে চান?')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('This post will be permanently deleted and cannot be recovered. Are you sure?', 
+                'এই পোস্টটি স্থায়ীভাবে মুছে যাবে এবং পুনরুদ্ধার করা যাবে না। আপনি কি নিশ্চিত?')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>বাতিল</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>{t('Cancel', 'বাতিল')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? 'ডিলিট হচ্ছে...' : 'ডিলিট করুন'}
+              {isDeleting ? t('Deleting...', 'ডিলিট হচ্ছে...') : t('Delete', 'ডিলিট করুন')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

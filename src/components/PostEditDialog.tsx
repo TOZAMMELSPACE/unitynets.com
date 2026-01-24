@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PostEditDialogProps {
   postId: string;
@@ -29,10 +30,11 @@ export const PostEditDialog = ({
 }: PostEditDialogProps) => {
   const [content, setContent] = useState(initialContent);
   const [isSaving, setIsSaving] = useState(false);
+  const { t } = useLanguage();
 
   const handleSave = async () => {
     if (!content.trim()) {
-      toast.error("পোস্টের কন্টেন্ট খালি রাখা যাবে না");
+      toast.error(t("Post content cannot be empty", "পোস্টের কন্টেন্ট খালি রাখা যাবে না"));
       return;
     }
 
@@ -45,12 +47,12 @@ export const PostEditDialog = ({
 
       if (error) throw error;
 
-      toast.success("পোস্ট আপডেট হয়েছে");
+      toast.success(t("Post updated successfully", "পোস্ট আপডেট হয়েছে"));
       onUpdate?.(postId, content.trim());
       onOpenChange(false);
     } catch (error) {
       console.error("Error updating post:", error);
-      toast.error("পোস্ট আপডেট করতে সমস্যা হয়েছে");
+      toast.error(t("Failed to update post", "পোস্ট আপডেট করতে সমস্যা হয়েছে"));
     } finally {
       setIsSaving(false);
     }
@@ -60,17 +62,17 @@ export const PostEditDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-bengali">পোস্ট এডিট করুন</DialogTitle>
+          <DialogTitle>{t("Edit Post", "পোস্ট এডিট করুন")}</DialogTitle>
         </DialogHeader>
         <div className="py-4">
           <Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="আপনার পোস্ট লিখুন..."
-            className="min-h-[150px] resize-none text-bengali"
+            placeholder={t("Write your post...", "আপনার পোস্ট লিখুন...")}
+            className="min-h-[150px] resize-none"
           />
           <p className="text-xs text-muted-foreground mt-2">
-            {content.length} অক্ষর
+            {content.length} {t("characters", "অক্ষর")}
           </p>
         </div>
         <DialogFooter>
@@ -79,16 +81,16 @@ export const PostEditDialog = ({
             onClick={() => onOpenChange(false)}
             disabled={isSaving}
           >
-            বাতিল
+            {t("Cancel", "বাতিল")}
           </Button>
           <Button onClick={handleSave} disabled={isSaving}>
             {isSaving ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                সেভ হচ্ছে...
+                {t("Saving...", "সেভ হচ্ছে...")}
               </>
             ) : (
-              "সেভ করুন"
+              t("Save", "সেভ করুন")
             )}
           </Button>
         </DialogFooter>
