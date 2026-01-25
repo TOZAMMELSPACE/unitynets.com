@@ -28,6 +28,7 @@ import { toast } from "@/hooks/use-toast";
 import { uploadPostImage } from "@/lib/imageUpload";
 import { uploadPostVideo } from "@/lib/videoUpload";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EnhancedPostFormProps {
   user: User;
@@ -36,6 +37,7 @@ interface EnhancedPostFormProps {
 }
 
 export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text' }: EnhancedPostFormProps) => {
+  const { t } = useLanguage();
   const [content, setContent] = useState("");
   const [community, setCommunity] = useState("global");
   const [postType, setPostType] = useState<'text' | 'image' | 'video' | 'poll' | 'event' | 'job'>(initialPostType);

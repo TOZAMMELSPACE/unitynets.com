@@ -27,6 +27,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { useNavigate } from "react-router-dom";
 import { ImageCarousel } from "@/components/ImageCarousel";
 import { PostOptionsMenu } from "@/components/PostOptionsMenu";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EnhancedFeedProps {
   posts: (Post | PostWithAuthor)[];
@@ -64,6 +65,7 @@ export const EnhancedFeed = ({
   onUpdatePost
 }: EnhancedFeedProps) => {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [dislikedPosts, setDislikedPosts] = useState<Set<string>>(new Set());
   const [viewedPosts, setViewedPosts] = useState<Set<string>>(new Set());
@@ -174,7 +176,7 @@ export const EnhancedFeed = ({
       <div className="card-enhanced p-8 text-center">
         <div className="text-muted-foreground">
           <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p className="text-bengali">কোন পোস্ট নেই। প্রথম পোস্ট করুন!</p>
+          <p>{t("No posts yet. Be the first to post!", "কোন পোস্ট নেই। প্রথম পোস্ট করুন!")}</p>
         </div>
       </div>
     );
@@ -188,13 +190,13 @@ export const EnhancedFeed = ({
             <div className="p-4 bg-accent/5 rounded-lg border border-accent/20">
               <div className="flex items-center gap-2 mb-2">
                 <Calendar className="w-5 h-5 text-accent" />
-                <span className="font-semibold text-accent">ইভেন্ট</span>
+                <span className="font-semibold text-accent">{t("Event", "ইভেন্ট")}</span>
               </div>
               <h3 className="font-semibold text-lg mb-2">{post.eventDetails?.title}</h3>
               <div className="flex flex-col sm:flex-row gap-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
-                  {post.eventDetails?.date && new Date(post.eventDetails.date).toLocaleDateString('bn-BD')}
+                  {post.eventDetails?.date && new Date(post.eventDetails.date).toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-US')}
                 </div>
                 <div className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />
@@ -213,12 +215,12 @@ export const EnhancedFeed = ({
             <div className="p-4 bg-warning/5 rounded-lg border border-warning/20">
               <div className="flex items-center gap-2 mb-2">
                 <Briefcase className="w-5 h-5 text-warning" />
-                <span className="font-semibold text-warning">কাজের সুযোগ</span>
+                <span className="font-semibold text-warning">{t("Job Opportunity", "কাজের সুযোগ")}</span>
               </div>
               <h3 className="font-semibold text-lg mb-2">{post.jobDetails?.title}</h3>
               <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-2">
-                <span>বাজেট: {post.jobDetails?.budget}</span>
-                <span>ডেডলাইন: {post.jobDetails?.deadline && new Date(post.jobDetails.deadline).toLocaleDateString('bn-BD')}</span>
+                <span>{t("Budget", "বাজেট")}: {post.jobDetails?.budget}</span>
+                <span>{t("Deadline", "ডেডলাইন")}: {post.jobDetails?.deadline && new Date(post.jobDetails.deadline).toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-US')}</span>
               </div>
               {post.jobDetails?.skills && post.jobDetails.skills.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2">
@@ -243,8 +245,8 @@ export const EnhancedFeed = ({
             <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
               <div className="flex items-center gap-2 mb-3">
                 <BarChart3 className="w-5 h-5 text-primary" />
-                <span className="font-semibold text-primary">পোল</span>
-                <span className="text-sm text-muted-foreground">({totalVotes} ভোট)</span>
+                <span className="font-semibold text-primary">{t("Poll", "পোল")}</span>
+                <span className="text-sm text-muted-foreground">({totalVotes} {t("votes", "ভোট")})</span>
               </div>
               <div className="space-y-3">
                 {post.pollOptions?.map((option, index) => {
@@ -253,7 +255,7 @@ export const EnhancedFeed = ({
                     <div key={index} className="space-y-1">
                       <div className="flex justify-between text-sm">
                         <span>{option.option}</span>
-                        <span className="text-muted-foreground">{option.votes} ভোট</span>
+                        <span className="text-muted-foreground">{option.votes} {t("votes", "ভোট")}</span>
                       </div>
                       <div className="relative">
                         <Progress value={percentage} className="h-2" />
@@ -263,7 +265,7 @@ export const EnhancedFeed = ({
                           className="absolute inset-0 w-full h-full opacity-0 hover:opacity-100 transition-opacity"
                           onClick={() => onVotePoll?.(post.id, index)}
                         >
-                          ভোট দিন
+                          {t("Vote", "ভোট দিন")}
                         </Button>
                       </div>
                     </div>
@@ -287,11 +289,11 @@ export const EnhancedFeed = ({
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'এইমাত্র';
-    if (diffMins < 60) return `${diffMins} মিনিট আগে`;
-    if (diffHours < 24) return `${diffHours} ঘণ্টা আগে`;
-    if (diffDays < 7) return `${diffDays} দিন আগে`;
-    return date.toLocaleDateString('bn-BD');
+    if (diffMins < 1) return t('just now', 'এইমাত্র');
+    if (diffMins < 60) return `${diffMins} ${t('minutes ago', 'মিনিট আগে')}`;
+    if (diffHours < 24) return `${diffHours} ${t('hours ago', 'ঘণ্টা আগে')}`;
+    if (diffDays < 7) return `${diffDays} ${t('days ago', 'দিন আগে')}`;
+    return date.toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-US');
   };
 
   return (
@@ -387,11 +389,11 @@ export const EnhancedFeed = ({
                   preload="metadata"
                   poster={post.videoThumbnail}
                 >
-                  আপনার ব্রাউজার ভিডিও সাপোর্ট করে না।
+                  {t("Your browser does not support video.", "আপনার ব্রাউজার ভিডিও সাপোর্ট করে না।")}
                 </video>
                 <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
                   <Play className="w-3 h-3" />
-                  ভিডিও
+                  {t("Video", "ভিডিও")}
                 </div>
               </div>
             )}
@@ -419,15 +421,15 @@ export const EnhancedFeed = ({
           <div className="px-4 py-2 flex items-center justify-between text-sm text-muted-foreground border-t border-border/50">
             <div className="flex items-center gap-4">
               {(post.likes > 0 || likedPosts.has(post.id)) && (
-                <span>{(post.likes || 0) + (likedPosts.has(post.id) ? 1 : 0)} লাইক</span>
+                <span>{(post.likes || 0) + (likedPosts.has(post.id) ? 1 : 0)} {t("likes", "লাইক")}</span>
               )}
               {(post.dislikes || 0) > 0 && (
-                <span>{post.dislikes} ডিসলাইক</span>
+                <span>{post.dislikes} {t("dislikes", "ডিসলাইক")}</span>
               )}
             </div>
             <div className="flex items-center gap-4">
               {(post.comments?.length || 0) > 0 && (
-                <span>{post.comments?.length} মন্তব্য</span>
+                <span>{post.comments?.length} {t("comments", "মন্তব্য")}</span>
               )}
               <span className="flex items-center gap-1">
                 <Eye className="w-3.5 h-3.5" />
@@ -449,7 +451,7 @@ export const EnhancedFeed = ({
               }`}
             >
               <Heart className={`w-5 h-5 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
-              <span className="hidden sm:inline">লাইক</span>
+              <span className="hidden sm:inline">{t("Like", "লাইক")}</span>
             </Button>
 
             <Button
@@ -463,7 +465,7 @@ export const EnhancedFeed = ({
               }`}
             >
               <ThumbsDown className={`w-5 h-5 ${dislikedPosts.has(post.id) ? 'fill-current' : ''}`} />
-              <span className="hidden sm:inline">ডিসলাইক</span>
+              <span className="hidden sm:inline">{t("Dislike", "ডিসলাইক")}</span>
             </Button>
             
             <div className="flex-1">
@@ -499,7 +501,7 @@ export const EnhancedFeed = ({
                 ) : (
                   <Bookmark className="w-5 h-5" />
                 )}
-                <span className="hidden sm:inline">সেভ</span>
+                <span className="hidden sm:inline">{t("Save", "সেভ")}</span>
               </Button>
             )}
           </div>
@@ -510,10 +512,10 @@ export const EnhancedFeed = ({
         <div className="card-enhanced p-8 text-center">
           <div className="text-muted-foreground">
             <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p className="text-bengali">
+            <p>
               {filters.search || filters.community !== "all" || filters.postType !== "all" 
-                ? "এই ফিল্টারে কোন পোস্ট পাওয়া যায়নি।" 
-                : "কোন পোস্ট নেই। প্রথম পোস্ট করুন!"
+                ? t("No posts found with this filter.", "এই ফিল্টারে কোন পোস্ট পাওয়া যায়নি।") 
+                : t("No posts yet. Be the first to post!", "কোন পোস্ট নেই। প্রথম পোস্ট করুন!")
               }
             </p>
           </div>
@@ -528,7 +530,7 @@ export const EnhancedFeed = ({
             onClick={onLoadMore}
             className="w-full max-w-xs"
           >
-            আরও পোস্ট দেখুন
+            {t("Load more posts", "আরও পোস্ট দেখুন")}
           </Button>
         </div>
       )}
