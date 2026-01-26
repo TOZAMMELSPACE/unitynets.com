@@ -95,7 +95,7 @@ const UnityNote = ({ currentUser, users, onSignOut }: UnityNoteProps) => {
             <h1 className="text-4xl font-bold">Unity Note</h1>
           </div>
           <p className="text-xl text-muted-foreground">
-            {t("মানবতার মুদ্রা - A Currency of Humanity", "মানবতার মুদ্রা - A Currency of Humanity")}
+            {t("A Currency of Humanity", "মানবতার মুদ্রা")}
           </p>
           <p className="text-sm text-muted-foreground mt-2">
             {t("Where time, service, and cooperation are real wealth", "যেখানে মানুষের সময়, সেবা ও সহযোগিতাই হবে আসল সম্পদ")}

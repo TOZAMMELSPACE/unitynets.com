@@ -10,6 +10,7 @@ import { Edit, Camera, X, Image, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { uploadProfileImage } from "@/lib/profileImageUpload";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ProfileEditProps {
   user: User;
@@ -17,6 +18,7 @@ interface ProfileEditProps {
 }
 
 export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [name, setName] = useState(user.name);
@@ -41,8 +43,8 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
     if (file) {
       if (file.size > 5 * 1024 * 1024) { // 5MB limit
         toast({
-          title: "ত্রুটি",
-          description: "ছবির সাইজ ৫ MB এর বেশি হতে পারে না",
+          title: t("Error", "ত্রুটি"),
+          description: t("Image size cannot exceed 5 MB", "ছবির সাইজ ৫ MB এর বেশি হতে পারে না"),
           variant: "destructive",
         });
         return;
@@ -90,8 +92,8 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
   const handleSave = async () => {
     if (!name.trim()) {
       toast({
-        title: "ত্রুটি",
-        description: "নাম খালি থাকতে পারে না",
+        title: t("Error", "ত্রুটি"),
+        description: t("Name cannot be empty", "নাম খালি থাকতে পারে না"),
         variant: "destructive",
       });
       return;
@@ -99,8 +101,8 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
 
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast({
-        title: "ত্রুটি",
-        description: "সঠিক ইমেইল ঠিকানা দিন",
+        title: t("Error", "ত্রুটি"),
+        description: t("Please enter a valid email address", "সঠিক ইমেইল ঠিকানা দিন"),
         variant: "destructive",
       });
       return;
@@ -119,8 +121,8 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
           avatarUrl = uploadedUrl;
         } else {
           toast({
-            title: "ত্রুটি",
-            description: "প্রোফাইল ছবি আপলোড করতে সমস্যা হয়েছে",
+            title: t("Error", "ত্রুটি"),
+            description: t("Failed to upload profile image", "প্রোফাইল ছবি আপলোড করতে সমস্যা হয়েছে"),
             variant: "destructive",
           });
         }
@@ -133,8 +135,8 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
           coverUrl = uploadedUrl;
         } else {
           toast({
-            title: "ত্রুটি",
-            description: "কভার ছবি আপলোড করতে সমস্যা হয়েছে",
+            title: t("Error", "ত্রুটি"),
+            description: t("Failed to upload cover image", "কভার ছবি আপলোড করতে সমস্যা হয়েছে"),
             variant: "destructive",
           });
         }
@@ -158,8 +160,8 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
       if (error) {
         console.error('Error updating profile:', error);
         toast({
-          title: "ত্রুটি",
-          description: "প্রোফাইল আপডেট করতে সমস্যা হয়েছে",
+          title: t("Error", "ত্রুটি"),
+          description: t("Failed to update profile", "প্রোফাইল আপডেট করতে সমস্যা হয়েছে"),
           variant: "destructive",
         });
         return;
@@ -187,14 +189,14 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
       setIsOpen(false);
       
       toast({
-        title: "সফল",
-        description: "প্রোফাইল আপডেট করা হয়েছে",
+        title: t("Success", "সফল"),
+        description: t("Profile updated successfully", "প্রোফাইল আপডেট করা হয়েছে"),
       });
     } catch (err) {
       console.error('Error saving profile:', err);
       toast({
-        title: "ত্রুটি",
-        description: "প্রোফাইল আপডেট করতে সমস্যা হয়েছে",
+        title: t("Error", "ত্রুটি"),
+        description: t("Failed to update profile", "প্রোফাইল আপডেট করতে সমস্যা হয়েছে"),
         variant: "destructive",
       });
     } finally {
@@ -207,17 +209,17 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
           <Edit size={16} />
-          সম্পাদনা
+          {t("Edit", "সম্পাদনা")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-bengali">প্রোফাইল সম্পাদনা</DialogTitle>
+          <DialogTitle>{t("Edit Profile", "প্রোফাইল সম্পাদনা")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 max-h-[70vh] overflow-y-auto">
           {/* Cover Image */}
           <div className="space-y-2">
-            <Label className="text-bengali">কভার ছবি</Label>
+            <Label>{t("Cover Image", "কভার ছবি")}</Label>
             <div className="space-y-3">
               <div className="relative">
                 {coverPreview ? (
@@ -242,7 +244,7 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
                   <div className="w-full h-32 bg-gradient-hero rounded-lg flex items-center justify-center">
                     <div className="text-center text-white">
                       <Image size={24} className="mx-auto mb-1" />
-                      <p className="text-sm text-bengali">কভার ছবি যোগ করুন</p>
+                      <p className="text-sm">{t("Add cover image", "কভার ছবি যোগ করুন")}</p>
                     </div>
                   </div>
                 )}
@@ -256,7 +258,7 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
                 disabled={isSaving}
               >
                 <Camera size={16} />
-                কভার ছবি নির্বাচন
+                {t("Select Cover Image", "কভার ছবি নির্বাচন")}
               </Button>
               <input
                 ref={coverInputRef}
@@ -270,7 +272,7 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
 
           {/* Profile Image */}
           <div className="space-y-2">
-            <Label className="text-bengali">প্রোফাইল ছবি</Label>
+            <Label>{t("Profile Image", "প্রোফাইল ছবি")}</Label>
             <div className="flex items-center gap-4">
               <div className="relative">
                 {imagePreview ? (
@@ -307,10 +309,10 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
                   disabled={isSaving}
                 >
                   <Camera size={16} />
-                  ছবি নির্বাচন
+                  {t("Select Image", "ছবি নির্বাচন")}
                 </Button>
                 <p className="text-xs text-muted-foreground mt-1">
-                  সর্বোচ্চ ৫ MB
+                  {t("Max 5 MB", "সর্বোচ্চ ৫ MB")}
                 </p>
               </div>
               <input
@@ -325,39 +327,37 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
 
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-bengali">নাম</Label>
+            <Label htmlFor="name">{t("Name", "নাম")}</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="আপনার নাম লিখুন"
-              className="text-bengali"
+              placeholder={t("Enter your name", "আপনার নাম লিখুন")}
               disabled={isSaving}
             />
           </div>
 
           {/* Username */}
           <div className="space-y-2">
-            <Label htmlFor="username" className="text-bengali">ব্যবহারকারীর নাম (ঐচ্ছিক)</Label>
+            <Label htmlFor="username">{t("Username (optional)", "ব্যবহারকারীর নাম (ঐচ্ছিক)")}</Label>
             <Input
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="@username"
-              className="text-bengali"
               disabled={isSaving}
             />
           </div>
 
           {/* Bio */}
           <div className="space-y-2">
-            <Label htmlFor="bio" className="text-bengali">সংক্ষিপ্ত পরিচিতি (ঐচ্ছিক)</Label>
+            <Label htmlFor="bio">{t("Bio (optional)", "সংক্ষিপ্ত পরিচিতি (ঐচ্ছিক)")}</Label>
             <Textarea
               id="bio"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="নিজের সম্পর্কে কিছু লিখুন..."
-              className="text-bengali min-h-[80px]"
+              placeholder={t("Write something about yourself...", "নিজের সম্পর্কে কিছু লিখুন...")}
+              className="min-h-[80px]"
               maxLength={200}
               disabled={isSaving}
             />
@@ -368,36 +368,35 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
 
           {/* Location */}
           <div className="space-y-2">
-            <Label htmlFor="location" className="text-bengali">অবস্থান (ঐচ্ছিক)</Label>
+            <Label htmlFor="location">{t("Location (optional)", "অবস্থান (ঐচ্ছিক)")}</Label>
             <Input
               id="location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="ঢাকা, বাংলাদেশ"
-              className="text-bengali"
+              placeholder={t("Dhaka, Bangladesh", "ঢাকা, বাংলাদেশ")}
               disabled={isSaving}
             />
           </div>
 
           {/* Role */}
           <div className="space-y-2">
-            <Label className="text-bengali">ভূমিকা</Label>
+            <Label>{t("Role", "ভূমিকা")}</Label>
             <Select value={role} onValueChange={(value: any) => setRole(value)} disabled={isSaving}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="user">সাধারণ ব্যবহারকারী</SelectItem>
-                <SelectItem value="freelancer">ফ্রিল্যান্সার</SelectItem>
-                <SelectItem value="trainer">প্রশিক্ষক</SelectItem>
-                <SelectItem value="learner">শিক্ষার্থী</SelectItem>
+                <SelectItem value="user">{t("Regular User", "সাধারণ ব্যবহারকারী")}</SelectItem>
+                <SelectItem value="freelancer">{t("Freelancer", "ফ্রিল্যান্সার")}</SelectItem>
+                <SelectItem value="trainer">{t("Trainer", "প্রশিক্ষক")}</SelectItem>
+                <SelectItem value="learner">{t("Learner", "শিক্ষার্থী")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Email */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-bengali">ইমেইল (ঐচ্ছিক)</Label>
+            <Label htmlFor="email">{t("Email (optional)", "ইমেইল (ঐচ্ছিক)")}</Label>
             <Input
               id="email"
               type="email"
@@ -410,7 +409,7 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
 
           {/* NID */}
           <div className="space-y-2">
-            <Label htmlFor="nid" className="text-bengali">NID (শেষের ৪ ডিজিট)</Label>
+            <Label htmlFor="nid">{t("NID (last 4 digits)", "NID (শেষের ৪ ডিজিট)")}</Label>
             <Input
               id="nid"
               value={nidMasked}
@@ -423,16 +422,16 @@ export const ProfileEdit = ({ user, onUpdateProfile }: ProfileEditProps) => {
 
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isSaving}>
-              বাতিল
+              {t("Cancel", "বাতিল")}
             </Button>
             <Button onClick={handleSave} disabled={isSaving}>
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  সংরক্ষণ হচ্ছে...
+                  {t("Saving...", "সংরক্ষণ হচ্ছে...")}
                 </>
               ) : (
-                'সংরক্ষণ'
+                t("Save", "সংরক্ষণ")
               )}
             </Button>
           </div>
