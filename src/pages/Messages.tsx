@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatInterface } from "@/components/ChatInterface";
 import { NewChatModal } from "@/components/NewChatModal";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MessagesProps {
   currentUser: User | null;
@@ -13,6 +14,7 @@ interface MessagesProps {
 }
 
 export default function Messages({ currentUser, users, onSignOut }: MessagesProps) {
+  const { t, language } = useLanguage();
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,11 +41,13 @@ export default function Messages({ currentUser, users, onSignOut }: MessagesProp
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
     
     if (diffInHours < 1) {
-      return `${Math.floor(diffInHours * 60)} মিনিট আগে`;
+      const mins = Math.floor(diffInHours * 60);
+      return language === 'bn' ? `${mins} মিনিট আগে` : `${mins} min ago`;
     } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)} ঘন্টা আগে`;
+      const hours = Math.floor(diffInHours);
+      return language === 'bn' ? `${hours} ঘন্টা আগে` : `${hours} hr ago`;
     } else {
-      return date.toLocaleDateString('bn-BD');
+      return date.toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-US');
     }
   };
 
@@ -70,24 +74,24 @@ export default function Messages({ currentUser, users, onSignOut }: MessagesProp
     <main className="container mx-auto px-4 py-6 max-w-2xl">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-bengali">চ্যাট</h2>
+          <h2 className="text-xl font-semibold">{t("Chats", "চ্যাট")}</h2>
           <Button 
             size="sm" 
             className="gap-2"
             onClick={() => setShowNewChatModal(true)}
           >
             <Plus size={16} />
-            নতুন চ্যাট
+            {t("New Chat", "নতুন চ্যাট")}
           </Button>
         </div>
         
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
-            placeholder="চ্যাট খুঁজুন..."
+            placeholder={t("Search chats...", "চ্যাট খুঁজুন...")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 text-bengali"
+            className="pl-10"
           />
         </div>
       </div>
@@ -115,7 +119,7 @@ export default function Messages({ currentUser, users, onSignOut }: MessagesProp
                       />
                     ) : (
                       <span className="text-primary font-semibold text-lg">
-                        {(otherParticipant?.name || chat.groupName || 'চ্যাট').charAt(0)}
+                        {(otherParticipant?.name || chat.groupName || t('Chat', 'চ্যাট')).charAt(0)}
                       </span>
                     )}
                   </div>
@@ -124,11 +128,11 @@ export default function Messages({ currentUser, users, onSignOut }: MessagesProp
                 
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-semibold text-bengali">
+                    <h3 className="font-semibold">
                       {otherParticipant?.name || chat.groupName}
                     </h3>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground text-bengali">
+                      <span className="text-xs text-muted-foreground">
                         {formatTime(chat.lastMessageTime)}
                       </span>
                       {chat.unreadCount > 0 && (
@@ -138,8 +142,8 @@ export default function Messages({ currentUser, users, onSignOut }: MessagesProp
                       )}
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground text-bengali truncate">
-                    {chat.lastMessage || "নতুন চ্যাট"}
+                  <p className="text-sm text-muted-foreground truncate">
+                    {chat.lastMessage || t("New chat", "নতুন চ্যাট")}
                   </p>
                 </div>
               </div>
@@ -151,16 +155,16 @@ export default function Messages({ currentUser, users, onSignOut }: MessagesProp
       {filteredChats.length === 0 && (
         <div className="text-center py-12">
           <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2 text-bengali">কোন চ্যাট নেই</h3>
-          <p className="text-muted-foreground text-bengali mb-4">
-            নতুন চ্যাট শুরু করুন এবং কমিউনিটির সাথে যুক্ত হন
+          <h3 className="text-lg font-semibold mb-2">{t("No chats", "কোন চ্যাট নেই")}</h3>
+          <p className="text-muted-foreground mb-4">
+            {t("Start a new chat and connect with the community", "নতুন চ্যাট শুরু করুন এবং কমিউনিটির সাথে যুক্ত হন")}
           </p>
           <Button 
             className="gap-2"
             onClick={() => setShowNewChatModal(true)}
           >
             <Plus size={16} />
-            নতুন চ্যাট শুরু করুন
+            {t("Start New Chat", "নতুন চ্যাট শুরু করুন")}
           </Button>
         </div>
       )}

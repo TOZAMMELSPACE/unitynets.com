@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useGroups, Group } from "@/hooks/useGroups";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,16 +35,30 @@ interface GroupsProps {
   onSignOut: () => void;
 }
 
+const getCategoryName = (id: string, t: (en: string, bn: string) => string) => {
+  const names: Record<string, [string, string]> = {
+    all: ["All", "সব"],
+    tech: ["Technology", "প্রযুক্তি"],
+    education: ["Education", "শিক্ষা"],
+    business: ["Business", "ব্যবসা"],
+    health: ["Health", "স্বাস্থ্য"],
+    community: ["Community", "সমাজ"],
+  };
+  const pair = names[id] || ["Other", "অন্যান্য"];
+  return t(pair[0], pair[1]);
+};
+
 const categories = [
-  { id: "all", name: "সব", icon: Sparkles },
-  { id: "tech", name: "প্রযুক্তি", icon: Zap },
-  { id: "education", name: "শিক্ষা", icon: BookOpen },
-  { id: "business", name: "ব্যবসা", icon: TrendingUp },
-  { id: "health", name: "স্বাস্থ্য", icon: Heart },
-  { id: "community", name: "সমাজ", icon: Users },
+  { id: "all", icon: Sparkles },
+  { id: "tech", icon: Zap },
+  { id: "education", icon: BookOpen },
+  { id: "business", icon: TrendingUp },
+  { id: "health", icon: Heart },
+  { id: "community", icon: Users },
 ];
 
 export default function Groups({ currentUser }: GroupsProps) {
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -125,24 +140,24 @@ export default function Groups({ currentUser }: GroupsProps) {
             {group.is_official && (
               <Badge className="bg-blue-500/90 text-white">
                 <Shield className="w-3 h-3 mr-1" />
-                অফিশিয়াল
+                {t("Official", "অফিশিয়াল")}
               </Badge>
             )}
             {role === 'admin' && (
               <Badge className="bg-yellow-500/90 text-white">
                 <Crown className="w-3 h-3 mr-1" />
-                অ্যাডমিন
+                {t("Admin", "অ্যাডমিন")}
               </Badge>
             )}
             {group.is_private ? (
               <Badge variant="secondary" className="bg-black/50 text-white">
                 <Lock className="w-3 h-3 mr-1" />
-                প্রাইভেট
+                {t("Private", "প্রাইভেট")}
               </Badge>
             ) : (
               <Badge variant="secondary" className="bg-black/50 text-white">
                 <Globe className="w-3 h-3 mr-1" />
-                পাবলিক
+                {t("Public", "পাবলিক")}
               </Badge>
             )}
           </div>
@@ -167,7 +182,7 @@ export default function Groups({ currentUser }: GroupsProps) {
               </div>
             </div>
             <Badge variant="outline" className="text-xs">
-              {categories.find(c => c.id === group.category)?.name || group.category}
+              {getCategoryName(group.category, t)}
             </Badge>
           </div>
           
@@ -342,7 +357,7 @@ export default function Groups({ currentUser }: GroupsProps) {
                     <SelectContent>
                       {categories.filter(c => c.id !== 'all').map((cat) => (
                         <SelectItem key={cat.id} value={cat.id}>
-                          {cat.name}
+                          {getCategoryName(cat.id, t)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -398,7 +413,7 @@ export default function Groups({ currentUser }: GroupsProps) {
               className="flex-shrink-0 gap-2 rounded-full"
             >
               <Icon className="w-4 h-4" />
-              {cat.name}
+              {getCategoryName(cat.id, t)}
             </Button>
           );
         })}

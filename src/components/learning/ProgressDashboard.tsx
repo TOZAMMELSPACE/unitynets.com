@@ -8,19 +8,21 @@ import {
 } from "lucide-react";
 import { useLearningProgress } from "@/hooks/useLearningProgress";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const ProgressDashboard = () => {
   const { user } = useAuth();
   const { progress, quizResults, stats, loading } = useLearningProgress();
+  const { t, language } = useLanguage();
 
   if (!user) {
     return (
       <Card className="border-dashed">
         <CardContent className="py-12 text-center">
           <Trophy className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold mb-2">Progress ট্র্যাক করুন</h3>
+          <h3 className="text-lg font-semibold mb-2">{t("Track Your Progress", "Progress ট্র্যাক করুন")}</h3>
           <p className="text-muted-foreground">
-            আপনার Learning Journey দেখতে সাইন ইন করুন
+            {t("Sign in to view your learning journey", "আপনার Learning Journey দেখতে সাইন ইন করুন")}
           </p>
         </CardContent>
       </Card>
@@ -50,23 +52,23 @@ export const ProgressDashboard = () => {
           <CardContent className="p-4 text-center">
             <Zap className="w-8 h-8 mx-auto mb-2 text-primary" />
             <p className="text-2xl font-bold">{stats?.total_xp || 0}</p>
-            <p className="text-xs text-muted-foreground">মোট XP</p>
+            <p className="text-xs text-muted-foreground">{t("Total XP", "মোট XP")}</p>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-warning/10 to-warning/5">
           <CardContent className="p-4 text-center">
             <Star className="w-8 h-8 mx-auto mb-2 text-warning" />
-            <p className="text-2xl font-bold">লেভেল {stats?.current_level || 1}</p>
-            <p className="text-xs text-muted-foreground">{xpToNextLevel} XP বাকি</p>
+            <p className="text-2xl font-bold">{t("Level", "লেভেল")} {stats?.current_level || 1}</p>
+            <p className="text-xs text-muted-foreground">{xpToNextLevel} XP {t("remaining", "বাকি")}</p>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-destructive/10 to-destructive/5">
           <CardContent className="p-4 text-center">
             <Flame className="w-8 h-8 mx-auto mb-2 text-destructive" />
-            <p className="text-2xl font-bold">{stats?.current_streak || 0} দিন</p>
-            <p className="text-xs text-muted-foreground">স্ট্রিক 🔥</p>
+            <p className="text-2xl font-bold">{stats?.current_streak || 0} {t("days", "দিন")}</p>
+            <p className="text-xs text-muted-foreground">{t("Streak", "স্ট্রিক")} 🔥</p>
           </CardContent>
         </Card>
 
@@ -74,7 +76,7 @@ export const ProgressDashboard = () => {
           <CardContent className="p-4 text-center">
             <Trophy className="w-8 h-8 mx-auto mb-2 text-accent" />
             <p className="text-2xl font-bold">{stats?.quizzes_completed || 0}</p>
-            <p className="text-xs text-muted-foreground">কুইজ সম্পন্ন</p>
+            <p className="text-xs text-muted-foreground">{t("Quizzes Completed", "কুইজ সম্পন্ন")}</p>
           </CardContent>
         </Card>
       </div>
@@ -84,7 +86,7 @@ export const ProgressDashboard = () => {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
-            লেভেল {stats?.current_level || 1} → {(stats?.current_level || 1) + 1}
+            {t("Level", "লেভেল")} {stats?.current_level || 1} → {(stats?.current_level || 1) + 1}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -99,11 +101,11 @@ export const ProgressDashboard = () => {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="courses" className="text-sm">
             <BookOpen className="w-4 h-4 mr-1" />
-            কোর্স
+            {t("Courses", "কোর্স")}
           </TabsTrigger>
           <TabsTrigger value="quizzes" className="text-sm">
             <Target className="w-4 h-4 mr-1" />
-            কুইজ
+            {t("Quizzes", "কুইজ")}
           </TabsTrigger>
         </TabsList>
 
@@ -113,7 +115,7 @@ export const ProgressDashboard = () => {
               <CardContent className="py-8 text-center">
                 <BookOpen className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
                 <p className="text-muted-foreground">
-                  এখনো কোনো কোর্স শুরু করেননি
+                  {t("No courses started yet", "এখনো কোনো কোর্স শুরু করেননি")}
                 </p>
               </CardContent>
             </Card>
@@ -125,13 +127,13 @@ export const ProgressDashboard = () => {
                     <div>
                       <h4 className="font-medium">{course.course_title}</h4>
                       <p className="text-xs text-muted-foreground">
-                        {course.lessons_completed}/{course.total_lessons} লেসন
+                        {course.lessons_completed}/{course.total_lessons} {t("lessons", "লেসন")}
                       </p>
                     </div>
                     {course.is_completed ? (
                       <Badge variant="default" className="bg-accent text-accent-foreground">
                         <Award className="w-3 h-3 mr-1" />
-                        সম্পন্ন
+                        {t("Completed", "সম্পন্ন")}
                       </Badge>
                     ) : (
                       <Badge variant="secondary">
@@ -152,10 +154,10 @@ export const ProgressDashboard = () => {
               <CardContent className="py-8 text-center">
                 <Target className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
                 <p className="text-muted-foreground">
-                  এখনো কোনো কুইজ দেননি
+                  {t("No quizzes taken yet", "এখনো কোনো কুইজ দেননি")}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  AI Chat এ কুইজ চাইলে এখানে দেখাবে!
+                  {t("Ask for a quiz in AI Chat and it will appear here!", "AI Chat এ কুইজ চাইলে এখানে দেখাবে!")}
                 </p>
               </CardContent>
             </Card>
@@ -167,7 +169,7 @@ export const ProgressDashboard = () => {
                     <div>
                       <h4 className="font-medium">{quiz.quiz_topic}</h4>
                       <p className="text-xs text-muted-foreground">
-                        {quiz.correct_answers}/{quiz.total_questions} সঠিক • {quiz.quiz_type.toUpperCase()}
+                        {quiz.correct_answers}/{quiz.total_questions} {t("correct", "সঠিক")} • {quiz.quiz_type.toUpperCase()}
                       </p>
                     </div>
                     <div className="text-right">
@@ -181,7 +183,7 @@ export const ProgressDashboard = () => {
                   </div>
                   <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                     <Calendar className="w-3 h-3" />
-                    {new Date(quiz.created_at).toLocaleDateString('bn-BD')}
+                    {new Date(quiz.created_at).toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-US')}
                   </div>
                 </CardContent>
               </Card>
@@ -196,28 +198,28 @@ export const ProgressDashboard = () => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Award className="w-4 h-4" />
-              অ্যাচিভমেন্টস
+              {t("Achievements", "অ্যাচিভমেন্টস")}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
             {stats.longest_streak >= 7 && (
               <Badge variant="outline" className="bg-destructive/10 text-destructive">
-                🔥 সাপ্তাহিক যোদ্ধা
+                🔥 {t("Weekly Warrior", "সাপ্তাহিক যোদ্ধা")}
               </Badge>
             )}
             {stats.quizzes_completed >= 10 && (
               <Badge variant="outline" className="bg-primary/10 text-primary">
-                🧠 কুইজ মাস্টার
+                🧠 {t("Quiz Master", "কুইজ মাস্টার")}
               </Badge>
             )}
             {stats.courses_completed >= 1 && (
               <Badge variant="outline" className="bg-accent/10 text-accent-foreground">
-                🎓 কোর্স সম্পন্নকারী
+                🎓 {t("Course Completer", "কোর্স সম্পন্নকারী")}
               </Badge>
             )}
             {stats.current_level >= 5 && (
               <Badge variant="outline" className="bg-warning/10 text-warning">
-                ⭐ এলিট লার্নার
+                ⭐ {t("Elite Learner", "এলিট লার্নার")}
               </Badge>
             )}
           </CardContent>
