@@ -76,8 +76,8 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
     
     if (images.length + files.length > 25) {
       toast({
-        title: "ত্রুটি",
-        description: "সর্বোচ্চ ২৫টি ছবি যুক্ত করতে পারেন",
+        title: t("Error", "ত্রুটি"),
+        description: t("Maximum 25 images allowed", "সর্বোচ্চ ২৫টি ছবি যুক্ত করতে পারেন"),
         variant: "destructive"
       });
       return;
@@ -86,8 +86,8 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
     files.forEach(file => {
       if (file.size > 5 * 1024 * 1024) {
         toast({
-          title: "ত্রুটি", 
-          description: "প্রতিটি ছবির সাইজ ৫ MB এর বেশি হতে পারে না",
+          title: t("Error", "ত্রুটি"), 
+          description: t("Each image must be less than 5 MB", "প্রতিটি ছবির সাইজ ৫ MB এর বেশি হতে পারে না"),
           variant: "destructive",
         });
         return;
@@ -109,8 +109,8 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
     // Validate video size (max 50MB)
     if (file.size > 50 * 1024 * 1024) {
       toast({
-        title: "ত্রুটি",
-        description: "ভিডিওর সাইজ ৫০ MB এর বেশি হতে পারে না",
+        title: t("Error", "ত্রুটি"),
+        description: t("Video must be less than 50 MB", "ভিডিওর সাইজ ৫০ MB এর বেশি হতে পারে না"),
         variant: "destructive"
       });
       return;
@@ -120,8 +120,8 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
     const validTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
     if (!validTypes.includes(file.type)) {
       toast({
-        title: "ত্রুটি",
-        description: "শুধুমাত্র MP4, WebM, OGG বা MOV ভিডিও গ্রহণযোগ্য",
+        title: t("Error", "ত্রুটি"),
+        description: t("Only MP4, WebM, OGG or MOV videos are accepted", "শুধুমাত্র MP4, WebM, OGG বা MOV ভিডিও গ্রহণযোগ্য"),
         variant: "destructive"
       });
       return;
@@ -176,8 +176,8 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
     
     if (!content.trim() && postType === 'text') {
       toast({
-        title: "ত্রুটি",
-        description: "একটি পোস্ট লিখুন",
+        title: t("Error", "ত্রুটি"),
+        description: t("Write a post", "একটি পোস্ট লিখুন"),
         variant: "destructive"
       });
       return;
@@ -185,8 +185,8 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
 
     if (postType === 'video' && !video && !content.trim()) {
       toast({
-        title: "ত্রুটি",
-        description: "ভিডিও যুক্ত করুন অথবা কিছু লিখুন",
+        title: t("Error", "ত্রুটি"),
+        description: t("Add a video or write something", "ভিডিও যুক্ত করুন অথবা কিছু লিখুন"),
         variant: "destructive"
       });
       return;
@@ -199,15 +199,15 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
       let uploadedImageUrls: string[] = [];
       if (images.length > 0) {
         setIsUploading(true);
-        setUploadProgress("ছবি আপলোড হচ্ছে...");
+        setUploadProgress(t("Uploading images...", "ছবি আপলোড হচ্ছে..."));
         const uploadPromises = images.map(img => uploadPostImage(img.file, user.id));
         const results = await Promise.all(uploadPromises);
         uploadedImageUrls = results.filter((url): url is string => url !== null);
 
         if (uploadedImageUrls.length < images.length) {
           toast({
-            title: "সতর্কতা",
-            description: "কিছু ছবি আপলোড করতে সমস্যা হয়েছে",
+            title: t("Warning", "সতর্কতা"),
+            description: t("Some images failed to upload", "কিছু ছবি আপলোড করতে সমস্যা হয়েছে"),
             variant: "destructive"
           });
         }
@@ -217,14 +217,14 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
       let uploadedVideoUrl: string | undefined;
       if (video) {
         setIsUploading(true);
-        setUploadProgress("ভিডিও আপলোড হচ্ছে...");
+        setUploadProgress(t("Uploading video...", "ভিডিও আপলোড হচ্ছে..."));
         const result = await uploadPostVideo(video.file, user.id);
         if (result) {
           uploadedVideoUrl = result;
         } else {
           toast({
-            title: "ত্রুটি",
-            description: "ভিডিও আপলোড করতে সমস্যা হয়েছে",
+            title: t("Error", "ত্রুটি"),
+            description: t("Video upload failed", "ভিডিও আপলোড করতে সমস্যা হয়েছে"),
             variant: "destructive"
           });
         }
@@ -298,13 +298,13 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
       setPollOptions(["", ""]);
       
       toast({
-        title: "সফল",
-        description: saveAsDraft ? "ড্রাফট সেভ করা হয়েছে!" : "আপনার পোস্টটি কমিউনিটিতে শেয়ার করা হয়েছে!",
+        title: t("Success", "সফল"),
+        description: saveAsDraft ? t("Draft saved!", "ড্রাফট সেভ করা হয়েছে!") : t("Your post has been shared with the community!", "আপনার পোস্টটি কমিউনিটিতে শেয়ার করা হয়েছে!"),
       });
     } catch (error) {
       toast({
-        title: "ত্রুটি",
-        description: "পোস্ট তৈরি করতে সমস্যা হয়েছে।",
+        title: t("Error", "ত্রুটি"),
+        description: t("Failed to create post.", "পোস্ট তৈরি করতে সমস্যা হয়েছে।"),
         variant: "destructive"
       });
     } finally {
@@ -326,10 +326,10 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
     return (
       <Card className="card-enhanced">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>পোস্ট প্রিভিউ</CardTitle>
+          <CardTitle>{t("Post Preview", "পোস্ট প্রিভিউ")}</CardTitle>
           <Button variant="outline" onClick={() => setShowPreview(false)}>
             <X className="w-4 h-4 mr-2" />
-            বন্ধ করুন
+            {t("Close", "বন্ধ করুন")}
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -343,7 +343,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
             )}
             <div>
               <div className="font-semibold">{user.name}</div>
-              <div className="text-sm text-muted-foreground">এখনই</div>
+              <div className="text-sm text-muted-foreground">{t("Just now", "এখনই")}</div>
             </div>
           </div>
           
@@ -365,7 +365,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
           )}
           
           <Button onClick={() => setShowPreview(false)} className="w-full">
-            এডিট করুন
+            {t("Edit", "এডিট করুন")}
           </Button>
         </CardContent>
       </Card>
@@ -397,11 +397,11 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
               <TabsTrigger key={type} value={type} className="flex items-center gap-1">
                 <Icon className="w-4 h-4" />
                 <span className="hidden sm:inline">
-                  {type === 'text' ? 'টেক্সট' : 
-                   type === 'image' ? 'ছবি' :
-                   type === 'video' ? 'ভিডিও' :
-                   type === 'poll' ? 'পোল' :
-                   type === 'event' ? 'ইভেন্ট' : 'কাজ'}
+                  {type === 'text' ? t('Text', 'টেক্সট') : 
+                   type === 'image' ? t('Image', 'ছবি') :
+                   type === 'video' ? t('Video', 'ভিডিও') :
+                   type === 'poll' ? t('Poll', 'পোল') :
+                   type === 'event' ? t('Event', 'ইভেন্ট') : t('Job', 'কাজ')}
                 </span>
               </TabsTrigger>
             ))}
@@ -413,7 +413,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
               <Textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="আপনার মতামত শেয়ার করুন..."
+                placeholder={t("Share your thoughts...", "আপনার মতামত শেয়ার করুন...")}
                 className="min-h-[120px]"
               />
             </TabsContent>
@@ -422,7 +422,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
               <Textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="ছবির সাথে বর্ণনা লিখুন..."
+                placeholder={t("Write a caption for your image...", "ছবির সাথে বর্ণনা লিখুন...")}
                 className="min-h-[80px]"
               />
               <Button
@@ -433,7 +433,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
                 disabled={images.length >= 25}
               >
                 <Camera className="w-4 h-4 mr-2" />
-                ছবি যুক্ত করুন ({images.length}/২৫)
+                {t(`Add images (${images.length}/25)`, `ছবি যুক্ত করুন (${images.length}/২৫)`)}
               </Button>
             </TabsContent>
 
@@ -441,7 +441,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
               <Textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="ভিডিওর সাথে বর্ণনা লিখুন..."
+                placeholder={t("Write a caption for your video...", "ভিডিওর সাথে বর্ণনা লিখুন...")}
                 className="min-h-[80px]"
               />
               
@@ -453,7 +453,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
                   className="w-full h-32 border-2 border-dashed border-primary/30 hover:border-primary/50 flex flex-col items-center justify-center gap-2"
                 >
                   <Video className="w-8 h-8 text-primary/60" />
-                  <span className="text-muted-foreground">ভিডিও যুক্ত করুন (সর্বোচ্চ ৫০MB)</span>
+                  <span className="text-muted-foreground">{t("Add video (max 50MB)", "ভিডিও যুক্ত করুন (সর্বোচ্চ ৫০MB)")}</span>
                   <span className="text-xs text-muted-foreground">MP4, WebM, OGG, MOV</span>
                 </Button>
               ) : (
@@ -480,17 +480,17 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
               <Textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="পোলের প্রশ্ন লিখুন..."
+                placeholder={t("Write your poll question...", "পোলের প্রশ্ন লিখুন...")}
                 className="min-h-[80px]"
               />
               <div className="space-y-2">
-                <label className="text-sm font-medium">পোলের অপশন:</label>
+                <label className="text-sm font-medium">{t("Poll Options:", "পোলের অপশন:")}</label>
                 {pollOptions.map((option, index) => (
                   <div key={index} className="flex gap-2">
                     <Input
                       value={option}
                       onChange={(e) => updatePollOption(index, e.target.value)}
-                      placeholder={`অপশন ${index + 1}`}
+                      placeholder={t(`Option ${index + 1}`, `অপশন ${index + 1}`)}
                     />
                     {pollOptions.length > 2 && (
                       <Button
@@ -507,7 +507,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
                 {pollOptions.length < 4 && (
                   <Button type="button" variant="outline" onClick={addPollOption}>
                     <Plus className="w-4 h-4 mr-2" />
-                    অপশন যুক্ত করুন
+                    {t("Add Option", "অপশন যুক্ত করুন")}
                   </Button>
                 )}
               </div>
@@ -517,7 +517,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
               <Input
                 value={eventTitle}
                 onChange={(e) => setEventTitle(e.target.value)}
-                placeholder="ইভেন্টের নাম"
+                placeholder={t("Event Name", "ইভেন্টের নাম")}
               />
               <div className="grid grid-cols-2 gap-2">
                 <Input
@@ -528,13 +528,13 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
                 <Input
                   value={eventLocation}
                   onChange={(e) => setEventLocation(e.target.value)}
-                  placeholder="স্থান"
+                  placeholder={t("Location", "স্থান")}
                 />
               </div>
               <Textarea
                 value={eventDescription}
                 onChange={(e) => setEventDescription(e.target.value)}
-                placeholder="ইভেন্টের বিস্তারিত..."
+                placeholder={t("Event details...", "ইভেন্টের বিস্তারিত...")}
               />
             </TabsContent>
 
@@ -542,13 +542,13 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
               <Input
                 value={jobTitle}
                 onChange={(e) => setJobTitle(e.target.value)}
-                placeholder="কাজের শিরোনাম"
+                placeholder={t("Job Title", "কাজের শিরোনাম")}
               />
               <div className="grid grid-cols-2 gap-2">
                 <Input
                   value={jobBudget}
                   onChange={(e) => setJobBudget(e.target.value)}
-                  placeholder="বাজেট (টাকা)"
+                  placeholder={t("Budget", "বাজেট (টাকা)")}
                 />
                 <Input
                   type="date"
@@ -559,7 +559,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
               <Textarea
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
-                placeholder="কাজের বিস্তারিত..."
+                placeholder={t("Job details...", "কাজের বিস্তারিত...")}
               />
             </TabsContent>
 
@@ -568,7 +568,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-muted-foreground">
-                    {images.length}টি ছবি নির্বাচিত
+                    {t(`${images.length} images selected`, `${images.length}টি ছবি নির্বাচিত`)}
                   </span>
                   <Button
                     type="button"
@@ -581,7 +581,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
                     }}
                   >
                     <X className="w-4 h-4 mr-1" />
-                    সব মুছুন
+                    {t("Remove all", "সব মুছুন")}
                   </Button>
                 </div>
                 <div className="max-h-64 overflow-y-auto">
@@ -618,7 +618,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
             {isUploading && (
               <div className="flex items-center justify-center gap-2 p-3 bg-muted rounded-lg">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm text-muted-foreground">ছবি আপলোড হচ্ছে...</span>
+                <span className="text-sm text-muted-foreground">{uploadProgress || t("Uploading...", "আপলোড হচ্ছে...")}</span>
               </div>
             )}
 
@@ -629,7 +629,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
                   <Input
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    placeholder="লোকেশন যুক্ত করুন"
+                    placeholder={t("Add location", "লোকেশন যুক্ত করুন")}
                     className="w-full"
                   />
                 </div>
@@ -642,7 +642,7 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
                 <Input
                   value={hashtagInput}
                   onChange={(e) => setHashtagInput(e.target.value)}
-                  placeholder="হ্যাশট্যাগ যুক্ত করুন"
+                  placeholder={t("Add hashtag", "হ্যাশট্যাগ যুক্ত করুন")}
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -683,19 +683,19 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
               <div className="flex gap-2">
                 <Button type="button" variant="outline" onClick={() => setShowPreview(true)}>
                   <Eye className="w-4 h-4 mr-2" />
-                  প্রিভিউ
+                  {t("Preview", "প্রিভিউ")}
                 </Button>
                 <Button type="button" variant="outline" onClick={(e) => handleSubmit(e, true)}>
                   <Save className="w-4 h-4 mr-2" />
-                  ড্রাফট
+                  {t("Draft", "ড্রাফট")}
                 </Button>
                 <Button type="submit" disabled={isSubmitting || isUploading} className="btn-trust">
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {uploadProgress || "পোস্ট করছি..."}
+                      {uploadProgress || t("Posting...", "পোস্ট করছি...")}
                     </>
-                  ) : "পোস্ট করুন"}
+                  ) : t("Post", "পোস্ট করুন")}
                 </Button>
               </div>
             </div>
