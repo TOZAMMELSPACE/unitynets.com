@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { useSocialDB } from "@/hooks/useSocialDB";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ProfileProps {
   currentUser: User | null;
@@ -24,6 +25,7 @@ interface ProfileProps {
 }
 
 export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile, users = [], socialDB }: ProfileProps) {
+  const { t, language } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const [viewedProfile, setViewedProfile] = useState<User | null>(null);
@@ -125,9 +127,9 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
   if (!displayUser) {
     return (
       <div className="container mx-auto px-4 py-6 text-center">
-        <p className="text-bengali">প্রোফাইল পাওয়া যায়নি</p>
+        <p>{t("Profile not found", "প্রোফাইল পাওয়া যায়নি")}</p>
         <Button onClick={() => navigate('/')} className="mt-4">
-          হোম পেইজে যান
+          {t("Go to Home", "হোম পেইজে যান")}
         </Button>
       </div>
     );
@@ -187,18 +189,26 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
   };
 
   const getRoleText = (role: string) => {
-    const roles = {
+    const rolesEn = {
+      freelancer: 'Freelancer',
+      trainer: 'Trainer', 
+      learner: 'Learner',
+      moderator: 'Moderator',
+      user: 'Member'
+    };
+    const rolesBn = {
       freelancer: 'ফ্রিল্যান্সার',
       trainer: 'প্রশিক্ষক', 
       learner: 'শিক্ষার্থী',
       moderator: 'মডারেটর',
       user: 'সদস্য'
     };
-    return roles[role as keyof typeof roles] || 'সদস্য';
+    const roles = language === 'bn' ? rolesBn : rolesEn;
+    return roles[role as keyof typeof roles] || (language === 'bn' ? 'সদস্য' : 'Member');
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('bn-BD', {
+    return new Date(dateString).toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-US', {
       year: 'numeric',
       month: 'long'
     });
@@ -253,11 +263,11 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h1 className="text-2xl md:text-3xl font-bold text-bengali">{user.name}</h1>
+                      <h1 className="text-2xl md:text-3xl font-bold">{user.name}</h1>
                       {user.isVerified && (
                         <Badge variant="secondary" className="gap-1">
                           <Globe className="w-3 h-3 text-primary" />
-                          <span className="text-xs text-bengali">ভেরিফাইড</span>
+                          <span className="text-xs">{t("Verified", "ভেরিফাইড")}</span>
                         </Badge>
                       )}
                     </div>
@@ -267,7 +277,7 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                     )}
                     
                     <Badge variant="outline" className="mb-3">
-                      <span className="text-bengali">{getRoleText(user.role || 'user')}</span>
+                      <span>{getRoleText(user.role || 'user')}</span>
                     </Badge>
                   </div>
 
@@ -284,15 +294,15 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                       <>
                         <Button onClick={handleFollow} className="gap-2">
                           <UserPlus className="w-4 h-4" />
-                          <span className="text-bengali">ফলো করুন</span>
+                          <span>{t("Follow", "ফলো করুন")}</span>
                         </Button>
                         <Button onClick={handleSendMessage} variant="outline" className="gap-2">
                           <MessageCircle className="w-4 h-4" />
-                          <span className="text-bengali">মেসেজ</span>
+                          <span>{t("Message", "মেসেজ")}</span>
                         </Button>
                         <Button onClick={handleSendFriendRequest} variant="outline" className="gap-2">
                           <Users className="w-4 h-4" />
-                          <span className="text-bengali">বন্ধু রিকোয়েস্ট</span>
+                          <span>{t("Friend Request", "বন্ধু রিকোয়েস্ট")}</span>
                         </Button>
                       </>
                     )}
@@ -301,7 +311,7 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
 
                 {/* Bio */}
                 {user.bio && (
-                  <p className="text-bengali leading-relaxed">{user.bio}</p>
+                  <p className="leading-relaxed">{user.bio}</p>
                 )}
 
                 {/* Meta Info */}
@@ -309,17 +319,17 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                   {user.location && (
                     <div className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
-                      <span className="text-bengali">{user.location}</span>
+                      <span>{user.location}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    <span className="text-bengali">যোগদান {formatDate(user.joinDate)}</span>
+                    <span>{t("Joined", "যোগদান")} {formatDate(user.joinDate)}</span>
                   </div>
                   {user.privacySettings?.showLastOnline && !user.isOnline && user.lastOnline && (
                     <div className="flex items-center gap-1">
                       <Clock className="w-4 h-4" />
-                      <span className="text-bengali">শেষ সক্রিয় {formatDate(user.lastOnline)}</span>
+                      <span>{t("Last active", "শেষ সক্রিয়")} {formatDate(user.lastOnline)}</span>
                     </div>
                   )}
                 </div>
@@ -328,25 +338,25 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                 <div className="flex items-center gap-6">
                   <div className="text-center">
                     <div className="text-xl font-bold">{userPosts.length}</div>
-                    <div className="text-sm text-muted-foreground text-bengali">পোস্ট</div>
+                    <div className="text-sm text-muted-foreground">{t("Posts", "পোস্ট")}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-xl font-bold">{followerCount}</div>
-                    <div className="text-sm text-muted-foreground text-bengali">ফলোয়ার</div>
+                    <div className="text-sm text-muted-foreground">{t("Followers", "ফলোয়ার")}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-xl font-bold">{followingCount}</div>
-                    <div className="text-sm text-muted-foreground text-bengali">ফলোয়িং</div>
+                    <div className="text-sm text-muted-foreground">{t("Following", "ফলোয়িং")}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-xl font-bold">{totalLikes}</div>
-                    <div className="text-sm text-muted-foreground text-bengali">লাইক</div>
+                    <div className="text-sm text-muted-foreground">{t("Likes", "লাইক")}</div>
                   </div>
                   <div className="text-center">
                     <div className="flex items-center gap-1 justify-center">
                       <span className="text-xl font-bold text-primary">{Math.round(user.trustScore)}</span>
                     </div>
-                    <div className="text-sm text-muted-foreground text-bengali">ট্রাস্ট স্কোর</div>
+                    <div className="text-sm text-muted-foreground">{t("Trust Score", "ট্রাস্ট স্কোর")}</div>
                   </div>
                 </div>
               </div>
@@ -366,17 +376,17 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
         {/* Profile Tabs */}
         <Tabs defaultValue="posts" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="posts" className="text-bengali">
-              পোস্ট ({userPosts.length})
+            <TabsTrigger value="posts">
+              {t("Posts", "পোস্ট")} ({userPosts.length})
             </TabsTrigger>
-            <TabsTrigger value="portfolio" className="text-bengali">
-              পোর্টফোলিও
+            <TabsTrigger value="portfolio">
+              {t("Portfolio", "পোর্টফোলিও")}
             </TabsTrigger>
-            <TabsTrigger value="activity" className="text-bengali">
-              কার্যকলাপ
+            <TabsTrigger value="activity">
+              {t("Activity", "কার্যকলাপ")}
             </TabsTrigger>
-            <TabsTrigger value="media" className="text-bengali">
-              মিডিয়া
+            <TabsTrigger value="media">
+              {t("Media", "মিডিয়া")}
             </TabsTrigger>
           </TabsList>
 
@@ -389,8 +399,8 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                       <Badge variant="outline" className="text-xs">
                         {post.community}
                       </Badge>
-                      <span className="text-sm text-muted-foreground text-bengali">
-                        {new Date(post.createdAt).toLocaleDateString('bn-BD')}
+                      <span className="text-sm text-muted-foreground">
+                        {new Date(post.createdAt).toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-US')}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -398,7 +408,7 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                       <span className="text-sm text-muted-foreground">123</span>
                     </div>
                   </div>
-                  <p className="text-bengali leading-relaxed text-base">{post.content}</p>
+                  <p className="leading-relaxed text-base">{post.content}</p>
                   
                   {post.images && post.images.length > 0 && (
                     <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -420,16 +430,16 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                   <div className="flex items-center gap-6 text-sm text-muted-foreground">
                     <button className="flex items-center gap-1 hover:text-destructive transition-colors">
                       <Heart className="w-4 h-4" />
-                      <span className="text-bengali">{post.likes || 0} লাইক</span>
+                      <span>{post.likes || 0} {t("likes", "লাইক")}</span>
                     </button>
                     <button className="flex items-center gap-1 hover:text-primary transition-colors">
                       <MessageCircle className="w-4 h-4" />
-                      <span className="text-bengali">{post.comments?.length || 0} মন্তব্য</span>
+                      <span>{post.comments?.length || 0} {t("comments", "মন্তব্য")}</span>
                     </button>
                   </div>
                   <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
                     <Share className="w-4 h-4" />
-                    <span className="text-bengali">শেয়ার</span>
+                    <span>{t("Share", "শেয়ার")}</span>
                   </button>
                 </div>
               </div>
@@ -439,13 +449,13 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
               <Card>
                 <CardContent className="p-12 text-center">
                   <MessageCircle className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2 text-bengali">এখনও কোন পোস্ট নেই</h3>
-                  <p className="text-muted-foreground text-bengali mb-6">
-                    আপনার প্রথম পোস্ট করুন এবং কমিউনিটির সাথে যুক্ত হন
+                  <h3 className="text-xl font-semibold mb-2">{t("No posts yet", "এখনও কোন পোস্ট নেই")}</h3>
+                  <p className="text-muted-foreground mb-6">
+                    {t("Create your first post and connect with the community", "আপনার প্রথম পোস্ট করুন এবং কমিউনিটির সাথে যুক্ত হন")}
                   </p>
                   <Button className="gap-2">
                     <MessageCircle className="w-4 h-4" />
-                    <span className="text-bengali">প্রথম পোস্ট করুন</span>
+                    <span>{t("Create First Post", "প্রথম পোস্ট করুন")}</span>
                   </Button>
                 </CardContent>
               </Card>
@@ -467,7 +477,7 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
           <TabsContent value="media" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-bengali">মিডিয়া গ্যালারি</CardTitle>
+                <CardTitle>{t("Media Gallery", "মিডিয়া গ্যালারি")}</CardTitle>
               </CardHeader>
               <CardContent>
                 {(() => {
@@ -490,7 +500,7 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                   ) : (
                     <div className="text-center py-12">
                       <Camera className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground text-bengali">কোনো মিডিয়া ফাইল নেই</p>
+                      <p className="text-muted-foreground">{t("No media files", "কোনো মিডিয়া ফাইল নেই")}</p>
                     </div>
                   );
                 })()}
@@ -501,7 +511,7 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
           <TabsContent value="activity" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-bengali">সাম্প্রতিক কার্যকলাপ</CardTitle>
+                <CardTitle>{t("Recent Activity", "সাম্প্রতিক কার্যকলাপ")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-4">
@@ -510,8 +520,8 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                       <Heart className="w-4 h-4 text-destructive" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm text-bengali">আপনি করিম উল্লাহর পোস্টে লাইক দিয়েছেন</p>
-                      <p className="text-xs text-muted-foreground text-bengali mt-1">২ ঘন্টা আগে</p>
+                      <p className="text-sm">{t("You liked a post by Karim Ullah", "আপনি করিম উল্লাহর পোস্টে লাইক দিয়েছেন")}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t("2 hours ago", "২ ঘন্টা আগে")}</p>
                     </div>
                   </div>
                   
@@ -520,8 +530,8 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                       <MessageCircle className="w-4 h-4 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm text-bengali">আপনি "কমিউনিটি সেবায় স্বচ্ছতা" পোস্ট করেছেন</p>
-                      <p className="text-xs text-muted-foreground text-bengali mt-1">৫ ঘন্টা আগে</p>
+                      <p className="text-sm">{t('You posted "Transparency in Community Service"', 'আপনি "কমিউনিটি সেবায় স্বচ্ছতা" পোস্ট করেছেন')}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t("5 hours ago", "৫ ঘন্টা আগে")}</p>
                     </div>
                   </div>
                   
@@ -530,8 +540,8 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                       <Users className="w-4 h-4 text-success" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm text-bengali">৫ জন নতুন ব্যক্তি আপনাকে ফলো করেছেন</p>
-                      <p className="text-xs text-muted-foreground text-bengali mt-1">১২ ঘন্টা আগে</p>
+                      <p className="text-sm">{t("5 new people followed you", "৫ জন নতুন ব্যক্তি আপনাকে ফলো করেছেন")}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t("12 hours ago", "১২ ঘন্টা আগে")}</p>
                     </div>
                   </div>
                   
@@ -540,8 +550,8 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                       <Badge className="w-4 h-4 text-warning" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm text-bengali">"ট্রাস্টেড মেম্বার" ব্যাজ অর্জন করেছেন</p>
-                      <p className="text-xs text-muted-foreground text-bengali mt-1">১ দিন আগে</p>
+                      <p className="text-sm">{t('Earned "Trusted Member" badge', '"ট্রাস্টেড মেম্বার" ব্যাজ অর্জন করেছেন')}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t("1 day ago", "১ দিন আগে")}</p>
                     </div>
                   </div>
 
@@ -550,8 +560,8 @@ export default function Profile({ currentUser, onSignOut, posts, onUpdateProfile
                       <UserPlus className="w-4 h-4 text-accent" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm text-bengali">UnityNets কমিউনিটিতে যোগদান করেছেন</p>
-                      <p className="text-xs text-muted-foreground text-bengali mt-1">{formatDate(user.joinDate)}</p>
+                      <p className="text-sm">{t("Joined UnityNets community", "UnityNets কমিউনিটিতে যোগদান করেছেন")}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{formatDate(user.joinDate)}</p>
                     </div>
                   </div>
                 </div>
