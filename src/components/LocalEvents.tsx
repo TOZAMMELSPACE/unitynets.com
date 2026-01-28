@@ -2,6 +2,7 @@ import { Post } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Clock, Users, Plus } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface LocalEventsProps {
   posts: Post[];
@@ -9,6 +10,7 @@ interface LocalEventsProps {
 }
 
 export const LocalEvents = ({ posts, onCreateEvent }: LocalEventsProps) => {
+  const { language, t } = useLanguage();
   const eventPosts = posts
     .filter(post => post.postType === 'event' && post.community !== 'global')
     .slice(0, 3);
@@ -18,12 +20,12 @@ export const LocalEvents = ({ posts, onCreateEvent }: LocalEventsProps) => {
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold flex items-center gap-2">
           <Calendar className="w-5 h-5 text-primary" />
-          স্থানীয় ইভেন্ট
+          {t('Local Events', 'স্থানীয় ইভেন্ট')}
         </h3>
         {onCreateEvent && (
           <Button variant="outline" size="sm" onClick={onCreateEvent}>
             <Plus className="w-4 h-4 mr-2" />
-            তৈরি করুন
+            {t('Create', 'তৈরি করুন')}
           </Button>
         )}
       </div>
@@ -31,12 +33,12 @@ export const LocalEvents = ({ posts, onCreateEvent }: LocalEventsProps) => {
       {eventPosts.length === 0 ? (
         <div className="text-center py-6">
           <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
-          <p className="text-muted-foreground text-sm text-bengali">
-            আপনার এলাকায় এখনো কোনো ইভেন্ট নেই
+          <p className="text-muted-foreground text-sm">
+            {t('No events in your area yet', 'আপনার এলাকায় এখনো কোনো ইভেন্ট নেই')}
           </p>
           {onCreateEvent && (
             <Button variant="outline" size="sm" className="mt-3" onClick={onCreateEvent}>
-              প্রথম ইভেন্ট তৈরি করুন
+              {t('Create first event', 'প্রথম ইভেন্ট তৈরি করুন')}
             </Button>
           )}
         </div>
@@ -49,7 +51,7 @@ export const LocalEvents = ({ posts, onCreateEvent }: LocalEventsProps) => {
                          transition-colors cursor-pointer border border-accent/20"
             >
               <div className="flex items-start justify-between mb-2">
-                <h4 className="font-medium text-sm text-bengali line-clamp-1">
+                <h4 className="font-medium text-sm line-clamp-1">
                   {post.eventDetails?.title}
                 </h4>
                 <Badge variant="outline" className="text-xs">
@@ -61,7 +63,7 @@ export const LocalEvents = ({ posts, onCreateEvent }: LocalEventsProps) => {
                 <div className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   {post.eventDetails?.date && 
-                    new Date(post.eventDetails.date).toLocaleDateString('bn-BD')
+                    new Date(post.eventDetails.date).toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-US')
                   }
                 </div>
                 <div className="flex items-center gap-1">
@@ -70,7 +72,7 @@ export const LocalEvents = ({ posts, onCreateEvent }: LocalEventsProps) => {
                 </div>
                 <div className="flex items-center gap-1">
                   <Users className="w-3 h-3" />
-                  {post.likes || 0} আগ্রহী
+                  {post.likes || 0} {t('interested', 'আগ্রহী')}
                 </div>
               </div>
               
@@ -83,7 +85,7 @@ export const LocalEvents = ({ posts, onCreateEvent }: LocalEventsProps) => {
           ))}
           
           <Button variant="ghost" size="sm" className="w-full">
-            সব ইভেন্ট দেখুন
+            {t('View all events', 'সব ইভেন্ট দেখুন')}
           </Button>
         </div>
       )}
