@@ -435,7 +435,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                           {achievement.name}
                           <Badge variant="secondary" className="bg-success/20 text-success">
                             <CheckCircle2 className="w-3 h-3 mr-1" />
-                            আনলক
+                            {t("Unlocked", "আনলক")}
                           </Badge>
                         </h4>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -468,7 +468,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                             {achievement.name}
                             <Badge variant="outline" className="gap-1">
                               <Lock className="w-3 h-3" />
-                              লক
+                              {t("Locked", "লক")}
                             </Badge>
                           </h4>
                           <p className="text-sm text-muted-foreground mt-1">
@@ -481,7 +481,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                         
                         <div className="space-y-1">
                           <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>প্রগ্রেস</span>
+                            <span>{t("Progress", "প্রগ্রেস")}</span>
                             <span>
                               {achievement.current}/{achievement.requirement}
                             </span>
@@ -503,12 +503,12 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                 <div className="p-4 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <TrendingUp className="w-4 h-4" />
-                    আপনার সামগ্রিক প্রগ্রেস
+                    {t("Your Overall Progress", "আপনার সামগ্রিক প্রগ্রেস")}
                   </h3>
                   <div className="space-y-3">
                     <div>
                       <div className="flex justify-between text-sm mb-1">
-                        <span>অর্জন সম্পন্ন</span>
+                        <span>{t("Achievements Completed", "অর্জন সম্পন্ন")}</span>
                         <span className="font-medium">
                           {unlockedAchievements.length}/{totalAchievements}
                         </span>
@@ -520,7 +520,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                     </div>
                     <div>
                       <div className="flex justify-between text-sm mb-1">
-                        <span>ট্রাস্ট স্কোর</span>
+                        <span>{t("Trust Score", "ট্রাস্ট স্কোর")}</span>
                         <span className="font-medium">{user.trustScore}/100</span>
                       </div>
                       <Progress 
@@ -530,7 +530,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                     </div>
                     <div>
                       <div className="flex justify-between text-sm mb-1">
-                        <span>ফলোয়ার</span>
+                        <span>{t("Followers", "ফলোয়ার")}</span>
                         <span className="font-medium">{user.followers}/500</span>
                       </div>
                       <Progress 
@@ -542,7 +542,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                 </div>
                 
                 <div className="grid gap-3">
-                  <h3 className="font-semibold">পরবর্তী অর্জন</h3>
+                  <h3 className="font-semibold">{t("Next Achievement", "পরবর্তী অর্জন")}</h3>
                   {achievements
                     .filter(a => !a.unlocked)
                     .sort((a, b) => {
@@ -570,7 +570,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                             <div className="space-y-1">
                               <div className="flex justify-between text-xs text-muted-foreground">
                                 <span>
-                                  আর মাত্র {achievement.requirement - achievement.current} প্রয়োজন
+                                  {t(`Only ${achievement.requirement - achievement.current} more needed`, `আর মাত্র ${achievement.requirement - achievement.current} প্রয়োজন`)}
                                 </span>
                                 <span>
                                   {Math.round((achievement.current / achievement.requirement) * 100)}%
