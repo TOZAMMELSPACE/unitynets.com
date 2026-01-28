@@ -87,6 +87,10 @@ export function ChatList({
         return `${prefix}📞 ${t('Call started', 'কল শুরু হয়েছে')}`;
       case 'call_ended':
         return `${prefix}📞 ${t('Call ended', 'কল শেষ হয়েছে')}`;
+      case 'missed_call':
+        return `${prefix}📞 ${t('Missed call', 'মিসড কল')}`;
+      case 'call_summary':
+        return `${prefix}📞 ${t('Call completed', 'কল সম্পন্ন')}`;
       default:
         return `${prefix}${chat.last_message.content?.slice(0, 30) || ''}${(chat.last_message.content?.length || 0) > 30 ? '...' : ''}`;
     }
