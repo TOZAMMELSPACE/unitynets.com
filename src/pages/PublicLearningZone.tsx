@@ -49,6 +49,9 @@ import { StudyRoomsSection } from "@/components/study-rooms/StudyRoomsSection";
 import { useAuth } from "@/hooks/useAuth";
 import { ProgressDashboard } from "@/components/learning/ProgressDashboard";
 import { QuizScorer, hasQuizContent } from "@/components/learning/QuizScorer";
+import { LeftSidebar } from "@/components/LeftSidebar";
+import { GlobalHeader } from "@/components/GlobalHeader";
+import { BottomNavigation } from "@/components/BottomNavigation";
 
 interface FileAttachment {
   name: string;
@@ -800,6 +803,427 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
     </div>
   );
 
+  // Create a currentUser object for GlobalHeader when logged in
+  const currentUser = user ? {
+    id: user.id,
+    name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+    username: user.user_metadata?.username || '',
+    phone: '',
+    email: user.email || '',
+    nidMasked: '****',
+    profileImage: user.user_metadata?.avatar_url || '',
+    coverImage: '',
+    bio: '',
+    location: '',
+    role: 'user' as const,
+    trustScore: 50,
+    followers: 0,
+    following: 0,
+    achievements: [],
+    isOnline: true,
+    isVerified: false,
+    joinDate: new Date().toISOString(),
+    unityBalance: 0,
+  } : null;
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+  };
+
+  // If user is logged in, show with LeftSidebar like other authenticated pages
+  if (user) {
+    return (
+      <div className="relative min-h-screen w-full bg-background">
+        <SEOHead
+          title="Learning Buddy - AI শেখার সঙ্গী | UnityNets"
+          description="AI চ্যাটবট দিয়ে যেকোনো বিষয়ে বাংলায় শিখুন। প্রোগ্রামিং, ডিজিটাল দক্ষতা, ফ্রিল্যান্সিং।"
+          keywords="AI chatbot, learning, programming, Python, JavaScript, digital skills, বাংলা, শেখা"
+          canonicalUrl="https://unitynets.com/learning-zone"
+        />
+        
+        {/* Left Sidebar - Same as other pages */}
+        <LeftSidebar />
+        
+        {/* Main content area */}
+        <div className="w-full lg:pl-64 min-h-screen pb-20 lg:pb-0">
+          {/* Global Header - same on all pages */}
+          <GlobalHeader 
+            currentUser={currentUser} 
+            onSignOut={handleSignOut}
+          />
+          
+          {/* Page Content */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Header with tabs */}
+            <header className="flex flex-col border-b border-border/50 bg-card">
+              <div className="flex items-center justify-between px-4 py-3">
+                <div className="flex items-center gap-2">
+                  {/* Mobile menu button */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden h-9 w-9"
+                    onClick={() => setSidebarMobileOpen(true)}
+                  >
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                  
+                  {/* Desktop sidebar toggle */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hidden md:flex h-9 w-9"
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                  >
+                    {sidebarOpen ? (
+                      <PanelLeftClose className="h-5 w-5" />
+                    ) : (
+                      <PanelLeft className="h-5 w-5" />
+                    )}
+                  </Button>
+                  
+                  <h1 className="text-lg font-semibold">Learning Buddy</h1>
+                </div>
+                
+                {activeTab === 'chat' && messages.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={startNewChat} className="gap-2">
+                    <RotateCcw className="h-4 w-4" />
+                    <span className="hidden sm:inline">{t("New Chat", "নতুন চ্যাট")}</span>
+                  </Button>
+                )}
+              </div>
+              
+              {/* Tab Navigation */}
+              <div className="px-4 pb-2">
+                <div className="flex gap-2 overflow-x-auto">
+                  <Button
+                    variant={activeTab === 'chat' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setActiveTab('chat')}
+                    className="gap-2"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    {t('AI Chat', 'AI চ্যাট')}
+                  </Button>
+                  <Button
+                    variant={activeTab === 'study-rooms' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setActiveTab('study-rooms')}
+                    className="gap-2"
+                  >
+                    <Users className="h-4 w-4" />
+                    {t('Study Rooms', 'স্টাডি রুম')}
+                  </Button>
+                  <Button
+                    variant={activeTab === 'progress' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setActiveTab('progress')}
+                    className="gap-2"
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    {t('Progress', 'প্রগ্রেস')}
+                  </Button>
+                </div>
+              </div>
+            </header>
+            
+            {/* Main Content with Chat Sidebar */}
+            <div className="flex-1 flex overflow-hidden">
+              {/* Chat History Sidebar */}
+              <div 
+                className={cn(
+                  "hidden md:flex flex-col border-r border-border/50 bg-muted/30 transition-all duration-300",
+                  sidebarOpen ? "w-64" : "w-0 overflow-hidden"
+                )}
+              >
+                <SidebarContent />
+              </div>
+              
+              {/* Mobile Sidebar Overlay */}
+              {sidebarMobileOpen && (
+                <div 
+                  className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+                  onClick={() => setSidebarMobileOpen(false)}
+                />
+              )}
+              
+              {/* Mobile Sidebar */}
+              <div 
+                className={cn(
+                  "fixed inset-y-0 left-0 z-50 w-72 bg-background border-r border-border/50 transform transition-transform duration-300 md:hidden",
+                  sidebarMobileOpen ? "translate-x-0" : "-translate-x-full"
+                )}
+              >
+                <SidebarContent />
+              </div>
+              
+              {/* Main Content Area */}
+              <div className="flex-1 flex flex-col min-w-0">
+                {/* Content Area */}
+                <div className="flex-1 overflow-hidden">
+                  {activeTab === 'progress' ? (
+                    /* Progress Dashboard */
+                    <div className="h-full overflow-y-auto p-4">
+                      <div className="max-w-2xl mx-auto">
+                        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                          <BarChart3 className="h-5 w-5 text-primary" />
+                          {t('My Learning Progress', 'আমার লার্নিং প্রগ্রেস')}
+                        </h2>
+                        <ProgressDashboard />
+                      </div>
+                    </div>
+                  ) : activeTab === 'study-rooms' ? (
+                    /* Study Rooms Section */
+                    <div className="h-full overflow-y-auto p-4">
+                      <StudyRoomsSection 
+                        userId={user?.id || null} 
+                        onRequestQuiz={(topic) => {
+                          setActiveTab('chat');
+                          sendMessage(`${topic} নিয়ে একটা MCQ Quiz দাও (৫টা প্রশ্ন)`);
+                        }}
+                      />
+                    </div>
+                  ) : messages.length === 0 ? (
+                    /* Welcome Screen */
+                    <div className="h-full flex flex-col items-center justify-center px-4">
+                      <div className="max-w-2xl w-full text-center">
+                        <h2 className="text-3xl md:text-4xl font-semibold mb-8">
+                          {t("What can I help with?", "কিভাবে সাহায্য করতে পারি?")}
+                        </h2>
+                        
+                        {/* Input Box */}
+                        <div className="relative mb-6">
+                          <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
+                            <div className="flex items-end gap-2">
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={isLoading || isUploading}
+                                className="h-10 w-10 shrink-0 rounded-xl"
+                              >
+                                {isUploading ? (
+                                  <Loader2 className="h-5 w-5 animate-spin" />
+                                ) : (
+                                  <Paperclip className="h-5 w-5" />
+                                )}
+                              </Button>
+                              
+                              <Textarea
+                                ref={textareaRef}
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                placeholder={t("Ask anything", "যেকোনো প্রশ্ন করো")}
+                                disabled={isLoading || isListening}
+                                rows={1}
+                                className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                              />
+                              
+                              <Button
+                                type="button"
+                                size="icon"
+                                onClick={() => sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined)}
+                                disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
+                                className="h-10 w-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
+                              >
+                                {isLoading ? (
+                                  <Loader2 className="h-5 w-5 animate-spin" />
+                                ) : (
+                                  <Send className="h-5 w-5" />
+                                )}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Suggested Questions */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-xl mx-auto">
+                          {suggestedQuestions.map((q, i) => {
+                            const Icon = q.icon;
+                            return (
+                              <button
+                                key={i}
+                                onClick={() => sendMessage(q.text)}
+                                className={cn(
+                                  "flex items-center gap-3 p-3 rounded-xl text-left",
+                                  "bg-muted/50 hover:bg-muted border border-border/30",
+                                  "transition-all duration-200 hover:shadow-sm"
+                                )}
+                              >
+                                <div className={cn("p-2 rounded-lg", q.color)}>
+                                  <Icon className="h-4 w-4" />
+                                </div>
+                                <span className="text-sm">{q.text}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Chat Messages */
+                    <ScrollArea className="h-full" ref={scrollRef}>
+                      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+                        {messages.map((msg, i) => (
+                          <div key={i} className={cn("flex gap-4", msg.role === "user" && "flex-row-reverse")}>
+                            <div className={cn(
+                              "h-8 w-8 rounded-full flex items-center justify-center shrink-0",
+                              msg.role === "user" 
+                                ? "bg-primary" 
+                                : "bg-gradient-to-br from-primary/20 to-accent/20"
+                            )}>
+                              {msg.role === "user" ? (
+                                <User className="h-4 w-4 text-primary-foreground" />
+                              ) : (
+                                <Bot className="h-4 w-4 text-primary" />
+                              )}
+                            </div>
+                            
+                            <div className={cn("flex-1 space-y-2", msg.role === "user" && "flex flex-col items-end")}>
+                              <div className={cn(
+                                "rounded-2xl px-4 py-3 max-w-[85%]",
+                                msg.role === "user"
+                                  ? "bg-primary text-primary-foreground rounded-tr-sm"
+                                  : "bg-muted rounded-tl-sm"
+                              )}>
+                                {msg.role === "assistant" ? (
+                                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                      {msg.content}
+                                    </ReactMarkdown>
+                                    {hasQuizContent(msg.content) && (
+                                      <QuizScorer content={msg.content} />
+                                    )}
+                                  </div>
+                                ) : (
+                                  <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                                    {msg.content}
+                                  </p>
+                                )}
+                              </div>
+                              
+                              {msg.role === "assistant" && (
+                                <div className="flex items-center gap-1 flex-wrap">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-7 px-2 text-xs text-muted-foreground"
+                                    onClick={() => copyToClipboard(msg.content, i)}
+                                  >
+                                    {copiedIndex === i ? (
+                                      <><Check className="h-3 w-3 mr-1" />{t("Copied", "কপি হয়েছে")}</>
+                                    ) : (
+                                      <><Copy className="h-3 w-3 mr-1" />{t("Copy", "কপি")}</>
+                                    )}
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-7 px-2 text-xs text-muted-foreground hover:text-primary"
+                                    onClick={() => askCommunity(i)}
+                                  >
+                                    <Users className="h-3 w-3 mr-1" />
+                                    {t("Ask Community", "কমিউনিটিতে জিজ্ঞাসা")}
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+
+                        {isLoading && messages[messages.length - 1]?.role === "user" && (
+                          <div className="flex gap-4">
+                            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                              <Bot className="h-4 w-4 text-primary" />
+                            </div>
+                            <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
+                              <div className="flex items-center gap-2">
+                                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                                <span className="text-sm text-muted-foreground">
+                                  {t("Thinking...", "ভাবছি...")}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </ScrollArea>
+                  )}
+                </div>
+                
+                {/* Input Area (when messages exist and on chat tab) */}
+                {activeTab === 'chat' && messages.length > 0 && (
+                  <div className="border-t border-border/50 p-4">
+                    <div className="max-w-3xl mx-auto">
+                      <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined);
+                          }}
+                          className="flex items-end gap-2"
+                        >
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isLoading || isUploading}
+                            className="h-10 w-10 shrink-0 rounded-xl"
+                          >
+                            {isUploading ? (
+                              <Loader2 className="h-5 w-5 animate-spin" />
+                            ) : (
+                              <Paperclip className="h-5 w-5" />
+                            )}
+                          </Button>
+                          
+                          <Textarea
+                            ref={textareaRef}
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder={t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
+                            disabled={isLoading || isListening}
+                            rows={1}
+                            className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                          />
+                          
+                          <Button
+                            type="submit"
+                            size="icon"
+                            disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
+                            className="h-10 w-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
+                          >
+                            {isLoading ? (
+                              <Loader2 className="h-5 w-5 animate-spin" />
+                            ) : (
+                              <Send className="h-5 w-5" />
+                            )}
+                          </Button>
+                        </form>
+                      </div>
+                      <p className="text-xs text-center text-muted-foreground mt-2">
+                        {t("Learning Buddy can make mistakes. Verify important info.", "Learning Buddy ভুল করতে পারে।")}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Mobile bottom navigation */}
+        <BottomNavigation />
+      </div>
+    );
+  }
+
+  // For non-logged in users, show the original layout with Navbar
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
@@ -809,7 +1233,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
         canonicalUrl="https://unitynets.com/learning-zone"
       />
       
-      {/* Site Navbar */}
+      {/* Site Navbar for non-logged in users */}
       <Navbar />
       
       {/* Main Content - Below Navbar */}
