@@ -76,12 +76,12 @@ interface ChatSession {
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/learning-chat`;
 
 const suggestedQuestions = [
-  { text: "🎯 আমি ফ্রিল্যান্সিং শিখতে চাই শুরু থেকে - একটা Learning Path দাও", icon: Lightbulb, color: "bg-green-500/10 text-green-600 dark:text-green-400", isPath: true },
-  { text: "🎯 ওয়েব ডেভেলপমেন্ট শেখার Complete Roadmap দাও", icon: Globe, color: "bg-purple-500/10 text-purple-600 dark:text-purple-400", isPath: true },
-  { text: "📝 HTML নিয়ে একটা MCQ Quiz দাও (৫টা প্রশ্ন)", icon: GraduationCap, color: "bg-rose-500/10 text-rose-600 dark:text-rose-400", isQuiz: true },
-  { text: "🗂️ JavaScript Flashcards দাও (১০টা)", icon: Code, color: "bg-blue-500/10 text-blue-600 dark:text-blue-400", isFlashcard: true },
-  { text: "পাইথন প্রোগ্রামিং শিখতে চাই", icon: Code, color: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" },
-  { text: "AI কিভাবে কাজ করে?", icon: Sparkles, color: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+  { textEn: "🎯 Give me a beginner's learning path for web development", textBn: "🎯 ওয়েব ডেভেলপমেন্টের জন্য শিক্ষার পথ দাও", icon: Globe, color: "bg-green-500/10 text-green-600 dark:text-green-400", isPath: true },
+  { textEn: "🎯 How can I start learning programming?", textBn: "🎯 প্রোগ্রামিং শেখা কিভাবে শুরু করব?", icon: Code, color: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
+  { textEn: "📝 Give me a quiz on basic Python (5 questions)", textBn: "📝 পাইথন বেসিক নিয়ে ৫টা প্রশ্নের কুইজ দাও", icon: GraduationCap, color: "bg-rose-500/10 text-rose-600 dark:text-rose-400", isQuiz: true },
+  { textEn: "🗂️ Create JavaScript flashcards (10 cards)", textBn: "🗂️ জাভাস্ক্রিপ্ট ফ্ল্যাশকার্ড তৈরি করো (১০টা)", icon: Lightbulb, color: "bg-blue-500/10 text-blue-600 dark:text-blue-400", isFlashcard: true },
+  { textEn: "How does Artificial Intelligence work?", textBn: "কৃত্রিম বুদ্ধিমত্তা কিভাবে কাজ করে?", icon: Sparkles, color: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+  { textEn: "Tips for effective online learning", textBn: "কার্যকর অনলাইন লার্নিং টিপস", icon: BookOpen, color: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" },
 ];
 
 export default function PublicLearningZone() {
@@ -1043,10 +1043,11 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-xl mx-auto">
                           {suggestedQuestions.map((q, i) => {
                             const Icon = q.icon;
+                            const questionText = t(q.textEn, q.textBn);
                             return (
                               <button
                                 key={i}
-                                onClick={() => sendMessage(q.text)}
+                                onClick={() => sendMessage(questionText)}
                                 className={cn(
                                   "flex items-center gap-3 p-3 rounded-xl text-left",
                                   "bg-muted/50 hover:bg-muted border border-border/30",
@@ -1056,7 +1057,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                                 <div className={cn("p-2 rounded-lg", q.color)}>
                                   <Icon className="h-4 w-4" />
                                 </div>
-                                <span className="text-sm">{q.text}</span>
+                                <span className="text-sm">{questionText}</span>
                               </button>
                             );
                           })}
@@ -1475,10 +1476,11 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-xl mx-auto">
                   {suggestedQuestions.map((q, i) => {
                     const Icon = q.icon;
+                    const questionText = t(q.textEn, q.textBn);
                     return (
                       <button
                         key={i}
-                        onClick={() => sendMessage(q.text)}
+                        onClick={() => sendMessage(questionText)}
                         className={cn(
                           "flex items-center gap-3 p-3 rounded-xl text-left",
                           "bg-muted/50 hover:bg-muted border border-border/30",
@@ -1488,7 +1490,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                         <div className={cn("p-2 rounded-lg", q.color)}>
                           <Icon className="h-4 w-4" />
                         </div>
-                        <span className="text-sm">{q.text}</span>
+                        <span className="text-sm">{questionText}</span>
                       </button>
                     );
                   })}
