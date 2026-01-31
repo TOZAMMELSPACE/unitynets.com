@@ -659,6 +659,54 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_user_memory: {
+        Row: {
+          accomplishments: Json | null
+          conversation_summary: string | null
+          created_at: string
+          device_fingerprint: string | null
+          goals: Json | null
+          id: string
+          important_dates: Json | null
+          last_mood: string | null
+          learning_interests: string[] | null
+          personality_notes: string | null
+          preferences: Json | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          accomplishments?: Json | null
+          conversation_summary?: string | null
+          created_at?: string
+          device_fingerprint?: string | null
+          goals?: Json | null
+          id?: string
+          important_dates?: Json | null
+          last_mood?: string | null
+          learning_interests?: string[] | null
+          personality_notes?: string | null
+          preferences?: Json | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          accomplishments?: Json | null
+          conversation_summary?: string | null
+          created_at?: string
+          device_fingerprint?: string | null
+          goals?: Json | null
+          id?: string
+          important_dates?: Json | null
+          last_mood?: string | null
+          learning_interests?: string[] | null
+          personality_notes?: string | null
+          preferences?: Json | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string | null

@@ -37,7 +37,8 @@ import {
   Menu,
   Users,
   BookOpen,
-  BarChart3
+  BarChart3,
+  Brain
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -49,6 +50,7 @@ import { StudyRoomsSection } from "@/components/study-rooms/StudyRoomsSection";
 import { useAuth } from "@/hooks/useAuth";
 import { ProgressDashboard } from "@/components/learning/ProgressDashboard";
 import { QuizScorer, hasQuizContent } from "@/components/learning/QuizScorer";
+import { UserMemoryPanel } from "@/components/learning/UserMemoryPanel";
 import { LeftSidebar } from "@/components/LeftSidebar";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -169,6 +171,9 @@ export default function PublicLearningZone() {
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Memory panel state
+  const [memoryPanelOpen, setMemoryPanelOpen] = useState(false);
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -336,6 +341,7 @@ export default function PublicLearningZone() {
 
   const streamChat = async (userMessages: Message[], imageUrls?: string[]) => {
     const apiMessages = userMessages.map(m => ({ role: m.role, content: m.content }));
+    const fingerprint = getDeviceFingerprint();
     
     const resp = await fetch(CHAT_URL, {
       method: "POST",
@@ -343,7 +349,12 @@ export default function PublicLearningZone() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages: apiMessages, imageUrls }),
+      body: JSON.stringify({ 
+        messages: apiMessages, 
+        imageUrls,
+        userId: user?.id,
+        deviceFingerprint: fingerprint
+      }),
     });
 
     if (!resp.ok) {
@@ -753,7 +764,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Sidebar Header */}
-      <div className="p-3 border-b border-border/50">
+      <div className="p-3 border-b border-border/50 space-y-2">
         <Button
           onClick={startNewChat}
           variant="outline"
@@ -761,6 +772,14 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
         >
           <Plus className="h-4 w-4" />
           {t("New chat", "নতুন চ্যাট")}
+        </Button>
+        <Button
+          onClick={() => setMemoryPanelOpen(true)}
+          variant="ghost"
+          className="w-full justify-start gap-2 h-10 text-primary"
+        >
+          <Brain className="h-4 w-4" />
+          {t("My Memory", "আমার মেমোরি")}
         </Button>
       </div>
       
@@ -1869,6 +1888,14 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
         )}
       </div>
       </div>
+      
+      {/* Memory Panel */}
+      <UserMemoryPanel
+        userId={user?.id}
+        deviceFingerprint={getDeviceFingerprint()}
+        isOpen={memoryPanelOpen}
+        onClose={() => setMemoryPanelOpen(false)}
+      />
     </div>
   );
 }

@@ -1,9 +1,104 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Helper to get or create user memory
+async function getUserMemory(supabase: any, userId?: string, deviceFingerprint?: string) {
+  let query = supabase.from('learning_user_memory').select('*');
+  
+  if (userId) {
+    query = query.eq('user_id', userId);
+  } else if (deviceFingerprint) {
+    query = query.eq('device_fingerprint', deviceFingerprint).is('user_id', null);
+  } else {
+    return null;
+  }
+  
+  const { data, error } = await query.maybeSingle();
+  if (error) {
+    console.error('Error fetching user memory:', error);
+    return null;
+  }
+  return data;
+}
+
+// Helper to update user memory based on conversation
+async function updateUserMemory(supabase: any, userId?: string, deviceFingerprint?: string, updates: any = {}) {
+  if (!userId && !deviceFingerprint) return;
+  
+  const existingMemory = await getUserMemory(supabase, userId, deviceFingerprint);
+  
+  if (existingMemory) {
+    const { error } = await supabase
+      .from('learning_user_memory')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', existingMemory.id);
+    
+    if (error) console.error('Error updating memory:', error);
+  } else {
+    const insertData: any = {
+      ...updates,
+    };
+    if (userId) insertData.user_id = userId;
+    if (deviceFingerprint && !userId) insertData.device_fingerprint = deviceFingerprint;
+    
+    const { error } = await supabase
+      .from('learning_user_memory')
+      .insert([insertData]);
+    
+    if (error) console.error('Error creating memory:', error);
+  }
+}
+
+// Format memory for system prompt
+function formatMemoryContext(memory: any): string {
+  if (!memory) return "";
+  
+  let context = "\n\n=== USER'S PERSONAL CONTEXT (মনে রেখো!) ===\n";
+  
+  if (memory.goals && memory.goals.length > 0) {
+    context += `\n🎯 User's Goals:\n${memory.goals.map((g: any) => `- ${g.text} (${g.status || 'active'})`).join('\n')}\n`;
+  }
+  
+  if (memory.learning_interests && memory.learning_interests.length > 0) {
+    context += `\n📚 Learning Interests: ${memory.learning_interests.join(', ')}\n`;
+  }
+  
+  if (memory.personality_notes) {
+    context += `\n🧠 Personality Notes: ${memory.personality_notes}\n`;
+  }
+  
+  if (memory.preferences && Object.keys(memory.preferences).length > 0) {
+    context += `\n⚙️ Preferences: ${JSON.stringify(memory.preferences)}\n`;
+  }
+  
+  if (memory.accomplishments && memory.accomplishments.length > 0) {
+    context += `\n🏆 Recent Accomplishments:\n${memory.accomplishments.slice(-5).map((a: any) => `- ${a.text}`).join('\n')}\n`;
+  }
+  
+  if (memory.last_mood) {
+    context += `\n😊 Last Known Mood: ${memory.last_mood}\n`;
+  }
+  
+  if (memory.conversation_summary) {
+    context += `\n📝 Previous Conversation Summary: ${memory.conversation_summary}\n`;
+  }
+  
+  context += "\n=== USE THIS CONTEXT TO PERSONALIZE YOUR RESPONSES ===\n";
+  context += "- Reference their goals when relevant\n";
+  context += "- Build on their previous learning interests\n";
+  context += "- Remember their accomplishments and celebrate progress\n";
+  context += "- Adapt your tone to their personality\n";
+  
+  return context;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -11,8 +106,13 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, imageUrls } = await req.json();
+    const { messages, imageUrls, userId, deviceFingerprint } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    // Create Supabase client for memory operations
+    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
@@ -351,7 +451,24 @@ For English users:
 - Make every interaction enjoyable
 - Remember: তুমি শুধু একটা tool না, তুমি একটা বন্ধু 🤝
 
-You represent UnityNets with pride. Make every user feel valued, supported, and capable of achieving their dreams! 🚀`;
+You represent UnityNets with pride. Make every user feel valued, supported, and capable of achieving their dreams! 🚀
+
+=== MEMORY MANAGEMENT ===
+If the user mentions any of the following, make a mental note (you'll help track these):
+- Goals they want to achieve (career, learning, personal)
+- Things they're learning or interested in
+- Accomplishments they share
+- Their mood or how they're feeling
+- Preferences (communication style, topics they like)
+
+When you detect goals, interests, or accomplishments, acknowledge them warmly and let the user know you'll remember!`;
+
+    // Fetch user memory
+    const userMemory = await getUserMemory(supabase, userId, deviceFingerprint);
+    const memoryContext = formatMemoryContext(userMemory);
+    
+    // Combine system prompt with memory context
+    const fullSystemPrompt = systemPrompt + memoryContext;
 
     // Build messages with image support
     const formattedMessages = messages.map((msg: any) => {
@@ -381,7 +498,7 @@ You represent UnityNets with pride. Make every user feel valued, supported, and 
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: fullSystemPrompt },
           ...formattedMessages,
         ],
         stream: true,
