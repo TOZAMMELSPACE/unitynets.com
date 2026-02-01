@@ -280,18 +280,72 @@ export function UserMemoryPanel({ userId, deviceFingerprint, isOpen, onClose }: 
                 </div>
               </div>
 
-              {/* Last Mood */}
-              {memory.last_mood && (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <Heart className="w-4 h-4 text-pink-500" />
-                    {t("Last Known Mood", "সর্বশেষ মুড")}
-                  </div>
-                  <div className="p-3 rounded-lg bg-pink-500/10 text-sm">
-                    {memory.last_mood}
-                  </div>
+              {/* Mood Tracking Section */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Heart className="w-4 h-4 text-pink-500" />
+                  {t("Mood Tracking", "মুড ট্র্যাকিং")}
+                  <span className="px-2 py-0.5 bg-pink-500/20 text-pink-600 dark:text-pink-400 rounded-full text-xs">
+                    {t("Auto-detected", "অটো-ডিটেক্টেড")}
+                  </span>
                 </div>
-              )}
+                
+                {memory.last_mood ? (
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20">
+                    <div className="flex items-center gap-3">
+                      <div className="text-3xl">
+                        {memory.last_mood.includes('😊') ? '😊' : 
+                         memory.last_mood.includes('🔥') ? '🔥' :
+                         memory.last_mood.includes('😟') ? '😟' :
+                         memory.last_mood.includes('😴') ? '😴' :
+                         memory.last_mood.includes('😢') ? '😢' :
+                         memory.last_mood.includes('😤') ? '😤' :
+                         memory.last_mood.includes('😑') ? '😑' :
+                         memory.last_mood.includes('🤔') ? '🤔' :
+                         memory.last_mood.includes('🌟') ? '🌟' :
+                         memory.last_mood.includes('😰') ? '😰' :
+                         memory.last_mood.includes('🏆') ? '🏆' :
+                         memory.last_mood.includes('🙏') ? '🙏' : '💭'}
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">
+                          {memory.last_mood}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {t(
+                            "Detected from your recent conversation",
+                            "তোমার সাম্প্রতিক কথোপকথন থেকে ডিটেক্ট করা হয়েছে"
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl bg-muted/50 border border-dashed">
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl opacity-50">💭</div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          {t(
+                            "No mood detected yet. Chat with Learning Buddy and I'll understand how you're feeling!",
+                            "এখনো কোনো মুড ডিটেক্ট হয়নি। Learning Buddy এর সাথে কথা বলো, আমি বুঝে নেব তুমি কেমন আছো!"
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="p-3 rounded-lg bg-muted/30 text-xs text-muted-foreground">
+                  <p className="flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    {t(
+                      "AI automatically detects your mood from conversation and adjusts responses accordingly",
+                      "AI তোমার কথোপকথন থেকে স্বয়ংক্রিয়ভাবে মুড বুঝে নেয় এবং সে অনুযায়ী উত্তর দেয়"
+                    )}
+                  </p>
+                </div>
+              </div>
 
               {/* Info */}
               <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
