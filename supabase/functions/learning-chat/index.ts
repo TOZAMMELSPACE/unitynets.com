@@ -26,6 +26,37 @@ async function getUserMemory(supabase: any, userId?: string, deviceFingerprint?:
   return data;
 }
 
+// Mood detection from user message
+function detectMood(message: string): string | null {
+  const lowerMessage = message.toLowerCase();
+  
+  // Mood patterns with Bengali and English keywords
+  const moodPatterns = {
+    'খুশি 😊': ['happy', 'excited', 'great', 'awesome', 'amazing', 'wonderful', 'fantastic', 'খুশি', 'আনন্দ', 'মজা', 'দারুণ', 'অসাধারণ', 'ভালো লাগছে', 'খুব ভালো', 'হ্যাপি'],
+    'উৎসাহী 🔥': ['motivated', 'pumped', 'ready', 'can\'t wait', 'excited', 'উৎসাহ', 'মোটিভেটেড', 'রেডি', 'পারবো', 'করে ফেলব'],
+    'চিন্তিত 😟': ['worried', 'anxious', 'nervous', 'stressed', 'tension', 'চিন্তা', 'টেনশন', 'ভয়', 'nervous', 'চিন্তিত', 'stress'],
+    'ক্লান্ত 😴': ['tired', 'exhausted', 'sleepy', 'ক্লান্ত', 'ঘুম', 'ক্লান্ত লাগছে', 'এনার্জি নাই', 'টায়ার্ড', 'ঘুম পাচ্ছে', 'ঘুম আসছে না'],
+    'দুঃখিত 😢': ['sad', 'upset', 'depressed', 'down', 'unhappy', 'দুঃখ', 'মন খারাপ', 'কষ্ট', 'মন ভালো না', 'sad', 'কান্না', 'খারাপ লাগছে'],
+    'বিরক্ত 😤': ['frustrated', 'annoyed', 'angry', 'irritated', 'বিরক্ত', 'রাগ', 'বিরক্ত লাগছে', 'frustrated', '짜증'],
+    'বোরিং 😑': ['bored', 'boring', 'nothing to do', 'বোর', 'বিরক্তিকর', 'কিছু করার নাই', 'bored'],
+    'কনফিউজড 🤔': ['confused', 'don\'t understand', 'কনফিউজ', 'বুঝতেছি না', 'বুঝি না', 'কঠিন', 'জটিল'],
+    'হোপফুল 🌟': ['hopeful', 'optimistic', 'hope', 'আশা', 'আশাবাদী', 'পারব', 'হবে'],
+    'নার্ভাস 😰': ['nervous', 'scared', 'afraid', 'ভয়', 'ডর', 'nervous', 'পরীক্ষা', 'interview'],
+    'প্রাউড 🏆': ['proud', 'accomplished', 'did it', 'গর্বিত', 'পেরেছি', 'করেছি', 'সফল', 'জিতেছি'],
+    'কৃতজ্ঞ 🙏': ['grateful', 'thankful', 'thanks', 'ধন্যবাদ', 'কৃতজ্ঞ', 'thanks', 'thank you']
+  };
+  
+  for (const [mood, keywords] of Object.entries(moodPatterns)) {
+    for (const keyword of keywords) {
+      if (lowerMessage.includes(keyword)) {
+        return mood;
+      }
+    }
+  }
+  
+  return null;
+}
+
 // Helper to update user memory based on conversation
 async function updateUserMemory(supabase: any, userId?: string, deviceFingerprint?: string, updates: any = {}) {
   if (!userId && !deviceFingerprint) return;
@@ -96,6 +127,9 @@ function formatMemoryContext(memory: any): string {
   context += "- Build on their previous learning interests\n";
   context += "- Remember their accomplishments and celebrate progress\n";
   context += "- Adapt your tone to their personality\n";
+  context += "- IMPORTANT: If user's mood has changed, acknowledge it warmly!\n";
+  context += "- If mood is negative, be extra supportive and encouraging\n";
+  context += "- If mood is positive, celebrate with them!\n";
   
   return context;
 }
@@ -466,6 +500,21 @@ When you detect goals, interests, or accomplishments, acknowledge them warmly an
     // Fetch user memory
     const userMemory = await getUserMemory(supabase, userId, deviceFingerprint);
     const memoryContext = formatMemoryContext(userMemory);
+    
+    // Detect mood from the latest user message
+    const latestUserMessage = messages.filter((m: any) => m.role === 'user').pop();
+    if (latestUserMessage) {
+      const detectedMood = detectMood(latestUserMessage.content);
+      if (detectedMood) {
+        // Only update if mood changed
+        if (!userMemory?.last_mood || userMemory.last_mood !== detectedMood) {
+          await updateUserMemory(supabase, userId, deviceFingerprint, {
+            last_mood: detectedMood
+          });
+          console.log(`Mood detected and saved: ${detectedMood}`);
+        }
+      }
+    }
     
     // Combine system prompt with memory context
     const fullSystemPrompt = systemPrompt + memoryContext;
