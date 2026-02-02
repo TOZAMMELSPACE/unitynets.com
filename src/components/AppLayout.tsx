@@ -38,6 +38,7 @@ interface AppLayoutProps {
     loadingMore?: boolean;
     onTrackView?: (postId: string) => void;
     onDeletePost?: (postId: string) => void;
+    onVotePoll?: (postId: string, optionIndex: number) => void;
   }) => React.ReactNode;
 }
 
@@ -54,6 +55,7 @@ const transformToLegacyPost = (post: PostWithAuthor): Post => ({
   likes: post.likes,
   dislikes: post.dislikes,
   views: post.views,
+  pollOptions: post.pollOptions,
   comments: post.comments.map(c => ({
     id: c.id,
     postId: c.postId,
@@ -96,7 +98,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const { user, appUser, loading: authLoading, signOut } = useAuth();
   const socialDB = useSocialDB(user?.id || null);
   // Always fetch posts from database, even for unauthenticated users
-  const { posts: dbPosts, createPost, likePost, addComment, likeComment, loadMore, hasMore, loadingMore, trackView, deletePost, loading: postsLoading } = usePosts(user?.id, socialDB.createNotification);
+  const { posts: dbPosts, createPost, likePost, addComment, likeComment, loadMore, hasMore, loadingMore, trackView, deletePost, votePoll, loading: postsLoading } = usePosts(user?.id, socialDB.createNotification);
   const { users: dbUsers, setUsers: setDbUsers, loading: usersLoading } = useProfiles();
   
   const [createPostTrigger, setCreatePostTrigger] = useState<(() => void) | null>(null);
@@ -163,12 +165,13 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
   const handlePostCreated = async (post: Post) => {
     if (user) {
-      // Save to database
+      // Save to database with poll options if present
       await createPost(
         post.content,
         post.images,
         post.community,
-        post.videoUrl
+        post.videoUrl,
+        post.pollOptions
       );
     } else {
       // Fallback to local storage
@@ -331,6 +334,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
               loadingMore,
               onTrackView: trackView,
               onDeletePost: deletePost,
+              onVotePoll: votePoll,
             })}
         </div>
         

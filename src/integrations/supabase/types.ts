@@ -835,6 +835,7 @@ export type Database = {
           id: string
           image_urls: string[] | null
           likes_count: number | null
+          poll_options: Json | null
           privacy: string
           sentiment_score: number | null
           target_country: string | null
@@ -851,6 +852,7 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           likes_count?: number | null
+          poll_options?: Json | null
           privacy?: string
           sentiment_score?: number | null
           target_country?: string | null
@@ -867,6 +869,7 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           likes_count?: number | null
+          poll_options?: Json | null
           privacy?: string
           sentiment_score?: number | null
           target_country?: string | null
