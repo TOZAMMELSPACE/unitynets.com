@@ -733,7 +733,32 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
 
   // Vote on a poll option
   const votePoll = useCallback(async (postId: string, optionIndex: number) => {
+    if (!userId) {
+      toast({
+        title: 'লগইন প্রয়োজন',
+        description: 'ভোট দিতে হলে প্রথমে লগইন করুন',
+        variant: 'destructive',
+      });
+      return false;
+    }
+
     try {
+      // Check if user already voted on this poll
+      const { data: existingVote } = await supabase
+        .from('poll_votes')
+        .select('id, option_index')
+        .eq('post_id', postId)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (existingVote) {
+        toast({
+          title: 'ইতিমধ্যে ভোট দিয়েছেন',
+          description: 'আপনি এই পোলে আগেই ভোট দিয়েছেন',
+        });
+        return false;
+      }
+
       // Get current poll options from database
       const { data: postData, error: fetchError } = await supabase
         .from('posts')
@@ -745,6 +770,17 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
 
       const pollOptions = postData?.poll_options as unknown as PollOption[];
       if (!pollOptions || !Array.isArray(pollOptions)) return false;
+
+      // Record the vote
+      const { error: voteError } = await supabase
+        .from('poll_votes')
+        .insert({
+          post_id: postId,
+          user_id: userId,
+          option_index: optionIndex,
+        });
+
+      if (voteError) throw voteError;
 
       // Increment vote count for the selected option
       const updatedOptions = pollOptions.map((opt, index) => 
@@ -768,12 +804,22 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         return updated;
       });
 
+      toast({
+        title: 'ভোট সফল!',
+        description: 'আপনার ভোট গ্রহণ করা হয়েছে',
+      });
+
       return true;
     } catch (err) {
       console.error('Error voting on poll:', err);
+      toast({
+        title: 'ত্রুটি',
+        description: 'ভোট দিতে সমস্যা হয়েছে',
+        variant: 'destructive',
+      });
       return false;
     }
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     fetchPosts(true);
