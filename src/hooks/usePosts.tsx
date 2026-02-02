@@ -39,6 +39,11 @@ export interface DbComment {
   created_at: string;
 }
 
+export interface PollOption {
+  option: string;
+  votes: number;
+}
+
 export interface PostWithAuthor {
   id: string;
   content: string;
@@ -53,6 +58,7 @@ export interface PostWithAuthor {
   views: number;
   location?: string;
   hashtags?: string[];
+  pollOptions?: PollOption[];
   author: {
     id: string;
     name: string;
@@ -204,17 +210,28 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
             };
           });
 
+        // Determine post type based on content
+        let postType: 'text' | 'image' | 'video' | 'poll' | 'event' | 'job' = 'text';
+        if (post.poll_options && Array.isArray(post.poll_options) && post.poll_options.length > 0) {
+          postType = 'poll';
+        } else if (post.video_url) {
+          postType = 'video';
+        } else if (post.image_urls && post.image_urls.length > 0) {
+          postType = 'image';
+        }
+
         return {
           id: post.id,
           content: post.content,
           images: post.image_urls || undefined,
           videoUrl: post.video_url || undefined,
           community: post.community_tag || 'global',
-          postType: post.video_url ? 'video' as const : (post.image_urls && post.image_urls.length > 0 ? 'image' as const : 'text' as const),
+          postType,
           createdAt: post.created_at,
           likes: post.likes_count,
           dislikes: post.dislikes_count,
           views: post.views_count,
+          pollOptions: post.poll_options ? (post.poll_options as unknown as PollOption[]) : undefined,
           author: {
             id: post.user_id,
             name: profile?.full_name || 'Unknown User',
@@ -285,7 +302,8 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
     content: string,
     imageUrls?: string[],
     communityTag?: string,
-    videoUrl?: string
+    videoUrl?: string,
+    pollOptions?: PollOption[]
   ) => {
     if (!userId) {
       toast({
@@ -297,15 +315,26 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
     }
 
     try {
+      // Build the insert object with proper typing
+      const insertData: {
+        user_id: string;
+        content: string;
+        image_urls: string[] | null;
+        video_url: string | null;
+        community_tag: string;
+        poll_options: unknown;
+      } = {
+        user_id: userId,
+        content,
+        image_urls: imageUrls || null,
+        video_url: videoUrl || null,
+        community_tag: communityTag || 'global',
+        poll_options: pollOptions && pollOptions.length > 0 ? pollOptions : null,
+      };
+
       const { data, error } = await supabase
         .from('posts')
-        .insert({
-          user_id: userId,
-          content,
-          image_urls: imageUrls || null,
-          video_url: videoUrl || null,
-          community_tag: communityTag || 'global',
-        })
+        .insert(insertData as any)
         .select()
         .single();
 
@@ -318,6 +347,16 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         .eq('user_id', userId)
         .single();
 
+      // Determine post type
+      let newPostType: 'text' | 'image' | 'video' | 'poll' | 'event' | 'job' = 'text';
+      if (pollOptions && pollOptions.length > 0) {
+        newPostType = 'poll';
+      } else if (data.video_url) {
+        newPostType = 'video';
+      } else if (data.image_urls && data.image_urls.length > 0) {
+        newPostType = 'image';
+      }
+
       // Optimistic update - add new post immediately to UI
       const newPost: PostWithAuthor = {
         id: data.id,
@@ -325,11 +364,12 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         images: data.image_urls || undefined,
         videoUrl: data.video_url || undefined,
         community: data.community_tag || 'global',
-        postType: data.video_url ? 'video' : (data.image_urls && data.image_urls.length > 0 ? 'image' : 'text'),
+        postType: newPostType,
         createdAt: data.created_at,
         likes: 0,
         dislikes: 0,
         views: 0,
+        pollOptions: pollOptions || undefined,
         author: {
           id: userId,
           name: profileData?.full_name || 'Unknown User',
@@ -691,6 +731,50 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
     }
   }, [userId]);
 
+  // Vote on a poll option
+  const votePoll = useCallback(async (postId: string, optionIndex: number) => {
+    try {
+      // Get current poll options from database
+      const { data: postData, error: fetchError } = await supabase
+        .from('posts')
+        .select('poll_options')
+        .eq('id', postId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const pollOptions = postData?.poll_options as unknown as PollOption[];
+      if (!pollOptions || !Array.isArray(pollOptions)) return false;
+
+      // Increment vote count for the selected option
+      const updatedOptions = pollOptions.map((opt, index) => 
+        index === optionIndex ? { ...opt, votes: opt.votes + 1 } : opt
+      );
+
+      // Update in database
+      const { error: updateError } = await supabase
+        .from('posts')
+        .update({ poll_options: updatedOptions as any })
+        .eq('id', postId);
+
+      if (updateError) throw updateError;
+
+      // Update local state
+      setPosts(prev => {
+        const updated = prev.map(post => 
+          post.id === postId ? { ...post, pollOptions: updatedOptions } : post
+        );
+        postsRef.current = updated;
+        return updated;
+      });
+
+      return true;
+    } catch (err) {
+      console.error('Error voting on poll:', err);
+      return false;
+    }
+  }, []);
+
   useEffect(() => {
     fetchPosts(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -711,5 +795,6 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
     trackView,
     deletePost,
     updatePost,
+    votePoll,
   };
 };
