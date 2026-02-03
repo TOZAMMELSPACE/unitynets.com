@@ -909,11 +909,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
         
         {/* Main content area */}
         <div className="w-full lg:pl-64 min-h-screen pb-20 lg:pb-0">
-          {/* Global Header - same on all pages */}
-          <GlobalHeader 
-            currentUser={currentUser} 
-            onSignOut={handleSignOut}
-          />
+          {/* Global Header removed - cleaner UI for Learning Zone */}
           
           {/* Page Content */}
           <div className="flex-1 flex flex-col overflow-hidden">
@@ -990,18 +986,8 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
               </div>
             </header>
             
-            {/* Main Content with Chat Sidebar */}
+            {/* Main Content with Chat Sidebar - Sidebar on RIGHT */}
             <div className="flex-1 flex overflow-hidden">
-              {/* Chat History Sidebar */}
-              <div 
-                className={cn(
-                  "hidden md:flex flex-col border-r border-border/50 bg-muted/30 transition-all duration-300",
-                  sidebarOpen ? "w-64" : "w-0 overflow-hidden"
-                )}
-              >
-                <SidebarContent />
-              </div>
-              
               {/* Mobile Sidebar Overlay */}
               {sidebarMobileOpen && (
                 <div 
@@ -1010,17 +996,17 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                 />
               )}
               
-              {/* Mobile Sidebar */}
+              {/* Mobile Sidebar - slides from right */}
               <div 
                 className={cn(
-                  "fixed inset-y-0 left-0 z-50 w-72 bg-background border-r border-border/50 transform transition-transform duration-300 md:hidden",
-                  sidebarMobileOpen ? "translate-x-0" : "-translate-x-full"
+                  "fixed inset-y-0 right-0 z-50 w-72 bg-background border-l border-border/50 transform transition-transform duration-300 md:hidden",
+                  sidebarMobileOpen ? "translate-x-0" : "translate-x-full"
                 )}
               >
                 <SidebarContent />
               </div>
               
-              {/* Main Content Area */}
+              {/* Main Content Area - Now FIRST (left side) */}
               <div className="flex-1 flex flex-col min-w-0">
                 {/* Content Area */}
                 <div className="flex-1 overflow-hidden">
@@ -1308,8 +1294,18 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                 )}
               </div>
             </div>
+              
+              {/* Chat History Sidebar - Now on RIGHT */}
+              <div 
+                className={cn(
+                  "hidden md:flex flex-col border-l border-border/50 bg-muted/30 transition-all duration-300",
+                  sidebarOpen ? "w-64" : "w-0 overflow-hidden"
+                )}
+              >
+                <SidebarContent />
+              </div>
+            </div>
           </div>
-        </div>
         
         {/* Mobile bottom navigation */}
         <BottomNavigation />
@@ -1333,16 +1329,6 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
       {/* Main Content - Below Navbar */}
       <div className="flex-1 flex overflow-hidden pt-16 md:pt-20">
       
-      {/* Desktop Sidebar */}
-      <div 
-        className={cn(
-          "hidden md:flex flex-col border-r border-border/50 bg-muted/30 transition-all duration-300",
-          sidebarOpen ? "w-64" : "w-0 overflow-hidden"
-        )}
-      >
-        <SidebarContent />
-      </div>
-      
       {/* Mobile Sidebar Overlay */}
       {sidebarMobileOpen && (
         <div 
@@ -1351,11 +1337,11 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
         />
       )}
       
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar - slides from right */}
       <div 
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-72 bg-background border-r border-border/50 transform transition-transform duration-300 md:hidden",
-          sidebarMobileOpen ? "translate-x-0" : "-translate-x-full"
+          "fixed inset-y-0 right-0 z-50 w-72 bg-background border-l border-border/50 transform transition-transform duration-300 md:hidden",
+          sidebarMobileOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         <SidebarContent />
@@ -1886,6 +1872,16 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
             </div>
           </div>
         )}
+      </div>
+      
+      {/* Desktop Sidebar - on RIGHT */}
+      <div 
+        className={cn(
+          "hidden md:flex flex-col border-l border-border/50 bg-muted/30 transition-all duration-300",
+          sidebarOpen ? "w-64" : "w-0 overflow-hidden"
+        )}
+      >
+        <SidebarContent />
       </div>
       </div>
       
