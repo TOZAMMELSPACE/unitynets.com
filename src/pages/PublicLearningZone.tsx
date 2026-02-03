@@ -1293,9 +1293,8 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                   </div>
                 )}
               </div>
-            </div>
               
-              {/* Chat History Sidebar - Now on RIGHT */}
+              {/* Chat History Sidebar - on RIGHT side */}
               <div 
                 className={cn(
                   "hidden md:flex flex-col border-l border-border/50 bg-muted/30 transition-all duration-300",
@@ -1306,6 +1305,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
               </div>
             </div>
           </div>
+        </div>
         
         {/* Mobile bottom navigation */}
         <BottomNavigation />
