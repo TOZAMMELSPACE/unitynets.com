@@ -296,10 +296,10 @@ export default function PublicLearningZone() {
     }
   }, [input]);
 
-  // Load sessions on mount
+  // Load sessions on mount and when user changes (login/logout)
   useEffect(() => {
     loadSavedSessions();
-  }, []);
+  }, [user?.id]);
 
   const getDeviceFingerprint = () => {
     const nav = window.navigator;
@@ -318,11 +318,19 @@ export default function PublicLearningZone() {
     setIsLoadingSessions(true);
     try {
       const fingerprint = getDeviceFingerprint();
-      const { data, error } = await supabase
+      let query = supabase
         .from('learning_chat_sessions')
         .select('*')
-        .eq('device_fingerprint', fingerprint)
         .order('updated_at', { ascending: false });
+      
+      // If user is logged in, filter by user_id; otherwise filter by device_fingerprint
+      if (user?.id) {
+        query = query.eq('user_id', user.id);
+      } else {
+        query = query.eq('device_fingerprint', fingerprint).is('user_id', null);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       const sessions = (data || []).map(d => ({
@@ -474,12 +482,16 @@ export default function PublicLearningZone() {
       const fingerprint = getDeviceFingerprint();
       const title = firstMessage.slice(0, 50) + (firstMessage.length > 50 ? '...' : '');
 
+      // Convert messages to JSON-compatible format
+      const messagesJson = JSON.parse(JSON.stringify(msgs));
+
       const { data, error } = await supabase
         .from('learning_chat_sessions')
         .insert([{
           title,
-          messages: JSON.parse(JSON.stringify(msgs)),
-          device_fingerprint: fingerprint
+          messages: messagesJson,
+          device_fingerprint: user?.id ? null : fingerprint,
+          user_id: user?.id || null,
         }])
         .select()
         .single();
