@@ -1044,117 +1044,125 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                         }}
                       />
                     </div>
-                  ) : messages.length === 0 ? (
-                    /* Welcome Screen */
-                    <ScrollArea className="h-full">
-                      <div className="px-4 py-6">
-                        <div className="max-w-3xl mx-auto">
-                          <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
-                            {t("Hey! How can I help you today?", "হ্যালো! আজ কিভাবে সাহায্য করতে পারি?")}
-                          </h2>
-                          
-                          {/* Input Box */}
-                          <div className="relative mb-8">
-                            <div className="bg-muted/50 rounded-2xl border border-border/50 p-2 max-w-2xl mx-auto">
-                              <div className="flex items-end gap-2">
-                                <Button
-                                  type="button"
-                                  size="icon"
-                                  variant="ghost"
-                                  onClick={() => fileInputRef.current?.click()}
-                                  disabled={isLoading || isUploading}
-                                  className="h-10 w-10 shrink-0 rounded-xl"
-                                >
-                                  {isUploading ? (
-                                    <Loader2 className="h-5 w-5 animate-spin" />
-                                  ) : (
-                                    <Paperclip className="h-5 w-5" />
-                                  )}
-                                </Button>
-                                
-                                <Textarea
-                                  ref={textareaRef}
-                                  value={input}
-                                  onChange={(e) => setInput(e.target.value)}
-                                  onKeyDown={handleKeyDown}
-                                  placeholder={t("Ask anything...", "যেকোনো প্রশ্ন করো...")}
-                                  disabled={isLoading || isListening}
-                                  rows={1}
-                                  className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
-                                />
-                                
-                                {speechSupported && (
-                                  <Button
-                                    type="button"
-                                    size="icon"
-                                    variant={isListening ? "destructive" : "ghost"}
-                                    onClick={toggleListening}
-                                    disabled={isLoading}
-                                    className={cn(
-                                      "h-10 w-10 shrink-0 rounded-xl",
-                                      isListening && "animate-pulse"
-                                    )}
-                                  >
-                                    {isListening ? (
-                                      <MicOff className="h-5 w-5" />
-                                    ) : (
-                                      <Mic className="h-5 w-5" />
-                                    )}
-                                  </Button>
-                                )}
-                                
-                                <Button
-                                  type="button"
-                                  size="icon"
-                                  onClick={() => sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined)}
-                                  disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
-                                  className="h-10 w-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
-                                >
-                                  {isLoading ? (
-                                    <Loader2 className="h-5 w-5 animate-spin" />
-                                  ) : (
-                                    <Send className="h-5 w-5" />
-                                  )}
-                                </Button>
-                              </div>
+                ) : messages.length === 0 ? (
+                    /* Welcome Screen - with fixed input at bottom */
+                    <div className="h-full flex flex-col">
+                      {/* Scrollable content area */}
+                      <ScrollArea className="flex-1">
+                        <div className="px-4 py-6">
+                          <div className="max-w-3xl mx-auto">
+                            <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
+                              {t("Hey! How can I help you today?", "হ্যালো! আজ কিভাবে সাহায্য করতে পারি?")}
+                            </h2>
+                            
+                            {/* Question Categories */}
+                            <div className="space-y-6 pb-4">
+                              {questionCategories.map((category, catIndex) => (
+                                <div key={catIndex}>
+                                  <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                                    {t(category.titleEn, category.titleBn)}
+                                  </h3>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                    {category.questions.map((q, qIndex) => {
+                                      const Icon = q.icon;
+                                      const questionText = t(q.textEn, q.textBn);
+                                      return (
+                                        <button
+                                          key={qIndex}
+                                          onClick={() => sendMessage(questionText)}
+                                          className={cn(
+                                            "flex items-center gap-3 p-3 rounded-xl text-left",
+                                            "bg-muted/50 hover:bg-muted border border-border/30",
+                                            "transition-all duration-200 hover:shadow-sm"
+                                          )}
+                                        >
+                                          <div className={cn("p-2 rounded-lg shrink-0", q.color)}>
+                                            <Icon className="h-4 w-4" />
+                                          </div>
+                                          <span className="text-sm line-clamp-2">{questionText}</span>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ))}
                             </div>
                           </div>
-                          
-                          {/* Question Categories */}
-                          <div className="space-y-6">
-                            {questionCategories.map((category, catIndex) => (
-                              <div key={catIndex}>
-                                <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                                  {t(category.titleEn, category.titleBn)}
-                                </h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                                  {category.questions.map((q, qIndex) => {
-                                    const Icon = q.icon;
-                                    const questionText = t(q.textEn, q.textBn);
-                                    return (
-                                      <button
-                                        key={qIndex}
-                                        onClick={() => sendMessage(questionText)}
-                                        className={cn(
-                                          "flex items-center gap-3 p-3 rounded-xl text-left",
-                                          "bg-muted/50 hover:bg-muted border border-border/30",
-                                          "transition-all duration-200 hover:shadow-sm"
-                                        )}
-                                      >
-                                        <div className={cn("p-2 rounded-lg shrink-0", q.color)}>
-                                          <Icon className="h-4 w-4" />
-                                        </div>
-                                        <span className="text-sm line-clamp-2">{questionText}</span>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            ))}
+                        </div>
+                      </ScrollArea>
+                      
+                      {/* Fixed Input Box at Bottom */}
+                      <div className="border-t border-border/50 p-4 bg-background">
+                        <div className="max-w-3xl mx-auto">
+                          <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
+                            <div className="flex items-end gap-2">
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={isLoading || isUploading}
+                                className="h-10 w-10 shrink-0 rounded-xl"
+                              >
+                                {isUploading ? (
+                                  <Loader2 className="h-5 w-5 animate-spin" />
+                                ) : (
+                                  <Paperclip className="h-5 w-5" />
+                                )}
+                              </Button>
+                              
+                              <Textarea
+                                ref={textareaRef}
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                placeholder={t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
+                                disabled={isLoading || isListening}
+                                rows={1}
+                                className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                              />
+                              
+                              {speechSupported && (
+                                <Button
+                                  type="button"
+                                  size="icon"
+                                  variant={isListening ? "destructive" : "ghost"}
+                                  onClick={toggleListening}
+                                  disabled={isLoading}
+                                  className={cn(
+                                    "h-10 w-10 shrink-0 rounded-xl",
+                                    isListening && "animate-pulse"
+                                  )}
+                                >
+                                  {isListening ? (
+                                    <MicOff className="h-5 w-5" />
+                                  ) : (
+                                    <Mic className="h-5 w-5" />
+                                  )}
+                                </Button>
+                              )}
+                              
+                              <Button
+                                type="button"
+                                size="icon"
+                                onClick={() => sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined)}
+                                disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
+                                className="h-10 w-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
+                              >
+                                {isLoading ? (
+                                  <Loader2 className="h-5 w-5 animate-spin" />
+                                ) : (
+                                  <Send className="h-5 w-5" />
+                                )}
+                              </Button>
+                            </div>
                           </div>
+                          <p className="text-xs text-center text-muted-foreground mt-2">
+                            {t("Learning Buddy can make mistakes. Verify important info.", "Learning Buddy ভুল করতে পারে।")}
+                          </p>
                         </div>
                       </div>
-                    </ScrollArea>
+                    </div>
                   ) : (
                     /* Chat Messages */
                     <ScrollArea className="h-full" ref={scrollRef}>
@@ -1459,146 +1467,154 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
               />
             </div>
           ) : messages.length === 0 ? (
-            /* Welcome Screen */
-            <ScrollArea className="h-full">
-              <div className="px-4 py-6">
-                <div className="max-w-3xl mx-auto">
-                  <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
-                    {t("Hey! How can I help you today?", "হ্যালো! আজ কিভাবে সাহায্য করতে পারি?")}
-                  </h2>
-                  
-                  {/* Input Box */}
-                  <div className="relative mb-8">
-                    <div className="bg-muted/50 rounded-2xl border border-border/50 p-2 max-w-2xl mx-auto">
-                      {/* Attached files preview */}
-                      {attachedFiles.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-2 px-2">
-                          {attachedFiles.map((file, idx) => (
-                            <div key={idx} className="flex items-center gap-2 bg-background rounded-lg px-2 py-1 text-xs">
-                              {getFileIcon(file.type)}
-                              <span className="truncate max-w-[100px]">{file.name}</span>
-                              <button
-                                type="button"
-                                onClick={() => removeAttachedFile(idx)}
-                                className="text-muted-foreground hover:text-destructive"
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
-                            </div>
-                          ))}
+            /* Welcome Screen - with fixed input at bottom */
+            <div className="h-full flex flex-col">
+              {/* Scrollable content area */}
+              <ScrollArea className="flex-1">
+                <div className="px-4 py-6">
+                  <div className="max-w-3xl mx-auto">
+                    <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
+                      {t("Hey! How can I help you today?", "হ্যালো! আজ কিভাবে সাহায্য করতে পারি?")}
+                    </h2>
+                    
+                    {/* Question Categories */}
+                    <div className="space-y-6 pb-4">
+                      {questionCategories.map((category, catIndex) => (
+                        <div key={catIndex}>
+                          <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                            {t(category.titleEn, category.titleBn)}
+                          </h3>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                            {category.questions.map((q, qIndex) => {
+                              const Icon = q.icon;
+                              const questionText = t(q.textEn, q.textBn);
+                              return (
+                                <button
+                                  key={qIndex}
+                                  onClick={() => sendMessage(questionText)}
+                                  className={cn(
+                                    "flex items-center gap-3 p-3 rounded-xl text-left",
+                                    "bg-muted/50 hover:bg-muted border border-border/30",
+                                    "transition-all duration-200 hover:shadow-sm"
+                                  )}
+                                >
+                                  <div className={cn("p-2 rounded-lg shrink-0", q.color)}>
+                                    <Icon className="h-4 w-4" />
+                                  </div>
+                                  <span className="text-sm line-clamp-2">{questionText}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
-                      )}
-                      
-                      <div className="flex items-end gap-2">
-                        {/* Hidden file input */}
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*,.pdf,.doc,.docx"
-                          multiple
-                          onChange={handleFileUpload}
-                          className="hidden"
-                        />
-                        
-                        {/* Attach button */}
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={isLoading || isUploading}
-                          className="h-10 w-10 shrink-0 rounded-xl"
-                        >
-                          {isUploading ? (
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                          ) : (
-                            <Paperclip className="h-5 w-5" />
-                          )}
-                        </Button>
-                        
-                        <Textarea
-                          ref={textareaRef}
-                          value={input}
-                          onChange={(e) => setInput(e.target.value)}
-                          onKeyDown={handleKeyDown}
-                          placeholder={t("Ask anything...", "যেকোনো প্রশ্ন করো...")}
-                          disabled={isLoading || isListening}
-                          rows={1}
-                          className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
-                        />
-                        
-                        {speechSupported && (
-                          <Button
-                            type="button"
-                            size="icon"
-                            variant={isListening ? "destructive" : "ghost"}
-                            onClick={toggleListening}
-                            disabled={isLoading}
-                            className={cn(
-                              "h-10 w-10 shrink-0 rounded-xl",
-                              isListening && "animate-pulse"
-                            )}
-                          >
-                            {isListening ? (
-                              <MicOff className="h-5 w-5" />
-                            ) : (
-                              <Mic className="h-5 w-5" />
-                            )}
-                          </Button>
-                        )}
-                        
-                        <Button
-                          type="button"
-                          size="icon"
-                          onClick={() => sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined)}
-                          disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
-                          className="h-10 w-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
-                        >
-                          {isLoading ? (
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                          ) : (
-                            <Send className="h-5 w-5" />
-                          )}
-                        </Button>
-                      </div>
+                      ))}
                     </div>
                   </div>
-                  
-                  {/* Question Categories */}
-                  <div className="space-y-6">
-                    {questionCategories.map((category, catIndex) => (
-                      <div key={catIndex}>
-                        <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                          {t(category.titleEn, category.titleBn)}
-                        </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                          {category.questions.map((q, qIndex) => {
-                            const Icon = q.icon;
-                            const questionText = t(q.textEn, q.textBn);
-                            return (
-                              <button
-                                key={qIndex}
-                                onClick={() => sendMessage(questionText)}
-                                className={cn(
-                                  "flex items-center gap-3 p-3 rounded-xl text-left",
-                                  "bg-muted/50 hover:bg-muted border border-border/30",
-                                  "transition-all duration-200 hover:shadow-sm"
-                                )}
-                              >
-                                <div className={cn("p-2 rounded-lg shrink-0", q.color)}>
-                                  <Icon className="h-4 w-4" />
-                                </div>
-                                <span className="text-sm line-clamp-2">{questionText}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
+                </div>
+              </ScrollArea>
+              
+              {/* Fixed Input Box at Bottom */}
+              <div className="border-t border-border/50 p-4 bg-background">
+                <div className="max-w-3xl mx-auto">
+                  <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
+                    {/* Attached files preview */}
+                    {attachedFiles.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-2 px-2">
+                        {attachedFiles.map((file, idx) => (
+                          <div key={idx} className="flex items-center gap-2 bg-background rounded-lg px-2 py-1 text-xs">
+                            {getFileIcon(file.type)}
+                            <span className="truncate max-w-[100px]">{file.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeAttachedFile(idx)}
+                              className="text-muted-foreground hover:text-destructive"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
+                    
+                    <div className="flex items-end gap-2">
+                      {/* Hidden file input */}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*,.pdf,.doc,.docx"
+                        multiple
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                      
+                      {/* Attach button */}
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isLoading || isUploading}
+                        className="h-10 w-10 shrink-0 rounded-xl"
+                      >
+                        {isUploading ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Paperclip className="h-5 w-5" />
+                        )}
+                      </Button>
+                      
+                      <Textarea
+                        ref={textareaRef}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder={t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
+                        disabled={isLoading || isListening}
+                        rows={1}
+                        className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                      />
+                      
+                      {speechSupported && (
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant={isListening ? "destructive" : "ghost"}
+                          onClick={toggleListening}
+                          disabled={isLoading}
+                          className={cn(
+                            "h-10 w-10 shrink-0 rounded-xl",
+                            isListening && "animate-pulse"
+                          )}
+                        >
+                          {isListening ? (
+                            <MicOff className="h-5 w-5" />
+                          ) : (
+                            <Mic className="h-5 w-5" />
+                          )}
+                        </Button>
+                      )}
+                      
+                      <Button
+                        type="button"
+                        size="icon"
+                        onClick={() => sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined)}
+                        disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
+                        className="h-10 w-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
+                      >
+                        {isLoading ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Send className="h-5 w-5" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
+                  <p className="text-xs text-center text-muted-foreground mt-2">
+                    {t("Learning Buddy can make mistakes. Verify important info.", "Learning Buddy ভুল করতে পারে।")}
+                  </p>
                 </div>
               </div>
-            </ScrollArea>
+            </div>
           ) : (
             /* Chat Messages */
             <ScrollArea className="h-full" ref={scrollRef}>
