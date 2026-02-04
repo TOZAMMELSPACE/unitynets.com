@@ -1164,154 +1164,157 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                       </div>
                     </div>
                   ) : (
-                    /* Chat Messages */
-                    <ScrollArea className="h-full" ref={scrollRef}>
-                      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-                        {messages.map((msg, i) => (
-                          <div key={i} className={cn("flex gap-4", msg.role === "user" && "flex-row-reverse")}>
-                            <div className={cn(
-                              "h-8 w-8 rounded-full flex items-center justify-center shrink-0",
-                              msg.role === "user" 
-                                ? "bg-primary" 
-                                : "bg-gradient-to-br from-primary/20 to-accent/20"
-                            )}>
-                              {msg.role === "user" ? (
-                                <User className="h-4 w-4 text-primary-foreground" />
-                              ) : (
-                                <Bot className="h-4 w-4 text-primary" />
-                              )}
-                            </div>
-                            
-                            <div className={cn("flex-1 space-y-2", msg.role === "user" && "flex flex-col items-end")}>
+                    /* Chat Messages - with fixed input at bottom */
+                    <div className="h-full flex flex-col">
+                      {/* Scrollable messages area */}
+                      <ScrollArea className="flex-1" ref={scrollRef}>
+                        <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+                          {messages.map((msg, i) => (
+                            <div key={i} className={cn("flex gap-4", msg.role === "user" && "flex-row-reverse")}>
                               <div className={cn(
-                                "rounded-2xl px-4 py-3 max-w-[85%]",
-                                msg.role === "user"
-                                  ? "bg-primary text-primary-foreground rounded-tr-sm"
-                                  : "bg-muted rounded-tl-sm"
+                                "h-8 w-8 rounded-full flex items-center justify-center shrink-0",
+                                msg.role === "user" 
+                                  ? "bg-primary" 
+                                  : "bg-gradient-to-br from-primary/20 to-accent/20"
                               )}>
-                                {msg.role === "assistant" ? (
-                                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                      {msg.content}
-                                    </ReactMarkdown>
-                                    {hasQuizContent(msg.content) && (
-                                      <QuizScorer content={msg.content} />
-                                    )}
-                                  </div>
+                                {msg.role === "user" ? (
+                                  <User className="h-4 w-4 text-primary-foreground" />
                                 ) : (
-                                  <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                                    {msg.content}
-                                  </p>
+                                  <Bot className="h-4 w-4 text-primary" />
                                 )}
                               </div>
                               
-                              {msg.role === "assistant" && (
-                                <div className="flex items-center gap-1 flex-wrap">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-7 px-2 text-xs text-muted-foreground"
-                                    onClick={() => copyToClipboard(msg.content, i)}
-                                  >
-                                    {copiedIndex === i ? (
-                                      <><Check className="h-3 w-3 mr-1" />{t("Copied", "কপি হয়েছে")}</>
-                                    ) : (
-                                      <><Copy className="h-3 w-3 mr-1" />{t("Copy", "কপি")}</>
-                                    )}
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-7 px-2 text-xs text-muted-foreground hover:text-primary"
-                                    onClick={() => askCommunity(i)}
-                                  >
-                                    <Users className="h-3 w-3 mr-1" />
-                                    {t("Ask Community", "কমিউনিটিতে জিজ্ঞাসা")}
-                                  </Button>
+                              <div className={cn("flex-1 space-y-2", msg.role === "user" && "flex flex-col items-end")}>
+                                <div className={cn(
+                                  "rounded-2xl px-4 py-3 max-w-[85%]",
+                                  msg.role === "user"
+                                    ? "bg-primary text-primary-foreground rounded-tr-sm"
+                                    : "bg-muted rounded-tl-sm"
+                                )}>
+                                  {msg.role === "assistant" ? (
+                                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                        {msg.content}
+                                      </ReactMarkdown>
+                                      {hasQuizContent(msg.content) && (
+                                        <QuizScorer content={msg.content} />
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                                      {msg.content}
+                                    </p>
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-
-                        {isLoading && messages[messages.length - 1]?.role === "user" && (
-                          <div className="flex gap-4">
-                            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                              <Bot className="h-4 w-4 text-primary" />
-                            </div>
-                            <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
-                              <div className="flex items-center gap-2">
-                                <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                                <span className="text-sm text-muted-foreground">
-                                  {t("Thinking...", "ভাবছি...")}
-                                </span>
+                                
+                                {msg.role === "assistant" && (
+                                  <div className="flex items-center gap-1 flex-wrap">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 px-2 text-xs text-muted-foreground"
+                                      onClick={() => copyToClipboard(msg.content, i)}
+                                    >
+                                      {copiedIndex === i ? (
+                                        <><Check className="h-3 w-3 mr-1" />{t("Copied", "কপি হয়েছে")}</>
+                                      ) : (
+                                        <><Copy className="h-3 w-3 mr-1" />{t("Copy", "কপি")}</>
+                                      )}
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 px-2 text-xs text-muted-foreground hover:text-primary"
+                                      onClick={() => askCommunity(i)}
+                                    >
+                                      <Users className="h-3 w-3 mr-1" />
+                                      {t("Ask Community", "কমিউনিটিতে জিজ্ঞাসা")}
+                                    </Button>
+                                  </div>
+                                )}
                               </div>
                             </div>
+                          ))}
+
+                          {isLoading && messages[messages.length - 1]?.role === "user" && (
+                            <div className="flex gap-4">
+                              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                                <Bot className="h-4 w-4 text-primary" />
+                              </div>
+                              <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
+                                <div className="flex items-center gap-2">
+                                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                                  <span className="text-sm text-muted-foreground">
+                                    {t("Thinking...", "ভাবছি...")}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </ScrollArea>
+                      
+                      {/* Fixed Input Box at Bottom */}
+                      <div className="border-t border-border/50 p-4 bg-background">
+                        <div className="max-w-3xl mx-auto">
+                          <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
+                            <form
+                              onSubmit={(e) => {
+                                e.preventDefault();
+                                sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined);
+                              }}
+                              className="flex items-end gap-2"
+                            >
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={isLoading || isUploading}
+                                className="h-10 w-10 shrink-0 rounded-xl"
+                              >
+                                {isUploading ? (
+                                  <Loader2 className="h-5 w-5 animate-spin" />
+                                ) : (
+                                  <Paperclip className="h-5 w-5" />
+                                )}
+                              </Button>
+                              
+                              <Textarea
+                                ref={textareaRef}
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                placeholder={t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
+                                disabled={isLoading || isListening}
+                                rows={1}
+                                className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                              />
+                              
+                              <Button
+                                type="submit"
+                                size="icon"
+                                disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
+                                className="h-10 w-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
+                              >
+                                {isLoading ? (
+                                  <Loader2 className="h-5 w-5 animate-spin" />
+                                ) : (
+                                  <Send className="h-5 w-5" />
+                                )}
+                              </Button>
+                            </form>
                           </div>
-                        )}
+                          <p className="text-xs text-center text-muted-foreground mt-2">
+                            {t("Learning Buddy can make mistakes. Verify important info.", "Learning Buddy ভুল করতে পারে।")}
+                          </p>
+                        </div>
                       </div>
-                    </ScrollArea>
+                    </div>
                   )}
                 </div>
                 
-                {/* Input Area (when messages exist and on chat tab) */}
-                {activeTab === 'chat' && messages.length > 0 && (
-                  <div className="border-t border-border/50 p-4">
-                    <div className="max-w-3xl mx-auto">
-                      <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
-                        <form
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined);
-                          }}
-                          className="flex items-end gap-2"
-                        >
-                          <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={isLoading || isUploading}
-                            className="h-10 w-10 shrink-0 rounded-xl"
-                          >
-                            {isUploading ? (
-                              <Loader2 className="h-5 w-5 animate-spin" />
-                            ) : (
-                              <Paperclip className="h-5 w-5" />
-                            )}
-                          </Button>
-                          
-                          <Textarea
-                            ref={textareaRef}
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder={t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
-                            disabled={isLoading || isListening}
-                            rows={1}
-                            className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
-                          />
-                          
-                          <Button
-                            type="submit"
-                            size="icon"
-                            disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
-                            className="h-10 w-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
-                          >
-                            {isLoading ? (
-                              <Loader2 className="h-5 w-5 animate-spin" />
-                            ) : (
-                              <Send className="h-5 w-5" />
-                            )}
-                          </Button>
-                        </form>
-                      </div>
-                      <p className="text-xs text-center text-muted-foreground mt-2">
-                        {t("Learning Buddy can make mistakes. Verify important info.", "Learning Buddy ভুল করতে পারে।")}
-                      </p>
-                    </div>
-                  </div>
-                )}
+                {/* Input Area moved inside the chat messages section above */}
               </div>
               
               {/* Chat History Sidebar - on RIGHT side */}
@@ -1616,290 +1619,292 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
               </div>
             </div>
           ) : (
-            /* Chat Messages */
-            <ScrollArea className="h-full" ref={scrollRef}>
-              <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-                {messages.map((msg, i) => (
-                  <div key={i} className={cn("flex gap-4", msg.role === "user" && "flex-row-reverse")}>
-                    <div className={cn(
-                      "h-8 w-8 rounded-full flex items-center justify-center shrink-0",
-                      msg.role === "user" 
-                        ? "bg-primary" 
-                        : "bg-gradient-to-br from-primary/20 to-accent/20"
-                    )}>
-                      {msg.role === "user" ? (
-                        <User className="h-4 w-4 text-primary-foreground" />
-                      ) : (
-                        <Bot className="h-4 w-4 text-primary" />
-                      )}
-                    </div>
-                    
-                    <div className={cn("flex-1 space-y-2", msg.role === "user" && "flex flex-col items-end")}>
-                      {/* File attachments */}
-                      {msg.files && msg.files.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          {msg.files.map((file, idx) => (
-                            <div key={idx} className="flex items-center gap-2 bg-muted rounded-lg px-3 py-2 text-xs">
-                              {file.type.startsWith('image/') ? (
-                                <img 
-                                  src={file.url} 
-                                  alt={file.name} 
-                                  className="h-16 w-16 object-cover rounded"
-                                />
-                              ) : (
-                                <>
-                                  {getFileIcon(file.type)}
-                                  <span>{file.name}</span>
-                                </>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      
+            /* Chat Messages - with fixed input at bottom */
+            <div className="h-full flex flex-col">
+              {/* Scrollable messages area */}
+              <ScrollArea className="flex-1" ref={scrollRef}>
+                <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+                  {messages.map((msg, i) => (
+                    <div key={i} className={cn("flex gap-4", msg.role === "user" && "flex-row-reverse")}>
                       <div className={cn(
-                        "rounded-2xl px-4 py-3 max-w-[85%]",
-                        msg.role === "user"
-                          ? "bg-primary text-primary-foreground rounded-tr-sm"
-                          : "bg-muted rounded-tl-sm"
+                        "h-8 w-8 rounded-full flex items-center justify-center shrink-0",
+                        msg.role === "user" 
+                          ? "bg-primary" 
+                          : "bg-gradient-to-br from-primary/20 to-accent/20"
                       )}>
-                        {msg.role === "assistant" ? (
-                          <div className="prose prose-sm dark:prose-invert max-w-none">
-                            <ReactMarkdown
-                              remarkPlugins={[remarkGfm]}
-                              components={{
-                                code: ({ className, children, ...props }) => {
-                                  const isInline = !className;
-                                  if (isInline) {
-                                    return (
-                                      <code className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-xs font-mono" {...props}>
-                                        {children}
-                                      </code>
-                                    );
-                                  }
-                                  return (
-                                    <pre className="bg-muted-foreground/10 rounded-lg p-3 overflow-x-auto my-2">
-                                      <code className={cn("text-xs font-mono", className)} {...props}>
-                                        {children}
-                                      </code>
-                                    </pre>
-                                  );
-                                },
-                                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                                ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
-                                ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
-                                li: ({ children }) => <li className="text-sm">{children}</li>,
-                                strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
-                                em: ({ children }) => <em className="italic">{children}</em>,
-                                h1: ({ children }) => <h1 className="text-lg font-bold mb-2 mt-3">{children}</h1>,
-                                h2: ({ children }) => <h2 className="text-base font-bold mb-2 mt-3">{children}</h2>,
-                                h3: ({ children }) => <h3 className="text-sm font-bold mb-1 mt-2">{children}</h3>,
-                                blockquote: ({ children }) => (
-                                  <blockquote className="border-l-2 border-primary/50 pl-3 italic text-muted-foreground my-2">
-                                    {children}
-                                  </blockquote>
-                                ),
-                                a: ({ children, href }) => (
-                                  <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">
-                                    {children}
-                                  </a>
-                                ),
-                                table: ({ children }) => (
-                                  <div className="overflow-x-auto my-2">
-                                    <table className="min-w-full border-collapse text-xs">{children}</table>
-                                  </div>
-                                ),
-                                th: ({ children }) => <th className="border border-border px-2 py-1 bg-muted font-semibold">{children}</th>,
-                                td: ({ children }) => <td className="border border-border px-2 py-1">{children}</td>,
-                              }}
-                            >
-                              {msg.content}
-                            </ReactMarkdown>
-                            
-                            {/* Quiz Scorer - Interactive quiz scoring */}
-                            {hasQuizContent(msg.content) && (
-                              <QuizScorer content={msg.content} />
-                            )}
-                          </div>
+                        {msg.role === "user" ? (
+                          <User className="h-4 w-4 text-primary-foreground" />
                         ) : (
-                          <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                            {msg.content}
-                          </p>
+                          <Bot className="h-4 w-4 text-primary" />
                         )}
                       </div>
                       
-                      {msg.role === "assistant" && (
-                        <div className="flex items-center gap-1 flex-wrap">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 px-2 text-xs text-muted-foreground"
-                            onClick={() => copyToClipboard(msg.content, i)}
-                          >
-                            {copiedIndex === i ? (
-                              <><Check className="h-3 w-3 mr-1" />{t("Copied", "কপি হয়েছে")}</>
-                            ) : (
-                              <><Copy className="h-3 w-3 mr-1" />{t("Copy", "কপি")}</>
-                            )}
-                          </Button>
-                          {ttsSupported && (
+                      <div className={cn("flex-1 space-y-2", msg.role === "user" && "flex flex-col items-end")}>
+                        {/* File attachments */}
+                        {msg.files && msg.files.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {msg.files.map((file, idx) => (
+                              <div key={idx} className="flex items-center gap-2 bg-muted rounded-lg px-3 py-2 text-xs">
+                                {file.type.startsWith('image/') ? (
+                                  <img 
+                                    src={file.url} 
+                                    alt={file.name} 
+                                    className="h-16 w-16 object-cover rounded"
+                                  />
+                                ) : (
+                                  <>
+                                    {getFileIcon(file.type)}
+                                    <span>{file.name}</span>
+                                  </>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        <div className={cn(
+                          "rounded-2xl px-4 py-3 max-w-[85%]",
+                          msg.role === "user"
+                            ? "bg-primary text-primary-foreground rounded-tr-sm"
+                            : "bg-muted rounded-tl-sm"
+                        )}>
+                          {msg.role === "assistant" ? (
+                            <div className="prose prose-sm dark:prose-invert max-w-none">
+                              <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
+                                components={{
+                                  code: ({ className, children, ...props }) => {
+                                    const isInline = !className;
+                                    if (isInline) {
+                                      return (
+                                        <code className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-xs font-mono" {...props}>
+                                          {children}
+                                        </code>
+                                      );
+                                    }
+                                    return (
+                                      <pre className="bg-muted-foreground/10 rounded-lg p-3 overflow-x-auto my-2">
+                                        <code className={cn("text-xs font-mono", className)} {...props}>
+                                          {children}
+                                        </code>
+                                      </pre>
+                                    );
+                                  },
+                                  p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                                  ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
+                                  ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
+                                  li: ({ children }) => <li className="text-sm">{children}</li>,
+                                  strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                                  em: ({ children }) => <em className="italic">{children}</em>,
+                                  h1: ({ children }) => <h1 className="text-lg font-bold mb-2 mt-3">{children}</h1>,
+                                  h2: ({ children }) => <h2 className="text-base font-bold mb-2 mt-3">{children}</h2>,
+                                  h3: ({ children }) => <h3 className="text-sm font-bold mb-1 mt-2">{children}</h3>,
+                                  blockquote: ({ children }) => (
+                                    <blockquote className="border-l-2 border-primary/50 pl-3 italic text-muted-foreground my-2">
+                                      {children}
+                                    </blockquote>
+                                  ),
+                                  a: ({ children, href }) => (
+                                    <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">
+                                      {children}
+                                    </a>
+                                  ),
+                                  table: ({ children }) => (
+                                    <div className="overflow-x-auto my-2">
+                                      <table className="min-w-full border-collapse text-xs">{children}</table>
+                                    </div>
+                                  ),
+                                  th: ({ children }) => <th className="border border-border px-2 py-1 bg-muted font-semibold">{children}</th>,
+                                  td: ({ children }) => <td className="border border-border px-2 py-1">{children}</td>,
+                                }}
+                              >
+                                {msg.content}
+                              </ReactMarkdown>
+                              
+                              {/* Quiz Scorer - Interactive quiz scoring */}
+                              {hasQuizContent(msg.content) && (
+                                <QuizScorer content={msg.content} />
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                              {msg.content}
+                            </p>
+                          )}
+                        </div>
+                        
+                        {msg.role === "assistant" && (
+                          <div className="flex items-center gap-1 flex-wrap">
                             <Button
                               variant="ghost"
                               size="sm"
-                              className={cn(
-                                "h-7 px-2 text-xs",
-                                speakingIndex === i ? "text-primary" : "text-muted-foreground"
-                              )}
-                              onClick={() => speakText(msg.content, i)}
+                              className="h-7 px-2 text-xs text-muted-foreground"
+                              onClick={() => copyToClipboard(msg.content, i)}
                             >
-                              {speakingIndex === i ? (
-                                <><VolumeX className="h-3 w-3 mr-1" />{t("Stop", "থামাও")}</>
+                              {copiedIndex === i ? (
+                                <><Check className="h-3 w-3 mr-1" />{t("Copied", "কপি হয়েছে")}</>
                               ) : (
-                                <><Volume2 className="h-3 w-3 mr-1" />{t("Listen", "শুনুন")}</>
+                                <><Copy className="h-3 w-3 mr-1" />{t("Copy", "কপি")}</>
                               )}
                             </Button>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 px-2 text-xs text-muted-foreground hover:text-primary"
-                            onClick={() => askCommunity(i)}
-                          >
-                            <Users className="h-3 w-3 mr-1" />
-                            {t("Ask Community", "কমিউনিটিতে জিজ্ঞাসা")}
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-
-                {isLoading && messages[messages.length - 1]?.role === "user" && (
-                  <div className="flex gap-4">
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                      <Bot className="h-4 w-4 text-primary" />
-                    </div>
-                    <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                        <span className="text-sm text-muted-foreground">
-                          {t("Thinking...", "ভাবছি...")}
-                        </span>
+                            {ttsSupported && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={cn(
+                                  "h-7 px-2 text-xs",
+                                  speakingIndex === i ? "text-primary" : "text-muted-foreground"
+                                )}
+                                onClick={() => speakText(msg.content, i)}
+                              >
+                                {speakingIndex === i ? (
+                                  <><VolumeX className="h-3 w-3 mr-1" />{t("Stop", "থামাও")}</>
+                                ) : (
+                                  <><Volume2 className="h-3 w-3 mr-1" />{t("Listen", "শুনুন")}</>
+                                )}
+                              </Button>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-xs text-muted-foreground hover:text-primary"
+                              onClick={() => askCommunity(i)}
+                            >
+                              <Users className="h-3 w-3 mr-1" />
+                              {t("Ask Community", "কমিউনিটিতে জিজ্ঞাসা")}
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
+                  ))}
+
+                  {isLoading && messages[messages.length - 1]?.role === "user" && (
+                    <div className="flex gap-4">
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                        <Bot className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                          <span className="text-sm text-muted-foreground">
+                            {t("Thinking...", "ভাবছি...")}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+              
+              {/* Fixed Input Box at Bottom */}
+              <div className="border-t border-border/50 p-4 bg-background">
+                <div className="max-w-3xl mx-auto">
+                  <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
+                    {/* Attached files preview */}
+                    {attachedFiles.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-2 px-2">
+                        {attachedFiles.map((file, idx) => (
+                          <div key={idx} className="flex items-center gap-2 bg-background rounded-lg px-2 py-1 text-xs">
+                            {getFileIcon(file.type)}
+                            <span className="truncate max-w-[100px]">{file.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeAttachedFile(idx)}
+                              className="text-muted-foreground hover:text-destructive"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined);
+                      }}
+                      className="flex items-end gap-2"
+                    >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*,.pdf,.doc,.docx"
+                        multiple
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                      
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isLoading || isUploading}
+                        className="h-10 w-10 shrink-0 rounded-xl"
+                      >
+                        {isUploading ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Paperclip className="h-5 w-5" />
+                        )}
+                      </Button>
+                      
+                      <Textarea
+                        ref={textareaRef}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder={t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
+                        disabled={isLoading || isListening}
+                        rows={1}
+                        className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                      />
+                      
+                      {speechSupported && (
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant={isListening ? "destructive" : "ghost"}
+                          onClick={toggleListening}
+                          disabled={isLoading}
+                          className={cn(
+                            "h-10 w-10 shrink-0 rounded-xl",
+                            isListening && "animate-pulse"
+                          )}
+                        >
+                          {isListening ? (
+                            <MicOff className="h-5 w-5" />
+                          ) : (
+                            <Mic className="h-5 w-5" />
+                          )}
+                        </Button>
+                      )}
+                      
+                      <Button
+                        type="submit"
+                        size="icon"
+                        disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
+                        className="h-10 w-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
+                      >
+                        {isLoading ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Send className="h-5 w-5" />
+                        )}
+                      </Button>
+                    </form>
                   </div>
-                )}
+                  <p className="text-xs text-center text-muted-foreground mt-2">
+                    {t("Learning Buddy can make mistakes. Verify important info.", "Learning Buddy ভুল করতে পারে।")}
+                  </p>
+                </div>
               </div>
-            </ScrollArea>
+            </div>
           )}
         </div>
-        
-        {/* Input Area (when messages exist and on chat tab) */}
-        {activeTab === 'chat' && messages.length > 0 && (
-          <div className="border-t border-border/50 p-4">
-            <div className="max-w-3xl mx-auto">
-              <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
-                {/* Attached files preview */}
-                {attachedFiles.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-2 px-2">
-                    {attachedFiles.map((file, idx) => (
-                      <div key={idx} className="flex items-center gap-2 bg-background rounded-lg px-2 py-1 text-xs">
-                        {getFileIcon(file.type)}
-                        <span className="truncate max-w-[100px]">{file.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeAttachedFile(idx)}
-                          className="text-muted-foreground hover:text-destructive"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    sendMessage(input, attachedFiles.length > 0 ? attachedFiles : undefined);
-                  }}
-                  className="flex items-end gap-2"
-                >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*,.pdf,.doc,.docx"
-                    multiple
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isLoading || isUploading}
-                    className="h-10 w-10 shrink-0 rounded-xl"
-                  >
-                    {isUploading ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <Paperclip className="h-5 w-5" />
-                    )}
-                  </Button>
-                  
-                  <Textarea
-                    ref={textareaRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder={t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
-                    disabled={isLoading || isListening}
-                    rows={1}
-                    className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
-                  />
-                  
-                  {speechSupported && (
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant={isListening ? "destructive" : "ghost"}
-                      onClick={toggleListening}
-                      disabled={isLoading}
-                      className={cn(
-                        "h-10 w-10 shrink-0 rounded-xl",
-                        isListening && "animate-pulse"
-                      )}
-                    >
-                      {isListening ? (
-                        <MicOff className="h-5 w-5" />
-                      ) : (
-                        <Mic className="h-5 w-5" />
-                      )}
-                    </Button>
-                  )}
-                  
-                  <Button
-                    type="submit"
-                    size="icon"
-                    disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
-                    className="h-10 w-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <Send className="h-5 w-5" />
-                    )}
-                  </Button>
-                </form>
-              </div>
-              <p className="text-xs text-center text-muted-foreground mt-2">
-                {t("Learning Buddy can make mistakes. Verify important info.", "Learning Buddy ভুল করতে পারে।")}
-              </p>
-            </div>
-          </div>
-        )}
+        {/* Input Area moved inside the chat messages section above */}
       </div>
       
       {/* Desktop Sidebar - on RIGHT */}
