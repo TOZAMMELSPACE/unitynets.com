@@ -924,82 +924,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
           {/* Global Header removed - cleaner UI for Learning Zone */}
           
           {/* Page Content */}
-          <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-            {/* Header with tabs */}
-            <header className="flex flex-col border-b border-border/50 bg-card">
-              <div className="flex items-center justify-between px-4 py-3">
-                <div className="flex items-center gap-2">
-                  {/* Mobile menu button */}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="md:hidden h-9 w-9"
-                    onClick={() => setSidebarMobileOpen(true)}
-                  >
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                  
-                  {/* Desktop sidebar toggle */}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hidden md:flex h-9 w-9"
-                    onClick={() => setSidebarOpen(!sidebarOpen)}
-                  >
-                    {sidebarOpen ? (
-                      <PanelLeftClose className="h-5 w-5" />
-                    ) : (
-                      <PanelLeft className="h-5 w-5" />
-                    )}
-                  </Button>
-                  
-                  <h1 className="text-lg font-semibold">Learning Buddy</h1>
-                </div>
-                
-                {activeTab === 'chat' && messages.length > 0 && (
-                  <Button variant="ghost" size="sm" onClick={startNewChat} className="gap-2">
-                    <RotateCcw className="h-4 w-4" />
-                    <span className="hidden sm:inline">{t("New Chat", "নতুন চ্যাট")}</span>
-                  </Button>
-                )}
-              </div>
-              
-              {/* Tab Navigation */}
-              <div className="px-4 pb-2">
-                <div className="flex gap-2 overflow-x-auto">
-                  <Button
-                    variant={activeTab === 'chat' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setActiveTab('chat')}
-                    className="gap-2"
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                    {t('AI Chat', 'AI চ্যাট')}
-                  </Button>
-                  <Button
-                    variant={activeTab === 'study-rooms' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setActiveTab('study-rooms')}
-                    className="gap-2"
-                  >
-                    <Users className="h-4 w-4" />
-                    {t('Study Rooms', 'স্টাডি রুম')}
-                  </Button>
-                  <Button
-                    variant={activeTab === 'progress' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setActiveTab('progress')}
-                    className="gap-2"
-                  >
-                    <BarChart3 className="h-4 w-4" />
-                    {t('Progress', 'প্রগ্রেস')}
-                  </Button>
-                </div>
-              </div>
-            </header>
-            
-            {/* Main Content with Chat Sidebar - Sidebar on RIGHT */}
-            <div className="flex-1 flex overflow-hidden min-h-0">
+          <div className="flex-1 flex overflow-hidden min-h-0">
               {/* Mobile Sidebar Overlay */}
               {sidebarMobileOpen && (
                 <div 
@@ -1019,7 +944,80 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
               </div>
               
               {/* Main Content Area - Now FIRST (left side) */}
-              <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
+              <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden border-r border-border/50">
+                {/* Header with tabs */}
+                <header className="flex flex-col border-b border-border/50 bg-card shrink-0">
+                  <div className="flex items-center justify-between px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      {/* Mobile menu button */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="md:hidden h-9 w-9"
+                        onClick={() => setSidebarMobileOpen(true)}
+                      >
+                        <Menu className="h-5 w-5" />
+                      </Button>
+                      
+                      {/* Desktop sidebar toggle */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="hidden md:flex h-9 w-9"
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                      >
+                        {sidebarOpen ? (
+                          <PanelLeftClose className="h-5 w-5" />
+                        ) : (
+                          <PanelLeft className="h-5 w-5" />
+                        )}
+                      </Button>
+                      
+                      <h1 className="text-lg font-semibold">Learning Buddy</h1>
+                    </div>
+                    
+                    {activeTab === 'chat' && messages.length > 0 && (
+                      <Button variant="ghost" size="sm" onClick={startNewChat} className="gap-2">
+                        <RotateCcw className="h-4 w-4" />
+                        <span className="hidden sm:inline">{t("New Chat", "নতুন চ্যাট")}</span>
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {/* Tab Navigation */}
+                  <div className="px-4 pb-2">
+                    <div className="flex gap-2 overflow-x-auto">
+                      <Button
+                        variant={activeTab === 'chat' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setActiveTab('chat')}
+                        className="gap-2"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        {t('AI Chat', 'AI চ্যাট')}
+                      </Button>
+                      <Button
+                        variant={activeTab === 'study-rooms' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setActiveTab('study-rooms')}
+                        className="gap-2"
+                      >
+                        <Users className="h-4 w-4" />
+                        {t('Study Rooms', 'স্টাডি রুম')}
+                      </Button>
+                      <Button
+                        variant={activeTab === 'progress' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setActiveTab('progress')}
+                        className="gap-2"
+                      >
+                        <BarChart3 className="h-4 w-4" />
+                        {t('Progress', 'প্রগ্রেস')}
+                      </Button>
+                    </div>
+                  </div>
+                </header>
+                
                 {/* Content Area */}
                 <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                   {activeTab === 'progress' ? (
@@ -1327,7 +1325,6 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                 <SidebarContent />
               </div>
             </div>
-          </div>
         </div>
         
         {/* Mobile bottom navigation */}
