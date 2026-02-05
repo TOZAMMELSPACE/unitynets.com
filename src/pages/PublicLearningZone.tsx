@@ -908,7 +908,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
   // If user is logged in, show with LeftSidebar like other authenticated pages
   if (user) {
     return (
-      <div className="relative min-h-screen w-full bg-background">
+      <div className="relative h-screen w-full bg-background overflow-hidden">
         <SEOHead
           title="Learning Buddy - AI শেখার সঙ্গী | UnityNets"
           description="AI চ্যাটবট দিয়ে যেকোনো বিষয়ে বাংলায় শিখুন। প্রোগ্রামিং, ডিজিটাল দক্ষতা, ফ্রিল্যান্সিং।"
@@ -920,11 +920,11 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
         <LeftSidebar />
         
         {/* Main content area */}
-        <div className="w-full lg:pl-64 min-h-screen pb-20 lg:pb-0">
+        <div className="w-full lg:pl-64 h-screen pb-20 lg:pb-0 flex flex-col overflow-hidden">
           {/* Global Header removed - cleaner UI for Learning Zone */}
           
           {/* Page Content */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col overflow-hidden min-h-0">
             {/* Header with tabs */}
             <header className="flex flex-col border-b border-border/50 bg-card">
               <div className="flex items-center justify-between px-4 py-3">
@@ -999,7 +999,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
             </header>
             
             {/* Main Content with Chat Sidebar - Sidebar on RIGHT */}
-            <div className="flex-1 flex overflow-hidden">
+            <div className="flex-1 flex overflow-hidden min-h-0">
               {/* Mobile Sidebar Overlay */}
               {sidebarMobileOpen && (
                 <div 
@@ -1019,9 +1019,9 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
               </div>
               
               {/* Main Content Area - Now FIRST (left side) */}
-              <div className="flex-1 flex flex-col min-w-0">
+              <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
                 {/* Content Area */}
-                <div className="flex-1 overflow-hidden">
+                <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                   {activeTab === 'progress' ? (
                     /* Progress Dashboard */
                     <div className="h-full overflow-y-auto p-4">
@@ -1046,9 +1046,9 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                     </div>
                 ) : messages.length === 0 ? (
                     /* Welcome Screen - with fixed input at bottom */
-                    <div className="h-full flex flex-col">
+                    <div className="h-full flex flex-col min-h-0 overflow-hidden">
                       {/* Scrollable content area */}
-                      <ScrollArea className="flex-1">
+                      <ScrollArea className="flex-1 min-h-0">
                         <div className="px-4 py-6">
                           <div className="max-w-3xl mx-auto">
                             <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
@@ -1092,7 +1092,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                       </ScrollArea>
                       
                       {/* Fixed Input Box at Bottom */}
-                      <div className="border-t border-border/50 p-4 bg-background">
+                      <div className="shrink-0 border-t border-border/50 p-4 bg-background">
                         <div className="max-w-3xl mx-auto">
                           <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
                             <div className="flex items-end gap-2">
@@ -1165,9 +1165,9 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                     </div>
                   ) : (
                     /* Chat Messages - with fixed input at bottom */
-                    <div className="h-full flex flex-col">
+                    <div className="h-full flex flex-col min-h-0 overflow-hidden">
                       {/* Scrollable messages area */}
-                      <ScrollArea className="flex-1" ref={scrollRef}>
+                      <ScrollArea className="flex-1 min-h-0" ref={scrollRef}>
                         <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
                           {messages.map((msg, i) => (
                             <div key={i} className={cn("flex gap-4", msg.role === "user" && "flex-row-reverse")}>
@@ -1255,7 +1255,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                       </ScrollArea>
                       
                       {/* Fixed Input Box at Bottom */}
-                      <div className="border-t border-border/50 p-4 bg-background">
+                      <div className="shrink-0 border-t border-border/50 p-4 bg-background">
                         <div className="max-w-3xl mx-auto">
                           <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
                             <form
@@ -1338,7 +1338,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
 
   // For non-logged in users, show the original layout with Navbar
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       <SEOHead
         title="Learning Buddy - AI শেখার সঙ্গী | UnityNets"
         description="AI চ্যাটবট দিয়ে যেকোনো বিষয়ে বাংলায় শিখুন। প্রোগ্রামিং, ডিজিটাল দক্ষতা, ফ্রিল্যান্সিং।"
@@ -1350,7 +1350,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
       <Navbar />
       
       {/* Main Content - Below Navbar */}
-      <div className="flex-1 flex overflow-hidden pt-16 md:pt-20">
+      <div className="flex-1 flex overflow-hidden pt-16 md:pt-20 min-h-0">
       
       {/* Mobile Sidebar Overlay */}
       {sidebarMobileOpen && (
@@ -1371,7 +1371,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
       </div>
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
         {/* Header */}
         <header className="flex flex-col border-b border-border/50">
           <div className="flex items-center justify-between px-4 py-3">
@@ -1446,7 +1446,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
         </header>
         
         {/* Content Area */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {activeTab === 'progress' ? (
             /* Progress Dashboard */
             <div className="h-full overflow-y-auto p-4">
@@ -1471,9 +1471,9 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
             </div>
           ) : messages.length === 0 ? (
             /* Welcome Screen - with fixed input at bottom */
-            <div className="h-full flex flex-col">
+            <div className="h-full flex flex-col min-h-0 overflow-hidden">
               {/* Scrollable content area */}
-              <ScrollArea className="flex-1">
+              <ScrollArea className="flex-1 min-h-0">
                 <div className="px-4 py-6">
                   <div className="max-w-3xl mx-auto">
                     <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
@@ -1517,7 +1517,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
               </ScrollArea>
               
               {/* Fixed Input Box at Bottom */}
-              <div className="border-t border-border/50 p-4 bg-background">
+              <div className="shrink-0 border-t border-border/50 p-4 bg-background">
                 <div className="max-w-3xl mx-auto">
                   <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
                     {/* Attached files preview */}
@@ -1620,9 +1620,9 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
             </div>
           ) : (
             /* Chat Messages - with fixed input at bottom */
-            <div className="h-full flex flex-col">
+            <div className="h-full flex flex-col min-h-0 overflow-hidden">
               {/* Scrollable messages area */}
-              <ScrollArea className="flex-1" ref={scrollRef}>
+              <ScrollArea className="flex-1 min-h-0" ref={scrollRef}>
                 <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
                   {messages.map((msg, i) => (
                     <div key={i} className={cn("flex gap-4", msg.role === "user" && "flex-row-reverse")}>
@@ -1798,7 +1798,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
               </ScrollArea>
               
               {/* Fixed Input Box at Bottom */}
-              <div className="border-t border-border/50 p-4 bg-background">
+              <div className="shrink-0 border-t border-border/50 p-4 bg-background">
                 <div className="max-w-3xl mx-auto">
                   <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
                     {/* Attached files preview */}
