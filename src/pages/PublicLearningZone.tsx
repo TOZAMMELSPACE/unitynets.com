@@ -920,7 +920,7 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
         <LeftSidebar />
         
         {/* Main content area */}
-        <div className="w-full lg:pl-64 h-screen pb-20 lg:pb-0 flex flex-col overflow-hidden">
+        <div className="w-full lg:pl-64 h-full pb-20 lg:pb-0 flex flex-col overflow-hidden">
           {/* Global Header removed - cleaner UI for Learning Zone */}
           
           {/* Page Content */}
