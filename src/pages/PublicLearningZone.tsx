@@ -80,6 +80,15 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/learning-cha
 // Categories of suggested questions for a comprehensive personal assistant
 const questionCategories = [
   {
+    titleEn: "🖼️ Image Analysis",
+    titleBn: "🖼️ ছবি বিশ্লেষণ",
+    questions: [
+      { textEn: "📷 Analyze my uploaded image", textBn: "📷 আমার আপলোড করা ছবি বিশ্লেষণ করো", icon: ImageIcon, color: "bg-violet-500/10 text-violet-600 dark:text-violet-400" },
+      { textEn: "🔍 What's in this picture?", textBn: "🔍 এই ছবিতে কী আছে?", icon: Search, color: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400" },
+      { textEn: "📝 Extract text from image (OCR)", textBn: "📝 ছবি থেকে টেক্সট বের করো (OCR)", icon: FileText, color: "bg-sky-500/10 text-sky-600 dark:text-sky-400" },
+    ]
+  },
+  {
     titleEn: "🌅 Daily Life",
     titleBn: "🌅 দৈনন্দিন জীবন",
     questions: [
