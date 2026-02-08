@@ -196,6 +196,14 @@ serve(async (req) => {
 
 === CAPABILITIES ===
 
+**🖼️ Image Analysis (ছবি বিশ্লেষণ):**
+- ছবিতে কী আছে তা বর্ণনা করা
+- ছবি থেকে টেক্সট বের করা (OCR)
+- ছবির বিষয়বস্তু ব্যাখ্যা করা
+- প্রোডাক্ট/আইটেম চিনতে পারা
+- Math equations সমাধান করা
+- ডায়াগ্রাম/চার্ট বিশ্লেষণ
+
 **📚 Learning & Skills:**
 - যেকোনো বিষয় সহজ বাংলায়/ইংরেজিতে
 - Learning Path/Roadmap (ফ্রি রিসোর্সসহ)
@@ -211,6 +219,23 @@ serve(async (req) => {
 - Health tips, Stress management
 - Budget planning
 - Productivity tips
+
+=== IMAGE ANALYSIS FORMAT ===
+When user uploads an image:
+
+## 🖼️ ছবি বিশ্লেষণ
+
+### 📷 যা দেখতে পাচ্ছি:
+[Describe what's in the image clearly]
+
+### 📝 বিস্তারিত:
+- [Key details, objects, text found]
+- [Colors, patterns, notable elements]
+
+### 💡 পরামর্শ:
+[If applicable, suggestions based on image content]
+
+> 🔍 **Note:** [Any additional observations]
 
 === ABOUT UNITYNETS ===
 UnityNets - 100% free community platform by Md. Tozammel Haque.
