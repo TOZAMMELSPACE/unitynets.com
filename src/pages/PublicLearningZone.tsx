@@ -170,6 +170,7 @@ export default function PublicLearningZone() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
+  const [interimTranscript, setInterimTranscript] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<FileAttachment[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [ttsSupported, setTtsSupported] = useState(false);
@@ -204,14 +205,26 @@ export default function PublicLearningZone() {
       recognition.lang = 'bn-BD';
       
       recognition.onresult = (event) => {
-        const transcript = Array.from(event.results)
-          .map(result => result[0].transcript)
-          .join('');
-        setInput(transcript);
+        let finalTranscript = '';
+        let interim = '';
+        for (let i = 0; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interim += event.results[i][0].transcript;
+          }
+        }
+        if (finalTranscript) {
+          setInput(prev => prev + finalTranscript);
+          setInterimTranscript('');
+        } else {
+          setInterimTranscript(interim);
+        }
       };
       
       recognition.onend = () => {
         setIsListening(false);
+        setInterimTranscript('');
       };
       
       recognition.onerror = (event) => {
@@ -1101,7 +1114,21 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                       {/* Fixed Input Box at Bottom */}
                       <div className="shrink-0 border-t border-border/50 p-4 bg-background">
                         <div className="max-w-3xl mx-auto">
-                          <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
+                          <div className={cn("bg-muted/50 rounded-2xl border p-2 transition-colors", isListening ? "border-primary/50 bg-primary/5" : "border-border/50")}>
+                            {isListening && (
+                              <div className="flex items-center gap-2 px-3 py-1.5 mb-2">
+                                <div className="flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
+                                  <span className="w-1.5 h-3 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                                  <span className="w-1.5 h-4 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                                  <span className="w-1.5 h-3 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                                  <span className="w-1.5 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '450ms' }} />
+                                </div>
+                                <span className="text-xs font-medium text-primary">
+                                  {interimTranscript ? interimTranscript : t("Listening...", "শুনছি...")}
+                                </span>
+                              </div>
+                            )}
                             <div className="flex items-end gap-2">
                               <Button
                                 type="button"
@@ -1123,10 +1150,10 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
-                                placeholder={t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
-                                disabled={isLoading || isListening}
+                                placeholder={isListening ? (interimTranscript || t("Listening... speak now", "শুনছি... এখন কথা বলুন")) : t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
+                                disabled={isLoading}
                                 rows={1}
-                                className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                                className={cn("min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base", isListening && "placeholder:text-primary placeholder:animate-pulse")}
                               />
                               
                               {speechSupported && (
@@ -1264,7 +1291,21 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                       {/* Fixed Input Box at Bottom */}
                       <div className="shrink-0 border-t border-border/50 p-4 bg-background">
                         <div className="max-w-3xl mx-auto">
-                          <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
+                          <div className={cn("bg-muted/50 rounded-2xl border p-2 transition-colors", isListening ? "border-primary/50 bg-primary/5" : "border-border/50")}>
+                            {isListening && (
+                              <div className="flex items-center gap-2 px-3 py-1.5 mb-2">
+                                <div className="flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
+                                  <span className="w-1.5 h-3 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                                  <span className="w-1.5 h-4 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                                  <span className="w-1.5 h-3 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                                  <span className="w-1.5 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '450ms' }} />
+                                </div>
+                                <span className="text-xs font-medium text-primary">
+                                  {interimTranscript ? interimTranscript : t("Listening...", "শুনছি...")}
+                                </span>
+                              </div>
+                            )}
                             <form
                               onSubmit={(e) => {
                                 e.preventDefault();
@@ -1292,10 +1333,10 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
-                                placeholder={t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
-                                disabled={isLoading || isListening}
+                                placeholder={isListening ? (interimTranscript || t("Listening... speak now", "শুনছি... এখন কথা বলুন")) : t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
+                                disabled={isLoading}
                                 rows={1}
-                                className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                                className={cn("min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base", isListening && "placeholder:text-primary placeholder:animate-pulse")}
                               />
                               
                               <Button
@@ -1525,7 +1566,21 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
               {/* Fixed Input Box at Bottom */}
               <div className="shrink-0 border-t border-border/50 p-4 bg-background">
                 <div className="max-w-3xl mx-auto">
-                  <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
+                  <div className={cn("bg-muted/50 rounded-2xl border p-2 transition-colors", isListening ? "border-primary/50 bg-primary/5" : "border-border/50")}>
+                    {isListening && (
+                      <div className="flex items-center gap-2 px-3 py-1.5 mb-2">
+                        <div className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
+                          <span className="w-1.5 h-3 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-1.5 h-4 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-1.5 h-3 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                          <span className="w-1.5 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '450ms' }} />
+                        </div>
+                        <span className="text-xs font-medium text-primary">
+                          {interimTranscript ? interimTranscript : t("Listening...", "শুনছি...")}
+                        </span>
+                      </div>
+                    )}
                     {/* Attached files preview */}
                     {attachedFiles.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-2 px-2">
@@ -1577,10 +1632,10 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder={t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
-                        disabled={isLoading || isListening}
+                        placeholder={isListening ? (interimTranscript || t("Listening... speak now", "শুনছি... এখন কথা বলুন")) : t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
+                        disabled={isLoading}
                         rows={1}
-                        className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                        className={cn("min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base", isListening && "placeholder:text-primary placeholder:animate-pulse")}
                       />
                       
                       {speechSupported && (
@@ -1806,7 +1861,22 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
               {/* Fixed Input Box at Bottom */}
               <div className="shrink-0 border-t border-border/50 p-4 bg-background">
                 <div className="max-w-3xl mx-auto">
-                  <div className="bg-muted/50 rounded-2xl border border-border/50 p-2">
+                  <div className={cn("bg-muted/50 rounded-2xl border p-2 transition-colors", isListening ? "border-primary/50 bg-primary/5" : "border-border/50")}>
+                    {/* Voice listening indicator */}
+                    {isListening && (
+                      <div className="flex items-center gap-2 px-3 py-1.5 mb-2">
+                        <div className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
+                          <span className="w-1.5 h-3 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-1.5 h-4 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-1.5 h-3 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                          <span className="w-1.5 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '450ms' }} />
+                        </div>
+                        <span className="text-xs font-medium text-primary">
+                          {interimTranscript ? interimTranscript : t("Listening...", "শুনছি...")}
+                        </span>
+                      </div>
+                    )}
                     {/* Attached files preview */}
                     {attachedFiles.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-2 px-2">
@@ -1862,10 +1932,10 @@ ${assistantContent.slice(0, 500)}${assistantContent.length > 500 ? '...' : ''}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder={t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
-                        disabled={isLoading || isListening}
+                        placeholder={isListening ? (interimTranscript || t("Listening... speak now", "শুনছি... এখন কথা বলুন")) : t("Message Learning Buddy...", "Learning Buddy কে মেসেজ করো...")}
+                        disabled={isLoading}
                         rows={1}
-                        className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                        className={cn("min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base", isListening && "placeholder:text-primary placeholder:animate-pulse")}
                       />
                       
                       {speechSupported && (
