@@ -189,6 +189,8 @@ export default function PublicLearningZone() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<typeof window.SpeechRecognition.prototype | null>(null);
+  const voiceInputRef = useRef('');
+  const sendMessageRef = useRef<(text: string) => void>(() => {});
 
   // Check for Web Speech API support
   useEffect(() => {
@@ -215,7 +217,11 @@ export default function PublicLearningZone() {
           }
         }
         if (finalTranscript) {
-          setInput(prev => prev + finalTranscript);
+          setInput(prev => {
+            const newVal = prev + finalTranscript;
+            voiceInputRef.current = newVal;
+            return newVal;
+          });
           setInterimTranscript('');
         } else {
           setInterimTranscript(interim);
@@ -225,6 +231,15 @@ export default function PublicLearningZone() {
       recognition.onend = () => {
         setIsListening(false);
         setInterimTranscript('');
+        // Auto-send after voice input ends
+        if (voiceInputRef.current.trim()) {
+          const textToSend = voiceInputRef.current.trim();
+          voiceInputRef.current = '';
+          // Use setTimeout to ensure state updates are flushed
+          setTimeout(() => {
+            sendMessageRef.current(textToSend);
+          }, 100);
+        }
       };
       
       recognition.onerror = (event) => {
@@ -257,6 +272,7 @@ export default function PublicLearningZone() {
       setIsListening(false);
     } else {
       try {
+        voiceInputRef.current = '';
         recognitionRef.current.start();
         setIsListening(true);
       } catch (error) {
@@ -438,6 +454,12 @@ export default function PublicLearningZone() {
         }
       }
     }
+  };
+
+  // Keep sendMessageRef in sync for auto-send from voice input
+  sendMessageRef.current = (text: string) => {
+    setInput('');
+    sendMessage(text);
   };
 
   const sendMessage = async (text: string, files?: FileAttachment[]) => {
