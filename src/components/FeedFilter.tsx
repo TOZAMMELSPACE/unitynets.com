@@ -15,6 +15,7 @@ import {
   X
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { worldCountries } from "@/lib/countries";
 
 interface FeedFilterProps {
   onFilterChange: (filters: {
@@ -162,10 +163,11 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t("All Communities", "সব কমিউনিটি")}</SelectItem>
-              <SelectItem value="global">🌍 {t("Global", "গ্লোবাল")}</SelectItem>
-              <SelectItem value="ward-1">🏘️ Ward-1</SelectItem>
-              <SelectItem value="ward-2">🏘️ Ward-2</SelectItem>
-              <SelectItem value="ward-3">🏘️ Ward-3</SelectItem>
+              {worldCountries.map((country) => (
+                <SelectItem key={country.value} value={country.value}>
+                  {country.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 

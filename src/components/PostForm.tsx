@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Image, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { worldCountries } from "@/lib/countries";
 
 interface PostFormProps {
   user: User;
@@ -168,11 +169,12 @@ export const PostForm = ({ user, onPostCreated }: PostFormProps) => {
               <SelectTrigger className="w-full sm:w-48">
                 <SelectValue placeholder="Select community" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="global">🌍 Global</SelectItem>
-                <SelectItem value="ward-1">🏘️ Ward-1</SelectItem>
-                <SelectItem value="ward-2">🏘️ Ward-2</SelectItem>
-                <SelectItem value="ward-3">🏘️ Ward-3</SelectItem>
+              <SelectContent className="max-h-60">
+                {worldCountries.map((country) => (
+                  <SelectItem key={country.value} value={country.value}>
+                    {country.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             
