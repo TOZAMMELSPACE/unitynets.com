@@ -183,30 +183,7 @@ export const useLocationStats = () => {
 
   useEffect(() => {
     fetchStats();
-
-    // Set up real-time subscriptions for live updates
-    const profilesChannel = supabase
-      .channel("location-stats-profiles")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "profiles" },
-        () => fetchStats()
-      )
-      .subscribe();
-
-    const postsChannel = supabase
-      .channel("location-stats-posts")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "posts" },
-        () => fetchStats()
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(profilesChannel);
-      supabase.removeChannel(postsChannel);
-    };
+    // No realtime subscriptions needed - stats don't change frequently
   }, []);
 
   // Aggregate stats by country
