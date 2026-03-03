@@ -7,7 +7,7 @@ import { useSocial } from "@/hooks/useSocial";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSocialDB } from "@/hooks/useSocialDB";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "@/contexts/LanguageContext";
+
 
 interface NotificationsProps {
   currentUser: User | null;
@@ -48,7 +48,7 @@ export default function Notifications({
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = 
     useNotificationsDB(currentUser?.id || null);
   const navigate = useNavigate();
-  const { t, language } = useLanguage();
+  
 
   useEffect(() => {
     // Mark notifications as read when viewed
@@ -87,14 +87,14 @@ export default function Notifications({
     <div className="min-h-screen bg-background pb-20">
       <main className="container mx-auto px-4 max-w-2xl pt-4">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">{t("Notifications", "বিজ্ঞপ্তি")}</h2>
+          <h2 className="text-xl font-bold">Notifications</h2>
           {unreadCount > 0 && (
             <Button 
               variant="ghost" 
               size="sm"
               onClick={markAllAsRead}
             >
-              {t("Mark all as read", "সব পড়া হয়েছে")}
+              Mark all as read
             </Button>
           )}
         </div>
@@ -103,9 +103,9 @@ export default function Notifications({
           {notifications.length === 0 ? (
             <div className="text-center py-12">
               <Bell className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">{t("No notifications", "কোন বিজ্ঞপ্তি নেই")}</h3>
+              <h3 className="text-lg font-semibold mb-2">No notifications</h3>
               <p className="text-muted-foreground">
-                {t("When you get new likes, comments or follows, they will appear here", "নতুন লাইক, কমেন্ট বা ফলো পেলে এখানে দেখতে পাবেন")}
+                When you get new likes, comments or follows, they will appear here
               </p>
             </div>
           ) : (
@@ -146,7 +146,7 @@ export default function Notifications({
                           {notification.content}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(notification.created_at).toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-US', {
+                          {new Date(notification.created_at).toLocaleDateString('en-US', {
                             day: 'numeric',
                             month: 'long',
                             hour: '2-digit',
@@ -161,14 +161,14 @@ export default function Notifications({
                               variant="default"
                               onClick={() => handleAcceptRequest(notification.from_user_id, notification.id)}
                             >
-                              {t("Accept", "গ্রহণ করুন")}
+                              Accept
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() => handleRejectRequest(notification.from_user_id, notification.id)}
                             >
-                              {t("Reject", "প্রত্যাখ্যান")}
+                              Reject
                             </Button>
                           </div>
                         )}
