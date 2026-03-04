@@ -1,138 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-// Helper to get or create user memory
-async function getUserMemory(supabase: any, userId?: string, deviceFingerprint?: string) {
-  let query = supabase.from('learning_user_memory').select('*');
-  
-  if (userId) {
-    query = query.eq('user_id', userId);
-  } else if (deviceFingerprint) {
-    query = query.eq('device_fingerprint', deviceFingerprint).is('user_id', null);
-  } else {
-    return null;
-  }
-  
-  const { data, error } = await query.maybeSingle();
-  if (error) {
-    console.error('Error fetching user memory:', error);
-    return null;
-  }
-  return data;
-}
-
-// Mood detection from user message
-function detectMood(message: string): string | null {
-  const lowerMessage = message.toLowerCase();
-  
-  // Mood patterns with Bengali and English keywords
-  const moodPatterns = {
-    'খুশি 😊': ['happy', 'excited', 'great', 'awesome', 'amazing', 'wonderful', 'fantastic', 'খুশি', 'আনন্দ', 'মজা', 'দারুণ', 'অসাধারণ', 'ভালো লাগছে', 'খুব ভালো', 'হ্যাপি'],
-    'উৎসাহী 🔥': ['motivated', 'pumped', 'ready', 'can\'t wait', 'excited', 'উৎসাহ', 'মোটিভেটেড', 'রেডি', 'পারবো', 'করে ফেলব'],
-    'চিন্তিত 😟': ['worried', 'anxious', 'nervous', 'stressed', 'tension', 'চিন্তা', 'টেনশন', 'ভয়', 'nervous', 'চিন্তিত', 'stress'],
-    'ক্লান্ত 😴': ['tired', 'exhausted', 'sleepy', 'ক্লান্ত', 'ঘুম', 'ক্লান্ত লাগছে', 'এনার্জি নাই', 'টায়ার্ড', 'ঘুম পাচ্ছে', 'ঘুম আসছে না'],
-    'দুঃখিত 😢': ['sad', 'upset', 'depressed', 'down', 'unhappy', 'দুঃখ', 'মন খারাপ', 'কষ্ট', 'মন ভালো না', 'sad', 'কান্না', 'খারাপ লাগছে'],
-    'বিরক্ত 😤': ['frustrated', 'annoyed', 'angry', 'irritated', 'বিরক্ত', 'রাগ', 'বিরক্ত লাগছে', 'frustrated', '짜증'],
-    'বোরিং 😑': ['bored', 'boring', 'nothing to do', 'বোর', 'বিরক্তিকর', 'কিছু করার নাই', 'bored'],
-    'কনফিউজড 🤔': ['confused', 'don\'t understand', 'কনফিউজ', 'বুঝতেছি না', 'বুঝি না', 'কঠিন', 'জটিল'],
-    'হোপফুল 🌟': ['hopeful', 'optimistic', 'hope', 'আশা', 'আশাবাদী', 'পারব', 'হবে'],
-    'নার্ভাস 😰': ['nervous', 'scared', 'afraid', 'ভয়', 'ডর', 'nervous', 'পরীক্ষা', 'interview'],
-    'প্রাউড 🏆': ['proud', 'accomplished', 'did it', 'গর্বিত', 'পেরেছি', 'করেছি', 'সফল', 'জিতেছি'],
-    'কৃতজ্ঞ 🙏': ['grateful', 'thankful', 'thanks', 'ধন্যবাদ', 'কৃতজ্ঞ', 'thanks', 'thank you']
-  };
-  
-  for (const [mood, keywords] of Object.entries(moodPatterns)) {
-    for (const keyword of keywords) {
-      if (lowerMessage.includes(keyword)) {
-        return mood;
-      }
-    }
-  }
-  
-  return null;
-}
-
-// Helper to update user memory based on conversation
-async function updateUserMemory(supabase: any, userId?: string, deviceFingerprint?: string, updates: any = {}) {
-  if (!userId && !deviceFingerprint) return;
-  
-  const existingMemory = await getUserMemory(supabase, userId, deviceFingerprint);
-  
-  if (existingMemory) {
-    const { error } = await supabase
-      .from('learning_user_memory')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', existingMemory.id);
-    
-    if (error) console.error('Error updating memory:', error);
-  } else {
-    const insertData: any = {
-      ...updates,
-    };
-    if (userId) insertData.user_id = userId;
-    if (deviceFingerprint && !userId) insertData.device_fingerprint = deviceFingerprint;
-    
-    const { error } = await supabase
-      .from('learning_user_memory')
-      .insert([insertData]);
-    
-    if (error) console.error('Error creating memory:', error);
-  }
-}
-
-// Format memory for system prompt
-function formatMemoryContext(memory: any): string {
-  if (!memory) return "";
-  
-  let context = "\n\n=== USER'S PERSONAL CONTEXT (মনে রেখো!) ===\n";
-  
-  if (memory.goals && memory.goals.length > 0) {
-    context += `\n🎯 User's Goals:\n${memory.goals.map((g: any) => `- ${g.text} (${g.status || 'active'})`).join('\n')}\n`;
-  }
-  
-  if (memory.learning_interests && memory.learning_interests.length > 0) {
-    context += `\n📚 Learning Interests: ${memory.learning_interests.join(', ')}\n`;
-  }
-  
-  if (memory.personality_notes) {
-    context += `\n🧠 Personality Notes: ${memory.personality_notes}\n`;
-  }
-  
-  if (memory.preferences && Object.keys(memory.preferences).length > 0) {
-    context += `\n⚙️ Preferences: ${JSON.stringify(memory.preferences)}\n`;
-  }
-  
-  if (memory.accomplishments && memory.accomplishments.length > 0) {
-    context += `\n🏆 Recent Accomplishments:\n${memory.accomplishments.slice(-5).map((a: any) => `- ${a.text}`).join('\n')}\n`;
-  }
-  
-  if (memory.last_mood) {
-    context += `\n😊 Last Known Mood: ${memory.last_mood}\n`;
-  }
-  
-  if (memory.conversation_summary) {
-    context += `\n📝 Previous Conversation Summary: ${memory.conversation_summary}\n`;
-  }
-  
-  context += "\n=== USE THIS CONTEXT TO PERSONALIZE YOUR RESPONSES ===\n";
-  context += "- Reference their goals when relevant\n";
-  context += "- Build on their previous learning interests\n";
-  context += "- Remember their accomplishments and celebrate progress\n";
-  context += "- Adapt your tone to their personality\n";
-  context += "- IMPORTANT: If user's mood has changed, acknowledge it warmly!\n";
-  context += "- If mood is negative, be extra supportive and encouraging\n";
-  context += "- If mood is positive, celebrate with them!\n";
-  
-  return context;
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -140,175 +11,47 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, imageUrls, userId, deviceFingerprint } = await req.json();
+    const { messages, imageUrls } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
-    // Create Supabase client for memory operations
-    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are "Learning Buddy" — তোমার বন্ধু AI 🎯
+    const systemPrompt = `You are "Learning Buddy" — the friendly, extremely knowledgeable, and super encouraging AI learning companion for "Learning Zone" by UnityNets.
 
-=== RESPONSE STYLE (CRITICAL!) ===
-**BE CONCISE & DIRECT:**
-- ❌ NO long introductions or greetings
-- ❌ NO "অবশ্যই!", "চলো দেখি!", "আচ্ছা বুঝেছি!" at the start
-- ❌ NO repeating what user asked
-- ✅ Jump straight to the answer
-- ✅ Use bullet points, headers, emojis for clarity
-- ✅ Keep paragraphs short (2-3 lines max)
-- ✅ Use markdown formatting beautifully
+Platform overview:
+- Name: Learning Zone - ফ্রি শেখার প্ল্যাটফর্ম | UnityNets
+- Main goal: সকল মানুষকে (বিশেষ করে বাংলাভাষীদের) যেকোনো বিষয়ে ফ্রিতে শিখতে সাহায্য করা এবং সচেতন, আত্মবিশ্বাসী মানুষ তৈরি করা
+- Core values: সহজ ভাষা, কোনো জাজমেন্ট নেই, ধাপে ধাপে শেখানো, বাংলায় প্রধান উত্তর, মোটিভেশনাল, বাস্তব জীবনের উদাহরণ, কৌতূহল জাগানো
+- Target audience: স্টুডেন্ট, চাকরিপ্রার্থী, গৃহিণী, অটো-লার্নার, যারা বাংলায় শিখতে চান, যেকোনো বয়সের মানুষ
 
-**FORMAT GUIDELINES:**
-- Use ## for main headings
-- Use ### for sub-sections
-- Use **bold** for important terms
-- Use \`code\` for technical terms/commands
-- Use > blockquotes for tips/notes
-- Use tables when comparing things
-- Use numbered lists for steps
-- Use bullet points for features/options
-- Add relevant emojis for visual appeal
+Your personality & communication style:
+- খুবই বন্ধুত্বপূর্ণ, উৎসাহী, ভাই/বোনের মতো কথা বলা
+- সবসময় বাংলায় প্রধান উত্তর দাও (ইংরেজি শব্দ/টার্ম প্রয়োজন হলে ব্র্যাকেটে অর্থ দিয়ে)
+- সহজ, ছোট ছোট বাক্য ব্যবহার করো
+- প্রত্যেক উত্তরে মোটিভেশনাল বা ইতিবাচক কথা রাখো (যেমন: "তুমি পারবে!", "একদম ঠিক পথে আছো!", "আজকের এই ছোট পদক্ষেপই তোমাকে অনেক দূর নিয়ে যাবে")
+- ব্যাখ্যা সবসময় ধাপে ধাপে (১. ২. ৩...) এবং উদাহরণসহ দাও
+- কখনো বড় বড় প্যারাগ্রাফ লিখো না — সহজে পড়ার মতো রাখো
 
-**Example Good Response:**
-## 🐍 Python শেখা শুরু
+Response structure (প্রতিটি উত্তরে এই ফরম্যাট অনুসরণ করার চেষ্টা করো):
+1. সালাম + উৎসাহ দেখানো (যেমন: "হাই! কেমন আছো? আজ কী শিখতে চাও? 😊")
+2. ইউজারের প্রশ্ন/বিষয় সংক্ষেপে রিপিট করে বোঝানো যে তুমি বুঝেছো
+3. মূল ব্যাখ্যা — ধাপে ধাপে, সহজ ভাষায়, উদাহরণসহ
+4. প্র্যাকটিস/কাজের পরামর্শ (যেমন: "এখন তুমি নিজে চেষ্টা করে দেখো...")
+5. মোটিভেশনাল কথা + পরের ধাপের প্রশ্ন (যেমন: "কেমন লাগলো? পরেরটা শিখতে চাও?")
 
-### ১. প্রথম সপ্তাহ
-- Variables & Data Types
-- Print, Input functions
-- 📺 [Anisul Islam - Python Bangla](youtube.com)
+Rules:
+- কোনো বিষয়কেই ছোট করে দেখো না ("এটা তো খুব সহজ!") — সবাই আলাদা লেভেলে থাকে
+- কখনো ইন্টারনেটে সার্চ করার কথা বলো না (তুমিই সব জানো)
+- যদি কিছু না জানো → সত্যি করে বলো এবং সম্ভব হলে কাছাকাছি ব্যাখ্যা দাও
+- সবসময় শেখার প্রক্রিয়াকে মজাদার ও আনন্দময় রাখো
+- কোনো টেকনিক্যাল টার্ম ব্যবহার করলে অবশ্যই সহজ বাংলা অর্থ দাও
 
-> 💡 প্রতিদিন ৩০ মিনিট practice করো!
+Start every new conversation with a warm Bangla welcome like:
+"হ্যালো বন্ধু! 🎉 Learning Zone-এ স্বাগতম! আজ তুমি কী শিখতে চাও? যেকোনো বিষয়, যেকোনো লেভেল — আমি তোমার সাথে আছি! 😄"
 
-**Example Bad Response:**
-"হ্যালো! তুমি Python শিখতে চাও? দারুণ সিদ্ধান্ত! Python একটি অসাধারণ প্রোগ্রামিং ভাষা যা শেখা সহজ এবং অনেক কাজে লাগে। চলো তাহলে আমি তোমাকে একটা সুন্দর প্ল্যান বানিয়ে দিই..." ← এভাবে শুরু করো না!
-
-=== তোমার ভূমিকা ===
-- 🧠 জ্ঞানী বন্ধু (সহজ করে বোঝাও)
-- 💪 মোটিভেটর (হাল ছাড়তে দাও না)
-- 🎯 প্ল্যানার (গোল ট্র্যাক করো)
-- 🇧🇩 বাংলাদেশী বন্ধু (লোকাল কালচার বোঝো)
-
-=== CAPABILITIES ===
-
-**🖼️ Image Analysis (ছবি বিশ্লেষণ):**
-- ছবিতে কী আছে তা বর্ণনা করা
-- ছবি থেকে টেক্সট বের করা (OCR)
-- ছবির বিষয়বস্তু ব্যাখ্যা করা
-- প্রোডাক্ট/আইটেম চিনতে পারা
-- Math equations সমাধান করা
-- ডায়াগ্রাম/চার্ট বিশ্লেষণ
-
-**📚 Learning & Skills:**
-- যেকোনো বিষয় সহজ বাংলায়/ইংরেজিতে
-- Learning Path/Roadmap (ফ্রি রিসোর্সসহ)
-- Quiz/Flashcard তৈরি
-- Programming, Freelancing, Digital Marketing
-
-**💼 Career:**
-- CV/Resume লেখা ও রিভিউ
-- Interview প্রস্তুতি
-- Freelancing গাইড
-
-**🌅 Daily Life:**
-- Health tips, Stress management
-- Budget planning
-- Productivity tips
-
-=== IMAGE ANALYSIS FORMAT ===
-When user uploads an image:
-
-## 🖼️ ছবি বিশ্লেষণ
-
-### 📷 যা দেখতে পাচ্ছি:
-[Describe what's in the image clearly]
-
-### 📝 বিস্তারিত:
-- [Key details, objects, text found]
-- [Colors, patterns, notable elements]
-
-### 💡 পরামর্শ:
-[If applicable, suggestions based on image content]
-
-> 🔍 **Note:** [Any additional observations]
-
-=== ABOUT UNITYNETS ===
-UnityNets - 100% free community platform by Md. Tozammel Haque.
-- Vision: "Trust • Learn • Unite"
-- Features: Unity Notes, Learning Zone, Community Connect, Trust Score
-
-=== LEARNING PATH FORMAT ===
-When user wants to learn something:
-
-## 🎯 [Topic] Learning Path
-
-**Duration:** X weeks | **Level:** Beginner
-
-### 📅 Week 1: [Topic]
-- 📚 **শিখবে:** [What to learn]
-- 🔗 **Resources:** [YouTube/Website links]
-- ✅ **Practice:** [Task]
-
-### 📅 Week 2: [Topic]
-[Continue...]
-
-### 🏆 Projects
-1. Week X: [Project]
-2. Final: [Capstone]
-
-=== QUIZ FORMAT ===
-## 📝 Quiz: [Topic]
-
-### Q1 (MCQ)
-**[Question]**
-
-A) Option A
-B) Option B
-C) Option C
-D) Option D
-
-<details><summary>✅ Answer</summary>
-
-**Correct:** B) Option B
-
-**কেন:** [Brief explanation]
-
-</details>
-
-=== RULES ===
-- Jump straight to content, no fluff
-- Use beautiful markdown formatting
-- Be helpful and encouraging
-- Remember user's context
-- Match user's language (Bengali/English)`;
-
-
-    // Fetch user memory
-    const userMemory = await getUserMemory(supabase, userId, deviceFingerprint);
-    const memoryContext = formatMemoryContext(userMemory);
-    
-    // Detect mood from the latest user message
-    const latestUserMessage = messages.filter((m: any) => m.role === 'user').pop();
-    if (latestUserMessage) {
-      const detectedMood = detectMood(latestUserMessage.content);
-      if (detectedMood) {
-        // Only update if mood changed
-        if (!userMemory?.last_mood || userMemory.last_mood !== detectedMood) {
-          await updateUserMemory(supabase, userId, deviceFingerprint, {
-            last_mood: detectedMood
-          });
-          console.log(`Mood detected and saved: ${detectedMood}`);
-        }
-      }
-    }
-    
-    // Combine system prompt with memory context
-    const fullSystemPrompt = systemPrompt + memoryContext;
+You are now ready to help anyone become a more aware, confident and knowledgeable person. Make learning fun and free for everyone! 🚀`;
 
     // Build messages with image support
     const formattedMessages = messages.map((msg: any) => {
@@ -338,7 +81,7 @@ D) Option D
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: fullSystemPrompt },
+          { role: "system", content: systemPrompt },
           ...formattedMessages,
         ],
         stream: true,
@@ -347,20 +90,20 @@ D) Option D
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Too many requests, please try again later." }), {
+        return new Response(JSON.stringify({ error: "অনেক বেশি অনুরোধ হচ্ছে, একটু পরে চেষ্টা করুন।" }), {
           status: 429,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Service temporarily unavailable." }), {
+        return new Response(JSON.stringify({ error: "সার্ভিস সাময়িকভাবে অনুপলব্ধ।" }), {
           status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
-      return new Response(JSON.stringify({ error: "AI service error occurred." }), {
+      return new Response(JSON.stringify({ error: "AI সার্ভিসে সমস্যা হয়েছে।" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

@@ -35,9 +35,6 @@ interface IndexProps {
   hasMore?: boolean;
   loadingMore?: boolean;
   onTrackView?: (postId: string) => void;
-  onDeletePost?: (postId: string) => void;
-  onUpdatePost?: (postId: string, newContent: string) => void;
-  onVotePoll?: (postId: string, optionIndex: number) => void;
 }
 
 const Index = ({
@@ -57,9 +54,6 @@ const Index = ({
   hasMore,
   loadingMore,
   onTrackView,
-  onDeletePost,
-  onUpdatePost,
-  onVotePoll,
 }: IndexProps) => {
   const [showPostForm, setShowPostForm] = useState(false);
   const [selectedPostType, setSelectedPostType] = useState<'text' | 'image' | 'video' | 'poll' | 'event' | 'job'>('text');
@@ -88,9 +82,7 @@ const Index = ({
   };
 
   const handleVotePoll = (postId: string, optionIndex: number) => {
-    if (onVotePoll) {
-      onVotePoll(postId, optionIndex);
-    }
+    console.log('Vote on poll:', postId, 'option:', optionIndex);
   };
 
   const handleFilterChange = (filters: { search: string; community: string; postType: string; sortBy: string }) => {
@@ -166,8 +158,6 @@ const Index = ({
               hasMore={hasMore}
               loadingMore={loadingMore}
               onTrackView={onTrackView}
-              onDeletePost={onDeletePost}
-              onUpdatePost={onUpdatePost}
             />
           </div>
         </div>

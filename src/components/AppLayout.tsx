@@ -10,8 +10,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePosts, PostWithAuthor } from "@/hooks/usePosts";
 import { useProfiles, LegacyUser } from "@/hooks/useProfiles";
 import { useSocialDB } from "@/hooks/useSocialDB";
-import { GlobalCallHandler } from "@/components/messages/GlobalCallHandler";
-import { CallProvider } from "@/contexts/CallContext";
 
 interface AppLayoutProps {
   children: (props: {
@@ -37,8 +35,6 @@ interface AppLayoutProps {
     hasMore?: boolean;
     loadingMore?: boolean;
     onTrackView?: (postId: string) => void;
-    onDeletePost?: (postId: string) => void;
-    onVotePoll?: (postId: string, optionIndex: number) => void;
   }) => React.ReactNode;
 }
 
@@ -55,7 +51,6 @@ const transformToLegacyPost = (post: PostWithAuthor): Post => ({
   likes: post.likes,
   dislikes: post.dislikes,
   views: post.views,
-  pollOptions: post.pollOptions,
   comments: post.comments.map(c => ({
     id: c.id,
     postId: c.postId,
@@ -98,7 +93,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const { user, appUser, loading: authLoading, signOut } = useAuth();
   const socialDB = useSocialDB(user?.id || null);
   // Always fetch posts from database, even for unauthenticated users
-  const { posts: dbPosts, createPost, likePost, addComment, likeComment, loadMore, hasMore, loadingMore, trackView, deletePost, votePoll, loading: postsLoading } = usePosts(user?.id, socialDB.createNotification);
+  const { posts: dbPosts, createPost, likePost, addComment, likeComment, loadMore, hasMore, loadingMore, trackView, loading: postsLoading } = usePosts(user?.id, socialDB.createNotification);
   const { users: dbUsers, setUsers: setDbUsers, loading: usersLoading } = useProfiles();
   
   const [createPostTrigger, setCreatePostTrigger] = useState<(() => void) | null>(null);
@@ -165,13 +160,12 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
   const handlePostCreated = async (post: Post) => {
     if (user) {
-      // Save to database with poll options if present
+      // Save to database
       await createPost(
         post.content,
         post.images,
         post.community,
-        post.videoUrl,
-        post.pollOptions
+        post.videoUrl
       );
     } else {
       // Fallback to local storage
@@ -296,54 +290,47 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     );
   }
   return (
-    <CallProvider currentUserId={user?.id || null}>
-      <div className="relative min-h-screen w-full bg-background">
-        <LeftSidebar onCreatePost={handleCreatePost} />
+    <div className="relative min-h-screen w-full bg-background">
+      <LeftSidebar onCreatePost={handleCreatePost} />
+      
+      {/* Main content area */}
+      <div className="w-full lg:pl-64 min-h-screen pb-20 lg:pb-0">
+        {/* Global Header - same on all pages */}
+        <GlobalHeader 
+          currentUser={currentUser} 
+          onSignOut={handleSignOut}
+          onCreatePost={handleCreatePost}
+        />
         
-        {/* Main content area */}
-        <div className="w-full lg:pl-64 min-h-screen pb-20 lg:pb-0">
-          {/* Global Header - same on all pages */}
-          <GlobalHeader 
-            currentUser={currentUser} 
-            onSignOut={handleSignOut}
-            onCreatePost={handleCreatePost}
-          />
-          
-          {/* Page Content */}
-          {children({
-              currentUser,
-              currentUserId: user?.id || null,
-              users,
-              posts,
-              comments,
-              onSignOut: handleSignOut,
-              onLogin: handleLogin,
-              onRegister: handleRegister,
-              onPostCreated: handlePostCreated,
-              onLikePost: handleLikePost,
-              onAddComment: handleAddComment,
-              onLikeComment: handleLikeComment,
-              onUpdateProfile: handleUpdateProfile,
-              onCreatePost: handleCreatePost,
-              registerCreatePostTrigger,
-              socialActions,
-              socialDB,
-              setUsers: setLocalUsers,
-              onLoadMore: loadMore,
-              hasMore,
-              loadingMore,
-              onTrackView: trackView,
-              onDeletePost: deletePost,
-              onVotePoll: votePoll,
-            })}
-        </div>
-        
-        {/* Mobile bottom navigation */}
-        <BottomNavigation />
-
-        {/* Global incoming call handler */}
-        <GlobalCallHandler currentUserId={user?.id || null} />
+        {/* Page Content */}
+        {children({
+            currentUser,
+            currentUserId: user?.id || null,
+            users,
+            posts,
+            comments,
+            onSignOut: handleSignOut,
+            onLogin: handleLogin,
+            onRegister: handleRegister,
+            onPostCreated: handlePostCreated,
+            onLikePost: handleLikePost,
+            onAddComment: handleAddComment,
+            onLikeComment: handleLikeComment,
+            onUpdateProfile: handleUpdateProfile,
+            onCreatePost: handleCreatePost,
+            registerCreatePostTrigger,
+            socialActions,
+            socialDB,
+            setUsers: setLocalUsers,
+            onLoadMore: loadMore,
+            hasMore,
+            loadingMore,
+            onTrackView: trackView,
+          })}
       </div>
-    </CallProvider>
+      
+      {/* Mobile bottom navigation */}
+      <BottomNavigation />
+    </div>
   );
 };

@@ -4,7 +4,6 @@ import { ArrowLeft, Send, Image, MoreVertical } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useMessages, Message, Conversation } from "@/hooks/useMessages";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ChatInterfaceDBProps {
   conversation: Conversation;
@@ -19,7 +18,6 @@ export const ChatInterfaceDB = ({ conversation, currentUserId, onBack }: ChatInt
   const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { language, t } = useLanguage();
 
   const otherUserId = conversation.participant_1 === currentUserId 
     ? conversation.participant_2 
@@ -93,7 +91,7 @@ export const ChatInterfaceDB = ({ conversation, currentUserId, onBack }: ChatInt
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString(language === 'bn' ? 'bn-BD' : 'en-US', { 
+    return date.toLocaleTimeString('bn-BD', { 
       hour: '2-digit', 
       minute: '2-digit',
       hour12: true 
@@ -118,17 +116,17 @@ export const ChatInterfaceDB = ({ conversation, currentUserId, onBack }: ChatInt
               />
             ) : (
               <span className="text-primary font-semibold">
-                {(conversation.other_user?.full_name || t('Chat', 'চ্যাট')).charAt(0)}
+                {(conversation.other_user?.full_name || 'চ্যাট').charAt(0)}
               </span>
             )}
           </div>
           
           <div className="flex-1">
-            <h3 className="font-semibold">
-              {conversation.other_user?.full_name || t('User', 'ব্যবহারকারী')}
+            <h3 className="font-semibold text-bengali">
+              {conversation.other_user?.full_name || 'ব্যবহারকারী'}
             </h3>
             <p className="text-xs text-muted-foreground">
-              {isTyping ? t("Typing...", "টাইপ করছে...") : t("Online", "অনলাইন")}
+              {isTyping ? "টাইপ করছে..." : "অনলাইন"}
             </p>
           </div>
         </div>
@@ -155,13 +153,13 @@ export const ChatInterfaceDB = ({ conversation, currentUserId, onBack }: ChatInt
               {message.image_url && (
                 <img 
                   src={message.image_url} 
-                  alt={t("Shared image", "শেয়ার করা ছবি")} 
+                  alt="Shared image" 
                   className="max-w-full h-auto rounded mb-2"
                 />
               )}
               
               {message.content && (
-                <p>{message.content}</p>
+                <p className="text-bengali">{message.content}</p>
               )}
               
               <p className={`text-xs mt-1 ${
@@ -193,7 +191,7 @@ export const ChatInterfaceDB = ({ conversation, currentUserId, onBack }: ChatInt
             size="icon"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            title={t("Send image", "ছবি পাঠান")}
+            title="ছবি পাঠান"
           >
             <Image size={20} />
           </Button>
@@ -202,8 +200,8 @@ export const ChatInterfaceDB = ({ conversation, currentUserId, onBack }: ChatInt
             <Textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder={t("Type a message...", "মেসেজ লিখুন...")}
-              className="min-h-[40px] max-h-32 resize-none"
+              placeholder="মেসেজ লিখুন..."
+              className="min-h-[40px] max-h-32 resize-none text-bengali"
               onKeyPress={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();

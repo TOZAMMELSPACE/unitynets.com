@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Send, Paperclip, Image, Smile, MoreVertical } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ChatInterfaceProps {
   chat: Chat;
@@ -19,7 +18,6 @@ export const ChatInterface = ({ chat, currentUser, onBack, users }: ChatInterfac
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { language, t } = useLanguage();
 
   const otherParticipant = users.find(u => 
     chat.participants.find(p => p !== currentUser.id && p === u.id)
@@ -122,7 +120,7 @@ export const ChatInterface = ({ chat, currentUser, onBack, users }: ChatInterfac
         c.id === chat.id 
           ? { 
               ...c, 
-              lastMessage: t('📷 Image', '📷 ছবি'),
+              lastMessage: '📷 ছবি',
               lastMessageTime: new Date().toISOString(),
               unreadCount: c.participants.filter(p => p !== currentUser.id).length
             }
@@ -140,7 +138,7 @@ export const ChatInterface = ({ chat, currentUser, onBack, users }: ChatInterfac
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString(language === 'bn' ? 'bn-BD' : 'en-US', { 
+    return date.toLocaleTimeString('bn-BD', { 
       hour: '2-digit', 
       minute: '2-digit',
       hour12: true 
@@ -165,17 +163,17 @@ export const ChatInterface = ({ chat, currentUser, onBack, users }: ChatInterfac
               />
             ) : (
               <span className="text-primary font-semibold">
-                {(otherParticipant?.name || chat.groupName || t('Chat', 'চ্যাট')).charAt(0)}
+                {(otherParticipant?.name || chat.groupName || 'চ্যাট').charAt(0)}
               </span>
             )}
           </div>
           
           <div className="flex-1">
-            <h3 className="font-semibold">
+            <h3 className="font-semibold text-bengali">
               {otherParticipant?.name || chat.groupName}
             </h3>
             <p className="text-xs text-muted-foreground">
-              {isTyping ? t("Typing...", "টাইপ করছে...") : t("Online", "অনলাইন")}
+              {isTyping ? "টাইপ করছে..." : "অনলাইন"}
             </p>
           </div>
         </div>
@@ -202,7 +200,7 @@ export const ChatInterface = ({ chat, currentUser, onBack, users }: ChatInterfac
               {message.type === 'image' && message.fileUrl && (
                 <img 
                   src={message.fileUrl} 
-                  alt={t("Shared image", "শেয়ার করা ছবি")} 
+                  alt="Shared image" 
                   className="max-w-full h-auto rounded mb-2"
                 />
               )}
@@ -214,7 +212,7 @@ export const ChatInterface = ({ chat, currentUser, onBack, users }: ChatInterfac
                 </div>
               )}
               
-              <p>{message.content}</p>
+              <p className="text-bengali">{message.content}</p>
               <p className={`text-xs mt-1 ${
                 message.senderId === currentUser.id 
                   ? 'text-primary-foreground/70' 
@@ -243,7 +241,7 @@ export const ChatInterface = ({ chat, currentUser, onBack, users }: ChatInterfac
             variant="ghost" 
             size="icon"
             onClick={() => fileInputRef.current?.click()}
-            title={t("Send image", "ছবি পাঠান")}
+            title="ছবি পাঠান"
           >
             <Image size={20} />
           </Button>
@@ -252,8 +250,8 @@ export const ChatInterface = ({ chat, currentUser, onBack, users }: ChatInterfac
             <Textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder={t("Type a message...", "মেসেজ লিখুন...")}
-              className="min-h-[40px] max-h-32 resize-none"
+              placeholder="মেসেজ লিখুন..."
+              className="min-h-[40px] max-h-32 resize-none text-bengali"
               onKeyPress={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();

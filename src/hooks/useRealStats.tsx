@@ -17,16 +17,25 @@ export const useRealStats = (): RealStats => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [userResult, postResult] = await Promise.all([
-          supabase.from("profiles").select("*", { count: "exact", head: true }),
-          supabase.from("posts").select("*", { count: "exact", head: true }),
-        ]);
+        // Fetch user count from profiles
+        const { count: userCount, error: userError } = await supabase
+          .from("profiles")
+          .select("*", { count: "exact", head: true });
 
-        setStats({
-          activeUsers: userResult.count || 0,
-          totalPosts: postResult.count || 0,
-          isLoading: false,
-        });
+        // Fetch post count
+        const { count: postCount, error: postError } = await supabase
+          .from("posts")
+          .select("*", { count: "exact", head: true });
+
+        if (!userError && !postError) {
+          setStats({
+            activeUsers: userCount || 0,
+            totalPosts: postCount || 0,
+            isLoading: false,
+          });
+        } else {
+          setStats(prev => ({ ...prev, isLoading: false }));
+        }
       } catch (error) {
         console.error("Error fetching stats:", error);
         setStats(prev => ({ ...prev, isLoading: false }));
@@ -34,7 +43,30 @@ export const useRealStats = (): RealStats => {
     };
 
     fetchStats();
-    // Removed realtime subscriptions - not needed on landing page, saves resources
+
+    // Set up real-time subscriptions for updates
+    const profilesChannel = supabase
+      .channel("stats-profiles")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "profiles" },
+        () => fetchStats()
+      )
+      .subscribe();
+
+    const postsChannel = supabase
+      .channel("stats-posts")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "posts" },
+        () => fetchStats()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(profilesChannel);
+      supabase.removeChannel(postsChannel);
+    };
   }, []);
 
   return stats;

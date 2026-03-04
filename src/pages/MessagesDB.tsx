@@ -5,14 +5,12 @@ import { Input } from "@/components/ui/input";
 import { ChatInterfaceDB } from "@/components/ChatInterfaceDB";
 import { NewChatModalDB } from "@/components/NewChatModalDB";
 import { useMessages, Conversation } from "@/hooks/useMessages";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MessagesDBProps {
   currentUserId: string | null;
 }
 
 export default function MessagesDB({ currentUserId }: MessagesDBProps) {
-  const { t, language } = useLanguage();
   const { conversations, loading } = useMessages(currentUserId);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,13 +29,11 @@ export default function MessagesDB({ currentUserId }: MessagesDBProps) {
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
     
     if (diffInHours < 1) {
-      const mins = Math.floor(diffInHours * 60);
-      return language === 'bn' ? `${mins} মিনিট আগে` : `${mins} min ago`;
+      return `${Math.floor(diffInHours * 60)} মিনিট আগে`;
     } else if (diffInHours < 24) {
-      const hours = Math.floor(diffInHours);
-      return language === 'bn' ? `${hours} ঘন্টা আগে` : `${hours} hr ago`;
+      return `${Math.floor(diffInHours)} ঘন্টা আগে`;
     } else {
-      return date.toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-US');
+      return date.toLocaleDateString('bn-BD');
     }
   };
 
@@ -59,9 +55,9 @@ export default function MessagesDB({ currentUserId }: MessagesDBProps) {
     return (
       <div className="text-center py-12">
         <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-        <h3 className="text-lg font-semibold mb-2">{t("Please Login", "লগইন করুন")}</h3>
-        <p className="text-muted-foreground">
-          {t("Login to view messages", "মেসেজ দেখতে লগইন করুন")}
+        <h3 className="text-lg font-semibold mb-2 text-bengali">লগইন করুন</h3>
+        <p className="text-muted-foreground text-bengali">
+          মেসেজ দেখতে লগইন করুন
         </p>
       </div>
     );
@@ -71,31 +67,31 @@ export default function MessagesDB({ currentUserId }: MessagesDBProps) {
     <main className="container mx-auto px-4 py-6 max-w-2xl">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">{t("Chats", "চ্যাট")}</h2>
+          <h2 className="text-xl font-semibold text-bengali">চ্যাট</h2>
           <Button 
             size="sm" 
             className="gap-2"
             onClick={() => setShowNewChatModal(true)}
           >
             <Plus size={16} />
-            {t("New Chat", "নতুন চ্যাট")}
+            নতুন চ্যাট
           </Button>
         </div>
         
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
-            placeholder={t("Search chats...", "চ্যাট খুঁজুন...")}
+            placeholder="চ্যাট খুঁজুন..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-bengali"
           />
         </div>
       </div>
 
       {loading ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">{t("Loading...", "লোড হচ্ছে...")}</p>
+          <p className="text-muted-foreground text-bengali">লোড হচ্ছে...</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -116,7 +112,7 @@ export default function MessagesDB({ currentUserId }: MessagesDBProps) {
                       />
                     ) : (
                       <span className="text-primary font-semibold text-lg">
-                        {(conv.other_user?.full_name || t('Chat', 'চ্যাট')).charAt(0)}
+                        {(conv.other_user?.full_name || 'চ্যাট').charAt(0)}
                       </span>
                     )}
                   </div>
@@ -125,11 +121,11 @@ export default function MessagesDB({ currentUserId }: MessagesDBProps) {
                 
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-semibold">
-                      {conv.other_user?.full_name || t('User', 'ব্যবহারকারী')}
+                    <h3 className="font-semibold text-bengali">
+                      {conv.other_user?.full_name || 'ব্যবহারকারী'}
                     </h3>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground text-bengali">
                         {formatTime(conv.last_message_at)}
                       </span>
                       {(conv.unread_count || 0) > 0 && (
@@ -139,8 +135,8 @@ export default function MessagesDB({ currentUserId }: MessagesDBProps) {
                       )}
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground truncate">
-                    {conv.last_message || t("New chat", "নতুন চ্যাট")}
+                  <p className="text-sm text-muted-foreground text-bengali truncate">
+                    {conv.last_message || "নতুন চ্যাট"}
                   </p>
                 </div>
               </div>
@@ -152,16 +148,16 @@ export default function MessagesDB({ currentUserId }: MessagesDBProps) {
       {!loading && filteredConversations.length === 0 && (
         <div className="text-center py-12">
           <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">{t("No chats", "কোন চ্যাট নেই")}</h3>
-          <p className="text-muted-foreground mb-4">
-            {t("Start a new chat and connect with the community", "নতুন চ্যাট শুরু করুন এবং কমিউনিটির সাথে যুক্ত হন")}
+          <h3 className="text-lg font-semibold mb-2 text-bengali">কোন চ্যাট নেই</h3>
+          <p className="text-muted-foreground text-bengali mb-4">
+            নতুন চ্যাট শুরু করুন এবং কমিউনিটির সাথে যুক্ত হন
           </p>
           <Button 
             className="gap-2"
             onClick={() => setShowNewChatModal(true)}
           >
             <Plus size={16} />
-            {t("Start New Chat", "নতুন চ্যাট শুরু করুন")}
+            নতুন চ্যাট শুরু করুন
           </Button>
         </div>
       )}

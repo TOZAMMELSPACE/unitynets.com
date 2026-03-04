@@ -9,10 +9,10 @@ const HowItWorksSection = memo(() => {
     {
       step: 1,
       icon: UserPlus,
-      title: language === "bn" ? "প্রোফাইল তৈরি করুন" : "Create Your Profile",
-      description: language === "bn" 
-        ? "ইমেইল বা ফোন নম্বর দিয়ে সাইন আপ করুন। আপনার আগ্রহ, দক্ষতা এবং অবস্থান যোগ করুন।"
-        : "Sign up with your email or phone number. Add your interests, skills, and location to help connect with like-minded people in your community.",
+      title: "Create Your Profile",
+      titleBn: "প্রোফাইল তৈরি করুন",
+      description: "Sign up with your email or phone number. Add your interests, skills, and location to help connect with like-minded people in your community.",
+      descriptionBn: "ইমেইল বা ফোন নম্বর দিয়ে সাইন আপ করুন। আপনার আগ্রহ, দক্ষতা এবং অবস্থান যোগ করুন।",
       features: [
         { icon: Shield, text: language === "bn" ? "সুরক্ষিত প্রোফাইল" : "Secure Profile" },
         { icon: Heart, text: language === "bn" ? "আগ্রহ যোগ করুন" : "Add Interests" },
@@ -21,10 +21,10 @@ const HowItWorksSection = memo(() => {
     {
       step: 2,
       icon: Users,
-      title: language === "bn" ? "সম্প্রদায়ে যোগ দিন" : "Join Your Community",
-      description: language === "bn" 
-        ? "প্রতিবেশীদের খুঁজুন, স্থানীয় গ্রুপে যোগ দিন এবং সমমনা মানুষদের সাথে সংযুক্ত হন।"
-        : "Discover neighbors, join local groups, and connect with people who share your interests. Build meaningful relationships within your community.",
+      title: "Join Your Community",
+      titleBn: "সম্প্রদায়ে যোগ দিন",
+      description: "Discover neighbors, join local groups, and connect with people who share your interests. Build meaningful relationships within your community.",
+      descriptionBn: "প্রতিবেশীদের খুঁজুন, স্থানীয় গ্রুপে যোগ দিন এবং সমমনা মানুষদের সাথে সংযুক্ত হন।",
       features: [
         { icon: Users, text: language === "bn" ? "স্থানীয় গ্রুপ" : "Local Groups" },
         { icon: Heart, text: language === "bn" ? "বন্ধু বানান" : "Make Friends" },
@@ -33,10 +33,10 @@ const HowItWorksSection = memo(() => {
     {
       step: 3,
       icon: BookOpen,
-      title: language === "bn" ? "শেয়ার করুন ও শিখুন" : "Share & Learn",
-      description: language === "bn" 
-        ? "জ্ঞান শেয়ার করুন, প্রশ্ন করুন এবং লার্নিং জোনে অভিজ্ঞদের কাছ থেকে শিখুন।"
-        : "Share your knowledge, ask questions, and learn from experienced community members through our Learning Zone and discussion forums.",
+      title: "Share & Learn",
+      titleBn: "শেয়ার করুন ও শিখুন",
+      description: "Share your knowledge, ask questions, and learn from experienced community members through our Learning Zone and discussion forums.",
+      descriptionBn: "জ্ঞান শেয়ার করুন, প্রশ্ন করুন এবং লার্নিং জোনে অভিজ্ঞদের কাছ থেকে শিখুন।",
       features: [
         { icon: BookOpen, text: language === "bn" ? "লার্নিং জোন" : "Learning Zone" },
         { icon: MessageSquare, text: language === "bn" ? "আলোচনা ফোরাম" : "Discussion Forums" },
@@ -45,22 +45,22 @@ const HowItWorksSection = memo(() => {
     {
       step: 4,
       icon: Coins,
-      title: language === "bn" ? "ইউনিটি নোট অর্জন করুন" : "Earn Unity Notes",
-      description: language === "bn" 
-        ? "সম্প্রদায়ে অবদান রাখুন এবং ইউনিটি নোট অর্জন করুন। সেবা বিনিময়ে ব্যবহার করুন।"
-        : "Contribute positively to the community and earn Unity Notes. Use them to exchange services, get help, or support local initiatives.",
+      title: "Earn Unity Notes",
+      titleBn: "Unity Note অর্জন করুন",
+      description: "Contribute positively to the community and earn Unity Notes. Use them to exchange services, get help, or support local initiatives.",
+      descriptionBn: "সম্প্রদায়ে অবদান রাখুন এবং Unity Note অর্জন করুন। সেবা বিনিময়ে ব্যবহার করুন।",
       features: [
-        { icon: Award, text: language === "bn" ? "বিশ্বাস স্কোর" : "Trust Score" },
+        { icon: Award, text: language === "bn" ? "Trust Score" : "Trust Score" },
         { icon: Coins, text: language === "bn" ? "সেবা বিনিময়" : "Service Exchange" },
       ],
     },
   ];
 
   return (
-    <section id="how-it-works" className="py-20 bg-muted/30 scroll-mt-20 overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="py-20 bg-muted/30 scroll-mt-20">
+      <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16 animate-fade-in">
+        <div className="text-center mb-16">
           <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
             {language === "bn" ? "সহজ ধাপগুলো" : "Simple Steps"}
           </span>
@@ -87,9 +87,9 @@ const HowItWorksSection = memo(() => {
                 <div className="hidden lg:block absolute top-14 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-primary/50 to-primary/10" />
               )}
               
-              <div className="bg-background rounded-2xl p-6 shadow-sm border border-border/50 hover:shadow-xl hover:border-primary/30 transition-all duration-300 h-full hover:-translate-y-2">
+              <div className="bg-background rounded-2xl p-6 shadow-sm border border-border/50 hover:shadow-lg hover:border-primary/30 transition-all duration-300 h-full hover:-translate-y-1">
                 {/* Step number badge */}
-                <div className="absolute -top-3 -left-3 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold shadow-lg ring-4 ring-background group-hover:scale-110 transition-transform duration-300">
+                <div className="absolute -top-3 -left-3 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold shadow-lg ring-4 ring-background">
                   {step.step}
                 </div>
                 
@@ -99,11 +99,14 @@ const HowItWorksSection = memo(() => {
                 </div>
                 
                 {/* Content */}
-                <h3 className="text-xl font-semibold text-foreground mb-3">
-                  {step.title}
+                <h3 className="text-xl font-semibold text-foreground mb-1">
+                  {language === "bn" ? step.titleBn : step.title}
                 </h3>
+                <p className="text-sm text-primary/80 font-medium mb-3">
+                  {language === "bn" ? step.title : step.titleBn}
+                </p>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                  {step.description}
+                  {language === "bn" ? step.descriptionBn : step.description}
                 </p>
 
                 {/* Feature pills */}

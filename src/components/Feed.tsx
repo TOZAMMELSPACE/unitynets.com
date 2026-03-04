@@ -4,7 +4,6 @@ import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { CommentSection } from "@/components/CommentSection";
 import { ShareButton } from "@/components/ShareButton";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FeedProps {
   posts: Post[];
@@ -16,15 +15,9 @@ interface FeedProps {
 
 export const Feed = ({ posts, currentUser, onLikePost, onAddComment, onLikeComment }: FeedProps) => {
   const navigate = useNavigate();
-  const { language, t } = useLanguage();
 
   const handleUserClick = (userId: string) => {
     navigate('/profile', { state: { userId } });
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString(language === 'bn' ? 'bn-BD' : 'en-US');
   };
 
   if (posts.length === 0) {
@@ -32,7 +25,7 @@ export const Feed = ({ posts, currentUser, onLikePost, onAddComment, onLikeComme
       <div className="card-enhanced p-8 text-center">
         <div className="text-muted-foreground">
           <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>{t("No posts yet. Be the first to post!", "কোন পোস্ট নেই। প্রথম পোস্ট করুন!")}</p>
+          <p className="text-bengali">কোন পোস্ট নেই। প্রথম পোস্ট করুন!</p>
         </div>
       </div>
     );
@@ -50,7 +43,6 @@ export const Feed = ({ posts, currentUser, onLikePost, onAddComment, onLikeComme
                   src={post.author.profileImage}
                   alt={`${post.author.name} profile`}
                   className="w-10 h-10 rounded-full object-cover border-2 border-border cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
-                  style={{ objectPosition: 'center 20%' }}
                   onClick={() => handleUserClick(post.author.id)}
                 />
               ) : (
@@ -63,13 +55,13 @@ export const Feed = ({ posts, currentUser, onLikePost, onAddComment, onLikeComme
               )}
               <div>
                 <div 
-                  className="font-semibold cursor-pointer hover:text-primary hover:underline transition-colors"
+                  className="font-semibold text-bengali cursor-pointer hover:text-primary hover:underline transition-colors"
                   onClick={() => handleUserClick(post.author.id)}
                 >
                   {post.author.name}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {formatDate(post.createdAt)}
+                  {new Date(post.createdAt).toLocaleString('bn-BD')}
                 </div>
               </div>
             </div>
@@ -80,13 +72,13 @@ export const Feed = ({ posts, currentUser, onLikePost, onAddComment, onLikeComme
                   ? 'bg-primary/10 text-primary' 
                   : 'bg-accent/10 text-accent'
               }`}>
-                {post.community === 'global' ? `🌍 ${t('Global', 'গ্লোবাল')}` : `🏘️ ${post.community}`}
+                {post.community === 'global' ? '🌍 Global' : `🏘️ ${post.community}`}
               </span>
             </div>
           </div>
 
           <div className="mb-4">
-            <p className="text-card-foreground leading-relaxed">
+            <p className="text-card-foreground leading-relaxed text-bengali">
               {post.content}
             </p>
             
@@ -107,7 +99,7 @@ export const Feed = ({ posts, currentUser, onLikePost, onAddComment, onLikeComme
                   }`}>
                     <img
                       src={image}
-                      alt={`${t('Post image', 'পোস্টের ছবি')} ${index + 1}`}
+                      alt={`Post image ${index + 1}`}
                       className="w-full h-48 object-cover rounded-lg border border-border cursor-pointer hover:opacity-90 transition-opacity"
                       onClick={() => {
                         // Create image preview modal

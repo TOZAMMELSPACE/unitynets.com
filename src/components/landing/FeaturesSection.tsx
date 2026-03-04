@@ -8,7 +8,7 @@ export const FeaturesSection = () => {
   const features = [
     {
       icon: Shield,
-      title: t("Trust", "বিশ্বাস"),
+      title: t("Trust", "বিশ্বাস / Trust"),
       description: t(
         "A safe community where every voice is heard and every member is valued.",
         "একটি নিরাপদ কমিউনিটি যেখানে প্রতিটি কণ্ঠস্বর শোনা হয় এবং প্রতিটি সদস্যের মূল্য দেওয়া হয়।"
@@ -19,7 +19,7 @@ export const FeaturesSection = () => {
     },
     {
       icon: BookOpen,
-      title: t("Learn", "শিক্ষা"),
+      title: t("Learn", "শিক্ষা / Learn"),
       description: t(
         "Thousands of free educational notes and skill sharing opportunities.",
         "হাজারো বিনামূল্যে শিক্ষামূলক নোটস এবং দক্ষতা বিনিময়। এখানে শেখা ও শেখানো দুটোই সম্মানের।"
@@ -30,7 +30,7 @@ export const FeaturesSection = () => {
     },
     {
       icon: Users,
-      title: t("Unite", "ঐক্য"),
+      title: t("Unite", "ঐক্য / Unite"),
       description: t(
         "Building a united community from South Asia to the entire world.",
         "দক্ষিণ এশিয়া থেকে শুরু করে পুরো বিশ্ব জুড়ে একটি ঐক্যবদ্ধ সম্প্রদায় গড়ার স্বপ্ন নিয়ে এগিয়ে যাচ্ছি।"
@@ -41,7 +41,7 @@ export const FeaturesSection = () => {
     },
     {
       icon: Heart,
-      title: t("Impact", "প্রভাব"),
+      title: t("Impact", "প্রভাব / Impact"),
       description: t(
         "See real stories of lives changing through our community.",
         "দেখুন কিভাবে আমাদের কমিউনিটির মাধ্যমে মানুষের জীবন বদলে যাচ্ছে। সত্যিকারের গল্প, সত্যিকারের পরিবর্তন।"
@@ -53,10 +53,10 @@ export const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-background overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 md:py-24 bg-background">
+      <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center mb-12 md:mb-16 animate-fade-in">
+        <div className="text-center mb-12 md:mb-16">
           <h2 className="section-header mb-4">
             {t("Why Join Us?", "কেন আমাদের সাথে যোগ দিবেন?")}
           </h2>
@@ -73,8 +73,7 @@ export const FeaturesSection = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className={`group relative bg-gradient-to-br ${feature.gradient} border border-border/30 rounded-2xl p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-500 overflow-hidden animate-fade-in`}
-              style={{ animationDelay: `${index * 100}ms` }}
+              className={`group relative bg-gradient-to-br ${feature.gradient} border border-border/30 rounded-2xl p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden`}
             >
               {/* Background Glow */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

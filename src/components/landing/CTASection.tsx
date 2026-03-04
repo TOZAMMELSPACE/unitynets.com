@@ -21,13 +21,13 @@ export const CTASection = () => {
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-accent">
         {/* Decorative elements */}
-        <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse" />
-        <div className="absolute bottom-10 right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-white/5 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.5s' }} />
+        <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+        <div className="absolute bottom-10 right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-white/5 rounded-full blur-xl" />
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="max-w-4xl mx-auto text-center animate-fade-in">
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
@@ -36,7 +36,7 @@ export const CTASection = () => {
 
           {/* Heading */}
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-            {t("Be Part of Everyone's Dream", "সবার স্বপ্নের অংশ হোন")}
+            {t("Be Part of Our Dream Now", "এখনই অংশ হোন আমাদের স্বপ্নের")}
             <span className="block text-white/80 text-xl md:text-2xl mt-2 font-normal">
               {t("From South Asia to the World", "দক্ষিণ এশিয়া থেকে সারা বিশ্ব")}
             </span>
@@ -45,8 +45,8 @@ export const CTASection = () => {
           {/* Description */}
           <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
             {t(
-              "We want to establish peace on Earth. Your participation will help make our dream a reality.",
-              "পৃথিবীতে শান্তি প্রতিষ্ঠা করতে চাই। আপনার অংশগ্রহণ আমাদের স্বপ্নকে বাস্তব করতে সাহায্য করবে।"
+              "From South Asia to the whole world — we want to unite everyone. Your participation will help make our dream a reality.",
+              "দক্ষিণ এশিয়া থেকে সারা বিশ্ব — আমরা সবাইকে একত্রিত করতে চাই। আপনার অংশগ্রহণ আমাদের স্বপ্নকে বাস্তব করতে সাহায্য করবে।"
             )}
           </p>
 
@@ -54,7 +54,7 @@ export const CTASection = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button 
               size="lg" 
-              className="bg-white text-primary hover:bg-white/90 text-lg px-8 py-6 rounded-xl group shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+              className="bg-white text-primary hover:bg-white/90 text-lg px-8 py-6 rounded-xl group shadow-xl"
               onClick={() => navigate('/auth?mode=signup')}
             >
               <span>{t("Register Free", "ফ্রি রেজিস্ট্রেশন করুন")}</span>
@@ -63,7 +63,7 @@ export const CTASection = () => {
             <Button 
               size="lg" 
               variant="outline"
-              className="border-white/30 text-white hover:bg-white/10 text-lg px-8 py-6 rounded-xl bg-transparent hover:-translate-y-1 transition-all duration-300"
+              className="border-white/30 text-white hover:bg-white/10 text-lg px-8 py-6 rounded-xl bg-transparent"
               onClick={() => navigate('/about')}
             >
               <span>{t("Learn Our Mission", "আমাদের মিশন জানুন")}</span>

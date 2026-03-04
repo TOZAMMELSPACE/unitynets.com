@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Phone, Video, MoreVertical, Users, Pin, Bell, BellOff, Trash2, LogOut, History } from 'lucide-react';
+import { ArrowLeft, Phone, Video, MoreVertical, Users, Pin, Bell, BellOff, Trash2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -12,19 +12,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Chat, ChatMessage } from '@/hooks/useChat';
 import { useChatMessages } from '@/hooks/useChatMessages';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
-import { useCall } from '@/contexts/CallContext';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
-import { CallHistory } from './CallHistory';
 import { formatDistanceToNow } from 'date-fns';
 import { bn } from 'date-fns/locale';
 
@@ -43,7 +35,6 @@ export function ChatWindow({
 }: ChatWindowProps) {
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [editMessage, setEditMessage] = useState<ChatMessage | null>(null);
-  const [showCallHistory, setShowCallHistory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -57,36 +48,6 @@ export function ChatWindow({
   } = useChatMessages(chat.id, currentUserId);
 
   const { typingUsers, handleTyping, stopTyping } = useTypingIndicator(chat.id, currentUserId);
-
-  // Use global call context instead of local WebRTC hook
-  const {
-    callState,
-    startCall,
-  } = useCall();
-
-  // Get other user ID for direct chats
-  const getOtherUserId = () => {
-    if (chat.type === 'direct' && chat.other_user) {
-      return chat.other_user.user_id;
-    }
-    return null;
-  };
-
-  // Start voice call
-  const handleVoiceCall = () => {
-    const otherUserId = getOtherUserId();
-    if (otherUserId) {
-      startCall(chat.id, otherUserId, 'voice');
-    }
-  };
-
-  // Start video call
-  const handleVideoCall = () => {
-    const otherUserId = getOtherUserId();
-    if (otherUserId) {
-      startCall(chat.id, otherUserId, 'video');
-    }
-  };
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -161,13 +122,6 @@ export function ChatWindow({
     console.log('Forward message:', message);
   };
 
-  // Handle call back from missed call message
-  const handleCallBack = (userId: string, callType: 'voice' | 'video') => {
-    if (!callState) {
-      startCall(chat.id, userId, callType);
-    }
-  };
-
   // Group messages by sender and time
   const groupedMessages = messages.reduce((groups, message, index) => {
     const prev = messages[index - 1];
@@ -226,28 +180,12 @@ export function ChatWindow({
 
         {/* Actions */}
         <div className="flex items-center gap-1">
-          {chat.type === 'direct' && (
-            <>
-              <Button 
-                size="icon" 
-                variant="ghost" 
-                title="ভয়েস কল"
-                onClick={handleVoiceCall}
-                disabled={!!callState}
-              >
-                <Phone className="w-5 h-5" />
-              </Button>
-              <Button 
-                size="icon" 
-                variant="ghost" 
-                title="ভিডিও কল"
-                onClick={handleVideoCall}
-                disabled={!!callState}
-              >
-                <Video className="w-5 h-5" />
-              </Button>
-            </>
-          )}
+          <Button size="icon" variant="ghost" title="ভয়েস কল">
+            <Phone className="w-5 h-5" />
+          </Button>
+          <Button size="icon" variant="ghost" title="ভিডিও কল">
+            <Video className="w-5 h-5" />
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="icon" variant="ghost">
@@ -255,12 +193,6 @@ export function ChatWindow({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {chat.type === 'direct' && (
-                <DropdownMenuItem onClick={() => setShowCallHistory(true)}>
-                  <History className="w-4 h-4 mr-2" />
-                  <span className="text-bengali">কল হিস্ট্রি</span>
-                </DropdownMenuItem>
-              )}
               {chat.type === 'group' && (
                 <DropdownMenuItem>
                   <Users className="w-4 h-4 mr-2" />
@@ -341,7 +273,6 @@ export function ChatWindow({
                 onDelete={deleteMessage}
                 onReact={addReaction}
                 onForward={handleForward}
-                onCallBack={handleCallBack}
               />
             ))}
             <div ref={bottomRef} />
@@ -377,21 +308,6 @@ export function ChatWindow({
         onSaveEdit={handleSaveEdit}
         disabled={loading}
       />
-
-      {/* Call dialog is now handled globally by GlobalCallHandler */}
-
-      {/* Call History Dialog */}
-      <Dialog open={showCallHistory} onOpenChange={setShowCallHistory}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-bengali flex items-center gap-2">
-              <History className="w-5 h-5" />
-              কল হিস্ট্রি
-            </DialogTitle>
-          </DialogHeader>
-          <CallHistory chatId={chat.id} currentUserId={currentUserId} />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
