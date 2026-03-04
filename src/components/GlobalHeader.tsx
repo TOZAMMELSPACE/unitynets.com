@@ -26,14 +26,13 @@ export const GlobalHeader = ({ currentUser, onSignOut, onCreatePost }: GlobalHea
     <header className="bg-card/95 backdrop-blur-xl border-b border-border/40 sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo & Tagline */}
-          <div className="flex flex-col">
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground tracking-tight">
-              Unity<span className="text-primary">Nets</span>
-            </h1>
-            <span className="text-xs sm:text-sm text-muted-foreground font-medium tracking-wide">
-              {t("Trust • Learn • Unite", "একত্রে শক্তিশালী")}
-            </span>
+          {/* Logo */}
+          <div className="flex items-center">
+            <img 
+              src="/logo.png" 
+              alt="UnityNets Logo" 
+              className="h-10 sm:h-12 w-auto"
+            />
           </div>
 
           {/* Right Actions */}

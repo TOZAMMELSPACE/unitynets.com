@@ -17,7 +17,8 @@ import {
 } from '@/components/ui/dialog';
 import type { Chat, ChatLoadError } from '@/hooks/useChat';
 import { formatDistanceToNow } from 'date-fns';
-import { bn } from 'date-fns/locale';
+import { bn, enUS } from 'date-fns/locale';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ChatListProps {
   chats: Chat[];
@@ -43,6 +44,7 @@ export function ChatList({
   onNewGroup,
 }: ChatListProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const { language, t } = useLanguage();
 
   const filteredChats = useMemo(() => {
     return chats.filter((chat) => {
@@ -53,9 +55,9 @@ export function ChatList({
 
   const getChatName = (chat: Chat) => {
     if (chat.type === 'group') {
-      return chat.group_name || 'গ্রুপ';
+      return chat.group_name || t('Group', 'গ্রুপ');
     }
-    return chat.other_user?.full_name || 'ব্যবহারকারী';
+    return chat.other_user?.full_name || t('User', 'ব্যবহারকারী');
   };
 
   const getChatAvatar = (chat: Chat) => {
@@ -66,25 +68,29 @@ export function ChatList({
   };
 
   const getLastMessagePreview = (chat: Chat) => {
-    if (!chat.last_message) return 'নতুন কথোপকথন';
+    if (!chat.last_message) return t('New conversation', 'নতুন কথোপকথন');
 
-    if (chat.last_message.is_deleted) return 'এই মেসেজটি মুছে ফেলা হয়েছে';
+    if (chat.last_message.is_deleted) return t('This message was deleted', 'এই মেসেজটি মুছে ফেলা হয়েছে');
 
-    const prefix = chat.last_message.sender_id === currentUserId ? 'আপনি: ' : '';
+    const prefix = chat.last_message.sender_id === currentUserId ? `${t('You', 'আপনি')}: ` : '';
 
     switch (chat.last_message.type) {
       case 'image':
-        return `${prefix}📷 ছবি`;
+        return `${prefix}📷 ${t('Image', 'ছবি')}`;
       case 'video':
-        return `${prefix}🎥 ভিডিও`;
+        return `${prefix}🎥 ${t('Video', 'ভিডিও')}`;
       case 'voice':
-        return `${prefix}🎤 ভয়েস মেসেজ`;
+        return `${prefix}🎤 ${t('Voice message', 'ভয়েস মেসেজ')}`;
       case 'file':
-        return `${prefix}📎 ফাইল`;
+        return `${prefix}📎 ${t('File', 'ফাইল')}`;
       case 'call_started':
-        return `${prefix}📞 কল শুরু হয়েছে`;
+        return `${prefix}📞 ${t('Call started', 'কল শুরু হয়েছে')}`;
       case 'call_ended':
-        return `${prefix}📞 কল শেষ হয়েছে`;
+        return `${prefix}📞 ${t('Call ended', 'কল শেষ হয়েছে')}`;
+      case 'missed_call':
+        return `${prefix}📞 ${t('Missed call', 'মিসড কল')}`;
+      case 'call_summary':
+        return `${prefix}📞 ${t('Call completed', 'কল সম্পন্ন')}`;
       default:
         return `${prefix}${chat.last_message.content?.slice(0, 30) || ''}${(chat.last_message.content?.length || 0) > 30 ? '...' : ''}`;
     }
@@ -92,7 +98,7 @@ export function ChatList({
 
   const getTimeAgo = (timestamp: string) => {
     try {
-      return formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: bn });
+      return formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: language === 'bn' ? bn : enUS });
     } catch {
       return '';
     }
@@ -137,12 +143,12 @@ export function ChatList({
       {/* Header */}
       <div className="p-4 border-b border-[hsl(var(--wa-border))] space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-bengali">চ্যাট</h2>
+          <h2 className="text-xl font-bold">{t('Chats', 'চ্যাট')}</h2>
           <div className="flex gap-2">
-            <Button size="icon" variant="ghost" onClick={onNewGroup} title="নতুন গ্রুপ">
+            <Button size="icon" variant="ghost" onClick={onNewGroup} title={t('New Group', 'নতুন গ্রুপ')}>
               <Users className="w-5 h-5" />
             </Button>
-            <Button size="icon" variant="ghost" onClick={onNewChat} title="নতুন চ্যাট">
+            <Button size="icon" variant="ghost" onClick={onNewChat} title={t('New Chat', 'নতুন চ্যাট')}>
               <Plus className="w-5 h-5" />
             </Button>
           </div>
@@ -151,10 +157,10 @@ export function ChatList({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="চ্যাট খুঁজুন..."
+            placeholder={t('Search chats...', 'চ্যাট খুঁজুন...')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 text-bengali input-premium rounded-full bg-background/70"
+            className="pl-10 input-premium rounded-full bg-background/70"
           />
         </div>
       </div>
@@ -163,8 +169,8 @@ export function ChatList({
       {error ? (
         <div className="px-4 pt-4">
           <Alert variant="destructive" className="border-[hsl(var(--wa-border))]">
-            <AlertTitle className="text-bengali">চ্যাট লোড হয়নি</AlertTitle>
-            <AlertDescription className="text-bengali">
+            <AlertTitle>{t('Failed to load chats', 'চ্যাট লোড হয়নি')}</AlertTitle>
+            <AlertDescription>
               {error.message}
               {error.code ? <span className="ml-2 opacity-80">(code: {error.code})</span> : null}
             </AlertDescription>
@@ -173,7 +179,7 @@ export function ChatList({
               {onRetry ? (
                 <Button size="sm" variant="outline" onClick={onRetry}>
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  <span className="text-bengali">আবার চেষ্টা</span>
+                  <span>{t('Retry', 'আবার চেষ্টা')}</span>
                 </Button>
               ) : null}
 
@@ -181,14 +187,14 @@ export function ChatList({
                 <DialogTrigger asChild>
                   <Button size="sm" variant="ghost">
                     <Info className="w-4 h-4 mr-2" />
-                    <span className="text-bengali">বিস্তারিত</span>
+                    <span>{t('Details', 'বিস্তারিত')}</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-xl">
                   <DialogHeader>
-                    <DialogTitle className="text-bengali">এরর বিস্তারিত</DialogTitle>
-                    <DialogDescription className="text-bengali">
-                      নিচের তথ্যটা কপি করে আমাকে পাঠালে দ্রুত ঠিক করতে পারবো।
+                    <DialogTitle>{t('Error Details', 'এরর বিস্তারিত')}</DialogTitle>
+                    <DialogDescription>
+                      {t('Copy this information and send it to us for quick resolution.', 'নিচের তথ্যটা কপি করে আমাকে পাঠালে দ্রুত ঠিক করতে পারবো।')}
                     </DialogDescription>
                   </DialogHeader>
 
@@ -205,7 +211,7 @@ export function ChatList({
                           }
                         }}
                       >
-                        <span className="text-bengali">কপি</span>
+                        <span>{t('Copy', 'কপি')}</span>
                       </Button>
                     </div>
 
@@ -224,8 +230,8 @@ export function ChatList({
           {filteredChats.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p className="text-bengali">কোনো চ্যাট নেই</p>
-              <p className="text-sm text-bengali mt-1">নতুন চ্যাট শুরু করুন</p>
+              <p>{t('No chats yet', 'কোনো চ্যাট নেই')}</p>
+              <p className="text-sm mt-1">{t('Start a new chat', 'নতুন চ্যাট শুরু করুন')}</p>
             </div>
           ) : (
             filteredChats.map((chat) => (
@@ -255,7 +261,7 @@ export function ChatList({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold truncate text-bengali">{getChatName(chat)}</span>
+                      <span className="font-semibold truncate">{getChatName(chat)}</span>
                       {chat.other_user?.trust_score && chat.other_user.trust_score > 0 ? (
                         <Badge variant="secondary" className="text-xs">
                           ⭐ {chat.other_user.trust_score}
@@ -269,7 +275,7 @@ export function ChatList({
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <p className="text-sm text-muted-foreground truncate text-bengali">{getLastMessagePreview(chat)}</p>
+                    <p className="text-sm text-muted-foreground truncate">{getLastMessagePreview(chat)}</p>
 
                     <div className="flex items-center gap-2">
                       {chat.unread_count && chat.unread_count > 0 ? (

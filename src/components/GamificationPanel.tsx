@@ -19,6 +19,7 @@ import {
   CheckCircle2,
   Sparkles
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface GamificationPanelProps {
   user: User | null;
@@ -26,6 +27,7 @@ interface GamificationPanelProps {
 }
 
 export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
+  const { t, language } = useLanguage();
   const [showFollowers, setShowFollowers] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
   
@@ -52,93 +54,93 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
   const achievements = [
     { 
       id: 'first_post', 
-      name: 'প্রথম পোস্ট', 
+      name: t('First Post', 'প্রথম পোস্ট'), 
       icon: '🎯', 
       unlocked: true,
-      description: 'আপনার প্রথম পোস্ট করেছেন',
+      description: t('Made your first post', 'আপনার প্রথম পোস্ট করেছেন'),
       requirement: 1,
       current: 1,
-      category: 'প্রাথমিক'
+      category: t('Basic', 'প্রাথমিক')
     },
     { 
       id: 'trusted_member', 
-      name: 'বিশ্বস্ত সদস্য', 
+      name: t('Trusted Member', 'বিশ্বস্ত সদস্য'), 
       icon: '🛡️', 
       unlocked: user.trustScore >= 50,
-      description: '৫০+ ট্রাস্ট স্কোর অর্জন করুন',
+      description: t('Achieve 50+ trust score', '৫০+ ট্রাস্ট স্কোর অর্জন করুন'),
       requirement: 50,
       current: user.trustScore,
-      category: 'ট্রাস্ট'
+      category: t('Trust', 'ট্রাস্ট')
     },
     { 
       id: 'community_leader', 
-      name: 'কমিউনিটি নেতা', 
+      name: t('Community Leader', 'কমিউনিটি নেতা'), 
       icon: '👑', 
       unlocked: user.trustScore >= 80,
-      description: '৮০+ ট্রাস্ট স্কোর অর্জন করুন',
+      description: t('Achieve 80+ trust score', '৮০+ ট্রাস্ট স্কোর অর্জন করুন'),
       requirement: 80,
       current: user.trustScore,
-      category: 'ট্রাস্ট'
+      category: t('Trust', 'ট্রাস্ট')
     },
     { 
       id: 'popular_creator', 
-      name: 'জনপ্রিয় ক্রিয়েটর', 
+      name: t('Popular Creator', 'জনপ্রিয় ক্রিয়েটর'), 
       icon: '⭐', 
       unlocked: user.followers >= 100,
-      description: '১০০+ ফলোয়ার অর্জন করুন',
+      description: t('Gain 100+ followers', '১০০+ ফলোয়ার অর্জন করুন'),
       requirement: 100,
       current: user.followers,
-      category: 'সোশ্যাল'
+      category: t('Social', 'সোশ্যাল')
     },
     { 
       id: 'helpful_member', 
-      name: 'সহায়ক সদস্য', 
+      name: t('Helpful Member', 'সহায়ক সদস্য'), 
       icon: '🤝', 
       unlocked: user.trustScore >= 30,
-      description: '৩০+ ট্রাস্ট স্কোর অর্জন করে কমিউনিটিতে সাহায্য করুন',
+      description: t('Achieve 30+ trust score by helping the community', '৩০+ ট্রাস্ট স্কোর অর্জন করে কমিউনিটিতে সাহায্য করুন'),
       requirement: 30,
       current: user.trustScore,
-      category: 'ট্রাস্ট'
+      category: t('Trust', 'ট্রাস্ট')
     },
     { 
       id: 'early_adopter', 
-      name: 'প্রাথমিক ব্যবহারকারী', 
+      name: t('Early Adopter', 'প্রাথমিক ব্যবহারকারী'), 
       icon: '🚀', 
       unlocked: true,
-      description: 'প্ল্যাটফর্মের প্রাথমিক সদস্য',
+      description: t('Early member of the platform', 'প্ল্যাটফর্মের প্রাথমিক সদস্য'),
       requirement: 1,
       current: 1,
-      category: 'প্রাথমিক'
+      category: t('Basic', 'প্রাথমিক')
     },
     { 
       id: 'top_contributor', 
-      name: 'টপ কন্ট্রিবিউটর', 
+      name: t('Top Contributor', 'টপ কন্ট্রিবিউটর'), 
       icon: '🏆', 
       unlocked: userRank <= 3,
-      description: 'কমিউনিটিতে টপ ৩ এ স্থান করুন',
+      description: t('Rank in top 3 in community', 'কমিউনিটিতে টপ ৩ এ স্থান করুন'),
       requirement: 3,
       current: userRank,
-      category: 'র‍্যাঙ্ক'
+      category: t('Rank', 'র‍্যাঙ্ক')
     },
     { 
       id: 'influencer', 
-      name: 'ইনফ্লুয়েন্সার', 
+      name: t('Influencer', 'ইনফ্লুয়েন্সার'), 
       icon: '💎', 
       unlocked: user.followers >= 500,
-      description: '৫০০+ ফলোয়ার অর্জন করুন',
+      description: t('Gain 500+ followers', '৫০০+ ফলোয়ার অর্জন করুন'),
       requirement: 500,
       current: user.followers,
-      category: 'সোশ্যাল'
+      category: t('Social', 'সোশ্যাল')
     },
     { 
       id: 'master', 
-      name: 'মাস্টার', 
+      name: t('Master', 'মাস্টার'), 
       icon: '⚡', 
       unlocked: user.trustScore >= 100,
-      description: '১০০ ট্রাস্ট স্কোর অর্জন করুন',
+      description: t('Achieve 100 trust score', '১০০ ট্রাস্ট স্কোর অর্জন করুন'),
       requirement: 100,
       current: user.trustScore,
-      category: 'ট্রাস্ট'
+      category: t('Trust', 'ট্রাস্ট')
     }
   ];
 
@@ -150,7 +152,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Trophy className="w-5 h-5 text-warning" />
-          আপনার অগ্রগতি
+          {t("Your Progress", "আপনার অগ্রগতি")}
         </CardTitle>
       </CardHeader>
       
@@ -158,7 +160,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
         {/* Trust Level Progress */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">ট্রাস্ট লেভেল</span>
+            <span className="text-sm font-medium">{t("Trust Level", "ট্রাস্ট লেভেল")}</span>
             <span className="text-sm text-muted-foreground">
               {user.trustScore}/{nextLevel}
             </span>
@@ -166,7 +168,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
           <Progress value={progressToNextLevel} className="h-2" />
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Star className="w-3 h-3" />
-            লেভেল {Math.floor(user.trustScore / 20) + 1}
+            {t("Level", "লেভেল")} {Math.floor(user.trustScore / 20) + 1}
           </div>
         </div>
 
@@ -174,7 +176,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
         <div className="flex items-center justify-between p-3 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium">কমিউনিটি র‍্যাঙ্ক</span>
+            <span className="text-sm font-medium">{t("Community Rank", "কমিউনিটি র‍্যাঙ্ক")}</span>
           </div>
           <Badge variant="secondary" className="bg-primary/20 text-primary">
             #{userRank}
@@ -185,10 +187,10 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
         <div className="flex items-center justify-between p-3 bg-gradient-to-r from-warning/10 to-destructive/10 rounded-lg">
           <div className="flex items-center gap-2">
             <Flame className="w-4 h-4 text-warning" />
-            <span className="text-sm font-medium">লগইন স্ট্রিক</span>
+            <span className="text-sm font-medium">{t("Login Streak", "লগইন স্ট্রিক")}</span>
           </div>
           <Badge variant="secondary" className="bg-warning/20 text-warning">
-            {loginStreak} দিন
+            {loginStreak} {t("days", "দিন")}
           </Badge>
         </div>
 
@@ -197,7 +199,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <Target className="w-4 h-4 text-accent" />
-              <span className="text-sm font-medium">সাপ্তাহিক লক্ষ্য</span>
+              <span className="text-sm font-medium">{t("Weekly Goal", "সাপ্তাহিক লক্ষ্য")}</span>
             </div>
             <span className="text-sm text-muted-foreground">
               {weeklyProgress}/{weeklyGoal}
@@ -211,7 +213,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Award className="w-4 h-4 text-success" />
-              <span className="text-sm font-medium">অর্জনসমূহ</span>
+              <span className="text-sm font-medium">{t("Achievements", "অর্জনসমূহ")}</span>
             </div>
             <span className="text-xs text-muted-foreground">
               {unlockedAchievements.length}/{totalAchievements}
@@ -257,7 +259,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
             onClick={() => setShowAchievements(true)}
           >
             <Sparkles className="w-3 h-3 mr-2" />
-            সব অর্জন দেখুন
+            {t("View All Achievements", "সব অর্জন দেখুন")}
           </Button>
         </div>
 
@@ -270,17 +272,17 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
           >
             <div className="flex items-center justify-center gap-1 mb-1">
               <Users className="w-3 h-3 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">ফলোয়ার</span>
+              <span className="text-xs text-muted-foreground">{t("Followers", "ফলোয়ার")}</span>
             </div>
             <div className="font-semibold">{user.followers}</div>
           </Button>
           <div className="text-center p-3">
             <div className="flex items-center justify-center gap-1 mb-1">
               <Calendar className="w-3 h-3 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">সদস্য হওয়ার তারিখ</span>
+              <span className="text-xs text-muted-foreground">{t("Member Since", "সদস্য হওয়ার তারিখ")}</span>
             </div>
             <div className="font-semibold text-xs">
-              {new Date(user.joinDate).toLocaleDateString('bn-BD')}
+              {new Date(user.joinDate).toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-US')}
             </div>
           </div>
         </div>
@@ -292,7 +294,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Users className="w-5 h-5" />
-              ফলোয়ার ({user.followers})
+              {t("Followers", "ফলোয়ার")} ({user.followers})
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3 max-h-[400px] overflow-y-auto">
@@ -327,7 +329,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">এখনো কোনো ফলোয়ার নেই</p>
+                <p className="text-sm">{t("No followers yet", "এখনো কোনো ফলোয়ার নেই")}</p>
               </div>
             )}
           </div>
@@ -340,19 +342,19 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-warning" />
-              অর্জনসমূহ ({unlockedAchievements.length}/{totalAchievements})
+              {t("Achievements", "অর্জনসমূহ")} ({unlockedAchievements.length}/{totalAchievements})
             </DialogTitle>
             <DialogDescription>
-              আপনার সকল অর্জন এবং প্রগ্রেস দেখুন
+              {t("View all your achievements and progress", "আপনার সকল অর্জন এবং প্রগ্রেস দেখুন")}
             </DialogDescription>
           </DialogHeader>
           
           <Tabs defaultValue="all" className="flex-1 flex flex-col">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="all">সব</TabsTrigger>
-              <TabsTrigger value="unlocked">আনলক</TabsTrigger>
-              <TabsTrigger value="locked">লক</TabsTrigger>
-              <TabsTrigger value="progress">প্রগ্রেস</TabsTrigger>
+              <TabsTrigger value="all">{t("All", "সব")}</TabsTrigger>
+              <TabsTrigger value="unlocked">{t("Unlocked", "আনলক")}</TabsTrigger>
+              <TabsTrigger value="locked">{t("Locked", "লক")}</TabsTrigger>
+              <TabsTrigger value="progress">{t("Progress", "প্রগ্রেস")}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="all" className="flex-1 overflow-y-auto mt-4">
@@ -378,12 +380,12 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                               {achievement.unlocked ? (
                                 <Badge variant="secondary" className="bg-success/20 text-success">
                                   <CheckCircle2 className="w-3 h-3 mr-1" />
-                                  আনলক
+                                  {t("Unlocked", "আনলক")}
                                 </Badge>
                               ) : (
                                 <Badge variant="outline" className="gap-1">
                                   <Lock className="w-3 h-3" />
-                                  লক
+                                  {t("Locked", "লক")}
                                 </Badge>
                               )}
                             </h4>
@@ -399,7 +401,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                         {!achievement.unlocked && (
                           <div className="space-y-1">
                             <div className="flex justify-between text-xs text-muted-foreground">
-                              <span>প্রগ্রেস</span>
+                              <span>{t("Progress", "প্রগ্রেস")}</span>
                               <span>
                                 {achievement.current}/{achievement.requirement}
                               </span>
@@ -433,7 +435,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                           {achievement.name}
                           <Badge variant="secondary" className="bg-success/20 text-success">
                             <CheckCircle2 className="w-3 h-3 mr-1" />
-                            আনলক
+                            {t("Unlocked", "আনলক")}
                           </Badge>
                         </h4>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -466,7 +468,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                             {achievement.name}
                             <Badge variant="outline" className="gap-1">
                               <Lock className="w-3 h-3" />
-                              লক
+                              {t("Locked", "লক")}
                             </Badge>
                           </h4>
                           <p className="text-sm text-muted-foreground mt-1">
@@ -479,7 +481,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                         
                         <div className="space-y-1">
                           <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>প্রগ্রেস</span>
+                            <span>{t("Progress", "প্রগ্রেস")}</span>
                             <span>
                               {achievement.current}/{achievement.requirement}
                             </span>
@@ -501,12 +503,12 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                 <div className="p-4 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <TrendingUp className="w-4 h-4" />
-                    আপনার সামগ্রিক প্রগ্রেস
+                    {t("Your Overall Progress", "আপনার সামগ্রিক প্রগ্রেস")}
                   </h3>
                   <div className="space-y-3">
                     <div>
                       <div className="flex justify-between text-sm mb-1">
-                        <span>অর্জন সম্পন্ন</span>
+                        <span>{t("Achievements Completed", "অর্জন সম্পন্ন")}</span>
                         <span className="font-medium">
                           {unlockedAchievements.length}/{totalAchievements}
                         </span>
@@ -518,7 +520,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                     </div>
                     <div>
                       <div className="flex justify-between text-sm mb-1">
-                        <span>ট্রাস্ট স্কোর</span>
+                        <span>{t("Trust Score", "ট্রাস্ট স্কোর")}</span>
                         <span className="font-medium">{user.trustScore}/100</span>
                       </div>
                       <Progress 
@@ -528,7 +530,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                     </div>
                     <div>
                       <div className="flex justify-between text-sm mb-1">
-                        <span>ফলোয়ার</span>
+                        <span>{t("Followers", "ফলোয়ার")}</span>
                         <span className="font-medium">{user.followers}/500</span>
                       </div>
                       <Progress 
@@ -540,7 +542,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                 </div>
                 
                 <div className="grid gap-3">
-                  <h3 className="font-semibold">পরবর্তী অর্জন</h3>
+                  <h3 className="font-semibold">{t("Next Achievement", "পরবর্তী অর্জন")}</h3>
                   {achievements
                     .filter(a => !a.unlocked)
                     .sort((a, b) => {
@@ -568,7 +570,7 @@ export const GamificationPanel = ({ user, users }: GamificationPanelProps) => {
                             <div className="space-y-1">
                               <div className="flex justify-between text-xs text-muted-foreground">
                                 <span>
-                                  আর মাত্র {achievement.requirement - achievement.current} প্রয়োজন
+                                  {t(`Only ${achievement.requirement - achievement.current} more needed`, `আর মাত্র ${achievement.requirement - achievement.current} প্রয়োজন`)}
                                 </span>
                                 <span>
                                   {Math.round((achievement.current / achievement.requirement) * 100)}%

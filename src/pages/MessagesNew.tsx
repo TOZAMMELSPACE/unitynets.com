@@ -8,6 +8,7 @@ import { ChatWindow } from '@/components/messages/ChatWindow';
 import { NewChatDialog } from '@/components/messages/NewChatDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function MessagesNew() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -16,6 +17,7 @@ export default function MessagesNew() {
   const [isGroupMode, setIsGroupMode] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
 
   const { chats, loading, error, fetchChats, getOrCreateDirectChat, createGroupChat } = useChat(currentUserId);
   usePresence(currentUserId);
@@ -81,9 +83,11 @@ export default function MessagesNew() {
         <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-4">
           <MessageCircle className="w-10 h-10 text-muted-foreground" />
         </div>
-        <h2 className="text-xl font-semibold mb-2 text-bengali">মেসেজ দেখতে লগইন করুন</h2>
-        <p className="text-muted-foreground text-bengali">
-          আপনার কথোপকথন দেখতে এবং মেসেজ পাঠাতে লগইন করুন
+        <h2 className="text-xl font-semibold mb-2">
+          {t('Please login to view messages', 'মেসেজ দেখতে লগইন করুন')}
+        </h2>
+        <p className="text-muted-foreground">
+          {t('Login to view your conversations and send messages', 'আপনার কথোপকথন দেখতে এবং মেসেজ পাঠাতে লগইন করুন')}
         </p>
       </div>
     );
@@ -158,12 +162,14 @@ export default function MessagesNew() {
             <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
               <MessageCircle className="w-12 h-12 text-muted-foreground" />
             </div>
-            <h2 className="text-xl font-semibold mb-2 text-bengali">UnityNets মেসেজিং</h2>
-            <p className="text-muted-foreground max-w-sm text-bengali">
-              বাম দিক থেকে একটি চ্যাট নির্বাচন করুন অথবা নতুন কথোপকথন শুরু করুন
+            <h2 className="text-xl font-semibold mb-2">
+              {t('UnityNets Messaging', 'UnityNets মেসেজিং')}
+            </h2>
+            <p className="text-muted-foreground max-w-sm">
+              {t('Select a chat from the left or start a new conversation', 'বাম দিক থেকে একটি চ্যাট নির্বাচন করুন অথবা নতুন কথোপকথন শুরু করুন')}
             </p>
             {error ? (
-              <p className="mt-3 text-sm text-destructive text-bengali">{error.message}</p>
+              <p className="mt-3 text-sm text-destructive">{error.message}</p>
             ) : null}
           </div>
         )}

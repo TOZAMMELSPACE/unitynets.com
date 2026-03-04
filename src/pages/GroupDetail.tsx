@@ -15,6 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -83,6 +84,7 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t, language } = useLanguage();
   const userId = currentUser?.id || null;
 
   const [group, setGroup] = useState<Group | null>(null);
@@ -109,7 +111,7 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
       if (error) throw error;
       if (!data) {
         toast({
-          title: "গ্রুপ পাওয়া যায়নি",
+          title: t("Group not found", "গ্রুপ পাওয়া যায়নি"),
           variant: "destructive"
         });
         navigate('/groups');
@@ -217,8 +219,8 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
   const handleJoinGroup = async () => {
     if (!userId || !groupId) {
       toast({
-        title: "লগইন প্রয়োজন",
-        description: "গ্রুপে যোগ দিতে প্রথমে লগইন করুন",
+        title: t("Login required", "লগইন প্রয়োজন"),
+        description: t("Please login to join the group", "গ্রুপে যোগ দিতে প্রথমে লগইন করুন"),
         variant: "destructive"
       });
       return;
@@ -237,16 +239,16 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
       if (error) throw error;
 
       toast({
-        title: "সফল!",
-        description: "আপনি সফলভাবে গ্রুপে যোগ দিয়েছেন"
+        title: t("Success!", "সফল!"),
+        description: t("You have successfully joined the group", "আপনি সফলভাবে গ্রুপে যোগ দিয়েছেন")
       });
 
       await Promise.all([fetchGroup(), fetchMembers()]);
     } catch (error) {
       console.error('Error joining group:', error);
       toast({
-        title: "ত্রুটি",
-        description: "গ্রুপে যোগ দিতে সমস্যা হয়েছে",
+        title: t("Error", "ত্রুটি"),
+        description: t("Failed to join the group", "গ্রুপে যোগ দিতে সমস্যা হয়েছে"),
         variant: "destructive"
       });
     } finally {
@@ -271,16 +273,16 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
 
       setPostContent("");
       toast({
-        title: "সফল!",
-        description: "আপনার পোস্ট প্রকাশিত হয়েছে"
+        title: t("Success!", "সফল!"),
+        description: t("Your post has been published", "আপনার পোস্ট প্রকাশিত হয়েছে")
       });
 
       await Promise.all([fetchPosts(), fetchGroup()]);
     } catch (error) {
       console.error('Error creating post:', error);
       toast({
-        title: "ত্রুটি",
-        description: "পোস্ট করতে সমস্যা হয়েছে",
+        title: t("Error", "ত্রুটি"),
+        description: t("Failed to create post", "পোস্ট করতে সমস্যা হয়েছে"),
         variant: "destructive"
       });
     } finally {
@@ -300,16 +302,16 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
       if (error) throw error;
 
       toast({
-        title: "সফল!",
-        description: "পোস্ট মুছে ফেলা হয়েছে"
+        title: t("Success!", "সফল!"),
+        description: t("Post has been deleted", "পোস্ট মুছে ফেলা হয়েছে")
       });
 
       await Promise.all([fetchPosts(), fetchGroup()]);
     } catch (error) {
       console.error('Error deleting post:', error);
       toast({
-        title: "ত্রুটি",
-        description: "পোস্ট মুছতে সমস্যা হয়েছে",
+        title: t("Error", "ত্রুটি"),
+        description: t("Failed to delete post", "পোস্ট মুছতে সমস্যা হয়েছে"),
         variant: "destructive"
       });
     } finally {
@@ -322,11 +324,11 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (diffInSeconds < 60) return 'এইমাত্র';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} মিনিট আগে`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} ঘন্টা আগে`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} দিন আগে`;
-    return date.toLocaleDateString('bn-BD');
+    if (diffInSeconds < 60) return t('Just now', 'এইমাত্র');
+    if (diffInSeconds < 3600) return t(`${Math.floor(diffInSeconds / 60)} minutes ago`, `${Math.floor(diffInSeconds / 60)} মিনিট আগে`);
+    if (diffInSeconds < 86400) return t(`${Math.floor(diffInSeconds / 3600)} hours ago`, `${Math.floor(diffInSeconds / 3600)} ঘন্টা আগে`);
+    if (diffInSeconds < 604800) return t(`${Math.floor(diffInSeconds / 86400)} days ago`, `${Math.floor(diffInSeconds / 86400)} দিন আগে`);
+    return date.toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-US');
   };
 
   if (loading) {
@@ -343,10 +345,10 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
     return (
       <main className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="text-center py-16">
-          <h2 className="text-xl font-bold mb-2">গ্রুপ পাওয়া যায়নি</h2>
+          <h2 className="text-xl font-bold mb-2">{t("Group not found", "গ্রুপ পাওয়া যায়নি")}</h2>
           <Button onClick={() => navigate('/groups')}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            ফিরে যান
+            {t("Go back", "ফিরে যান")}
           </Button>
         </div>
       </main>
@@ -362,7 +364,7 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
         onClick={() => navigate('/groups')}
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        ফিরে যান
+        {t("Go back", "ফিরে যান")}
       </Button>
 
       {/* Group Header */}
@@ -378,18 +380,18 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
             {group.is_official && (
               <Badge variant="secondary" className="bg-blue-500/90 text-white">
                 <Shield className="w-3 h-3 mr-1" />
-                অফিশিয়াল
+                {t("Official", "অফিশিয়াল")}
               </Badge>
             )}
             {group.is_private ? (
               <Badge variant="secondary" className="bg-black/50 text-white">
                 <Lock className="w-3 h-3 mr-1" />
-                প্রাইভেট
+                {t("Private", "প্রাইভেট")}
               </Badge>
             ) : (
               <Badge variant="secondary" className="bg-black/50 text-white">
                 <Globe className="w-3 h-3 mr-1" />
-                পাবলিক
+                {t("Public", "পাবলিক")}
               </Badge>
             )}
           </div>
@@ -403,11 +405,11 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
             <div className="flex items-center gap-4 text-white/90 text-sm">
               <span className="flex items-center gap-1">
                 <Users className="w-4 h-4" />
-                {group.members_count} সদস্য
+                {group.members_count} {t("members", "সদস্য")}
               </span>
               <span className="flex items-center gap-1">
                 <MessageCircle className="w-4 h-4" />
-                {group.posts_count} পোস্ট
+                {group.posts_count} {t("posts", "পোস্ট")}
               </span>
             </div>
             {!isMember ? (
@@ -421,12 +423,12 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
                 ) : (
                   <UserPlus className="w-4 h-4 mr-1" />
                 )}
-                যোগ দিন
+                {t("Join", "যোগ দিন")}
               </Button>
             ) : (
               <div className="flex items-center gap-2">
                 <Badge className="bg-green-500/90 text-white">
-                  সদস্য
+                  {t("Member", "সদস্য")}
                 </Badge>
                 {userRole === 'admin' && (
                   <Button size="icon" variant="ghost" className="text-white hover:bg-white/20">
@@ -447,14 +449,14 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
             className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
             <MessageCircle className="w-4 h-4 mr-2" />
-            পোস্ট ({group.posts_count})
+            {t("Posts", "পোস্ট")} ({group.posts_count})
           </TabsTrigger>
           <TabsTrigger 
             value="members"
             className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
             <Users className="w-4 h-4 mr-2" />
-            সদস্য ({group.members_count})
+            {t("Members", "সদস্য")} ({group.members_count})
           </TabsTrigger>
         </TabsList>
 
@@ -473,7 +475,7 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
                   </Avatar>
                   <div className="flex-1">
                     <Textarea
-                      placeholder="আপনার মনের কথা লিখুন..."
+                      placeholder={t("Share your thoughts...", "আপনার মনের কথা লিখুন...")}
                       value={postContent}
                       onChange={(e) => setPostContent(e.target.value)}
                       className="min-h-[80px] resize-none border-0 bg-muted/50 focus-visible:ring-1"
@@ -481,7 +483,7 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
                     <div className="flex items-center justify-between mt-3">
                       <Button variant="ghost" size="sm" className="text-muted-foreground">
                         <ImageIcon className="w-4 h-4 mr-2" />
-                        ছবি
+                        {t("Image", "ছবি")}
                       </Button>
                       <Button 
                         onClick={handleCreatePost}
@@ -493,7 +495,7 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
                         ) : (
                           <Send className="w-4 h-4 mr-1" />
                         )}
-                        পোস্ট করুন
+                        {t("Post", "পোস্ট করুন")}
                       </Button>
                     </div>
                   </div>
@@ -542,7 +544,7 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
                                 onClick={() => setDeletePostId(post.id)}
                               >
                                 <Trash2 className="w-4 h-4 mr-2" />
-                                মুছে ফেলুন
+                                {t("Delete", "মুছে ফেলুন")}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -584,11 +586,11 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
           ) : (
             <div className="text-center py-16 bg-muted/30 rounded-2xl">
               <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">কোন পোস্ট নেই</h3>
+              <h3 className="text-lg font-semibold mb-2">{t("No posts yet", "কোন পোস্ট নেই")}</h3>
               <p className="text-muted-foreground">
                 {isMember 
-                  ? "প্রথম পোস্ট করে আলোচনা শুরু করুন!" 
-                  : "গ্রুপে যোগ দিয়ে পোস্ট করুন"}
+                  ? t("Be the first to start a discussion!", "প্রথম পোস্ট করে আলোচনা শুরু করুন!") 
+                  : t("Join the group to post", "গ্রুপে যোগ দিয়ে পোস্ট করুন")}
               </p>
             </div>
           )}
@@ -615,12 +617,12 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
                         {member.role === 'admin' && (
                           <Badge className="bg-yellow-500/90 text-white">
                             <Crown className="w-3 h-3 mr-1" />
-                            অ্যাডমিন
+                            {t("Admin", "অ্যাডমিন")}
                           </Badge>
                         )}
                         {member.role === 'moderator' && (
                           <Badge variant="secondary">
-                            মডারেটর
+                            {t("Moderator", "মডারেটর")}
                           </Badge>
                         )}
                       </div>
@@ -632,7 +634,7 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
                     </div>
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    যোগ দিয়েছেন {formatTimeAgo(member.joined_at)}
+                    {t("Joined", "যোগ দিয়েছেন")} {formatTimeAgo(member.joined_at)}
                   </span>
                 </div>
               </CardContent>
@@ -642,9 +644,9 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
           {members.length === 0 && (
             <div className="text-center py-16 bg-muted/30 rounded-2xl">
               <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">কোন সদস্য নেই</h3>
+              <h3 className="text-lg font-semibold mb-2">{t("No members", "কোন সদস্য নেই")}</h3>
               <p className="text-muted-foreground">
-                প্রথম সদস্য হিসেবে যোগ দিন!
+                {t("Be the first member!", "প্রথম সদস্য হিসেবে যোগ দিন!")}
               </p>
             </div>
           )}
@@ -655,18 +657,18 @@ export default function GroupDetail({ currentUser }: GroupDetailProps) {
       <AlertDialog open={!!deletePostId} onOpenChange={() => setDeletePostId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>পোস্ট মুছে ফেলতে চান?</AlertDialogTitle>
+            <AlertDialogTitle>{t("Delete this post?", "পোস্ট মুছে ফেলতে চান?")}</AlertDialogTitle>
             <AlertDialogDescription>
-              এই পোস্ট চিরতরে মুছে যাবে। এই কাজ পূর্বাবস্থায় ফেরানো যাবে না।
+              {t("This post will be permanently deleted. This action cannot be undone.", "এই পোস্ট চিরতরে মুছে যাবে। এই কাজ পূর্বাবস্থায় ফেরানো যাবে না।")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>বাতিল</AlertDialogCancel>
+            <AlertDialogCancel>{t("Cancel", "বাতিল")}</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeletePost}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              মুছে ফেলুন
+              {t("Delete", "মুছে ফেলুন")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

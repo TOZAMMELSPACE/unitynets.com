@@ -8,13 +8,12 @@ export const Footer = () => {
 
   return (
     <footer className="bg-card border-t border-border">
-      <div className="container mx-auto px-4 py-12 md:py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12 animate-fade-in">
           {/* Brand */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <img src="/logo.jpg" alt="UnityNets Logo" className="w-10 h-10 rounded-lg" />
-              <span className="text-xl font-bold text-primary">UnityNets</span>
+              <img src="/logo.png" alt="UnityNets Logo" className="h-12 w-auto" />
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
               {t(
@@ -122,9 +121,9 @@ export const Footer = () => {
             © 2025 UnityNets. {t("All rights reserved.", "সর্বস্বত্ব সংরক্ষিত।")}
           </p>
           <p className="text-sm text-muted-foreground flex items-center gap-1">
-            <span>{t("Made with", "ভালোবাসা দিয়ে তৈরি")}</span>
+            {t("Made with", "তৈরি করা হয়েছে")}
             <Heart className="w-4 h-4 text-destructive fill-destructive" />
-            <span>{t("for the World", "সারা বিশ্বের জন্য")}</span>
+            {t("for the World", "ভালোবাসা দিয়ে সারা বিশ্বের জন্য")}
           </p>
         </div>
       </div>

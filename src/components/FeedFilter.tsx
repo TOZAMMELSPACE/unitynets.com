@@ -14,6 +14,8 @@ import {
   Briefcase,
   X
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { worldCountries } from "@/lib/countries";
 
 interface FeedFilterProps {
   onFilterChange: (filters: {
@@ -25,6 +27,7 @@ interface FeedFilterProps {
 }
 
 export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [community, setCommunity] = useState("all");
   const [postType, setPostType] = useState("all");
@@ -72,7 +75,7 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
               setSearch(e.target.value);
               handleFilterChange();
             }}
-            placeholder="পোস্ট, ইউজার বা হ্যাশট্যাগ খুঁজুন..."
+            placeholder={t("Search posts, users or hashtags...", "পোস্ট, ইউজার বা হ্যাশট্যাগ খুঁজুন...")}
             className="pl-10"
           />
         </div>
@@ -83,7 +86,7 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
           className="relative"
         >
           <Filter className="w-4 h-4 mr-2" />
-          ফিল্টার
+          {t("Filter", "ফিল্টার")}
           {activeFiltersCount > 0 && (
             <Badge variant="destructive" className="absolute -top-2 -right-2 w-5 h-5 p-0 text-xs">
               {activeFiltersCount}
@@ -103,7 +106,7 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
           }}
         >
           <Home className="w-4 h-4 mr-2" />
-          সব
+          {t("All", "সব")}
         </Button>
         <Button
           variant={community === "global" ? "default" : "outline"}
@@ -114,7 +117,7 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
           }}
         >
           <Globe className="w-4 h-4 mr-2" />
-          গ্লোবাল
+          {t("Global", "গ্লোবাল")}
         </Button>
         <Button
           variant={sortBy === "trending" ? "default" : "outline"}
@@ -125,7 +128,7 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
           }}
         >
           <TrendingUp className="w-4 h-4 mr-2" />
-          ট্রেন্ডিং
+          {t("Trending", "ট্রেন্ডিং")}
         </Button>
         <Button
           variant={postType === "event" ? "default" : "outline"}
@@ -136,7 +139,7 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
           }}
         >
           <Calendar className="w-4 h-4 mr-2" />
-          ইভেন্ট
+          {t("Event", "ইভেন্ট")}
         </Button>
         <Button
           variant={postType === "job" ? "default" : "outline"}
@@ -147,7 +150,7 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
           }}
         >
           <Briefcase className="w-4 h-4 mr-2" />
-          কাজ
+          {t("Job", "কাজ")}
         </Button>
       </div>
 
@@ -156,42 +159,43 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-border">
           <Select value={community} onValueChange={setCommunity}>
             <SelectTrigger>
-              <SelectValue placeholder="কমিউনিটি" />
+              <SelectValue placeholder={t("Community", "কমিউনিটি")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">সব কমিউনিটি</SelectItem>
-              <SelectItem value="global">🌍 Global</SelectItem>
-              <SelectItem value="ward-1">🏘️ Ward-1</SelectItem>
-              <SelectItem value="ward-2">🏘️ Ward-2</SelectItem>
-              <SelectItem value="ward-3">🏘️ Ward-3</SelectItem>
+              <SelectItem value="all">{t("All Communities", "সব কমিউনিটি")}</SelectItem>
+              {worldCountries.map((country) => (
+                <SelectItem key={country.value} value={country.value}>
+                  {country.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
           <Select value={postType} onValueChange={setPostType}>
             <SelectTrigger>
-              <SelectValue placeholder="পোস্ট টাইপ" />
+              <SelectValue placeholder={t("Post Type", "পোস্ট টাইপ")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">সব ধরনের পোস্ট</SelectItem>
-              <SelectItem value="text">📝 টেক্সট</SelectItem>
-              <SelectItem value="image">🖼️ ছবি</SelectItem>
-              <SelectItem value="video">🎥 ভিডিও</SelectItem>
-              <SelectItem value="poll">📊 পোল</SelectItem>
-              <SelectItem value="event">🎟️ ইভেন্ট</SelectItem>
-              <SelectItem value="job">💼 কাজ</SelectItem>
+              <SelectItem value="all">{t("All Post Types", "সব ধরনের পোস্ট")}</SelectItem>
+              <SelectItem value="text">📝 {t("Text", "টেক্সট")}</SelectItem>
+              <SelectItem value="image">🖼️ {t("Image", "ছবি")}</SelectItem>
+              <SelectItem value="video">🎥 {t("Video", "ভিডিও")}</SelectItem>
+              <SelectItem value="poll">📊 {t("Poll", "পোল")}</SelectItem>
+              <SelectItem value="event">🎟️ {t("Event", "ইভেন্ট")}</SelectItem>
+              <SelectItem value="job">💼 {t("Job", "কাজ")}</SelectItem>
             </SelectContent>
           </Select>
 
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger>
-              <SelectValue placeholder="সাজানো" />
+              <SelectValue placeholder={t("Sort By", "সাজানো")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="recent">সর্বশেষ</SelectItem>
-              <SelectItem value="trending">ট্রেন্ডিং</SelectItem>
-              <SelectItem value="popular">জনপ্রিয়</SelectItem>
-              <SelectItem value="most_liked">বেশি লাইক</SelectItem>
-              <SelectItem value="most_commented">বেশি কমেন্ট</SelectItem>
+              <SelectItem value="recent">{t("Latest", "সর্বশেষ")}</SelectItem>
+              <SelectItem value="trending">{t("Trending", "ট্রেন্ডিং")}</SelectItem>
+              <SelectItem value="popular">{t("Popular", "জনপ্রিয়")}</SelectItem>
+              <SelectItem value="most_liked">{t("Most Liked", "বেশি লাইক")}</SelectItem>
+              <SelectItem value="most_commented">{t("Most Commented", "বেশি কমেন্ট")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -203,7 +207,7 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
           <div className="flex flex-wrap gap-2">
             {search && (
               <Badge variant="secondary">
-                খোঁজ: "{search}"
+                {t("Search", "খোঁজ")}: "{search}"
                 <X className="w-3 h-3 ml-1 cursor-pointer" onClick={() => {
                   setSearch("");
                   handleFilterChange();
@@ -212,7 +216,7 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
             )}
             {community !== "all" && (
               <Badge variant="secondary">
-                {community === "global" ? "গ্লোবাল" : community}
+                {community === "global" ? t("Global", "গ্লোবাল") : community}
                 <X className="w-3 h-3 ml-1 cursor-pointer" onClick={() => {
                   setCommunity("all");
                   handleFilterChange();
@@ -221,10 +225,10 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
             )}
             {postType !== "all" && (
               <Badge variant="secondary">
-                {postType === "text" ? "টেক্সট" : 
-                 postType === "image" ? "ছবি" :
-                 postType === "event" ? "ইভেন্ট" : 
-                 postType === "job" ? "কাজ" : postType}
+                {postType === "text" ? t("Text", "টেক্সট") : 
+                 postType === "image" ? t("Image", "ছবি") :
+                 postType === "event" ? t("Event", "ইভেন্ট") : 
+                 postType === "job" ? t("Job", "কাজ") : postType}
                 <X className="w-3 h-3 ml-1 cursor-pointer" onClick={() => {
                   setPostType("all");
                   handleFilterChange();
@@ -235,7 +239,7 @@ export const FeedFilter = ({ onFilterChange }: FeedFilterProps) => {
           
           <Button variant="ghost" size="sm" onClick={clearFilters}>
             <X className="w-4 h-4 mr-2" />
-            পরিষ্কার করুন
+            {t("Clear", "পরিষ্কার করুন")}
           </Button>
         </div>
       )}

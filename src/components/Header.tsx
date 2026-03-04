@@ -19,6 +19,7 @@ import {
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
+import { worldCountries } from "@/lib/countries";
 
 interface HeaderProps {
   currentUser: User | null;
@@ -222,10 +223,11 @@ export const Header = ({ currentUser, onSignOut, onCreatePost, onFilterChange }:
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Communities</SelectItem>
-                      <SelectItem value="global">Global</SelectItem>
-                      <SelectItem value="ward-1">Ward-1</SelectItem>
-                      <SelectItem value="ward-2">Ward-2</SelectItem>
-                      <SelectItem value="ward-3">Ward-3</SelectItem>
+                      {worldCountries.map((country) => (
+                        <SelectItem key={country.value} value={country.value}>
+                          {country.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
 

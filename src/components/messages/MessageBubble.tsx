@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, CheckCheck, MoreVertical, Reply, Forward, Trash2, Edit, Pin, Smile } from 'lucide-react';
+import { Check, CheckCheck, MoreVertical, Reply, Forward, Trash2, Edit, Pin, Smile, Phone, PhoneMissed, Video, Clock } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,7 +17,8 @@ import {
 } from '@/components/ui/popover';
 import { ChatMessage } from '@/hooks/useChat';
 import { format } from 'date-fns';
-import { bn } from 'date-fns/locale';
+import { bn, enUS } from 'date-fns/locale';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -29,6 +30,7 @@ interface MessageBubbleProps {
   onDelete: (messageId: string) => void;
   onReact: (messageId: string, emoji: string) => void;
   onForward: (message: ChatMessage) => void;
+  onCallBack?: (userId: string, callType: 'voice' | 'video') => void;
 }
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
@@ -43,18 +45,20 @@ export function MessageBubble({
   onDelete,
   onReact,
   onForward,
+  onCallBack,
 }: MessageBubbleProps) {
   const [showActions, setShowActions] = useState(false);
+  const { language, t } = useLanguage();
 
   const formatTime = (timestamp: string) => {
-    return format(new Date(timestamp), 'p', { locale: bn });
+    return format(new Date(timestamp), 'p', { locale: language === 'bn' ? bn : enUS });
   };
 
   const renderContent = () => {
     if (message.is_deleted) {
       return (
-        <span className="italic text-muted-foreground text-bengali">
-          এই মেসেজটি মুছে ফেলা হয়েছে
+        <span className="italic text-muted-foreground">
+          {t('This message was deleted', 'এই মেসেজটি মুছে ফেলা হয়েছে')}
         </span>
       );
     }
@@ -65,12 +69,12 @@ export function MessageBubble({
           <div className="max-w-xs">
             <img
               src={message.content || (message.metadata as { url?: string })?.url}
-              alt="Shared image"
+              alt={t("Shared image", "শেয়ার করা ছবি")}
               className="rounded-lg max-w-full cursor-pointer hover:opacity-90 transition-opacity"
               onClick={() => window.open(message.content || (message.metadata as { url?: string })?.url, '_blank')}
             />
             {(message.metadata as { caption?: string })?.caption && (
-              <p className="mt-2 text-sm text-bengali">{(message.metadata as { caption?: string }).caption}</p>
+              <p className="mt-2 text-sm">{(message.metadata as { caption?: string }).caption}</p>
             )}
           </div>
         );
@@ -110,8 +114,8 @@ export function MessageBubble({
               📎
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium truncate text-bengali">
-                {metadata?.fileName || 'ফাইল'}
+              <p className="font-medium truncate">
+                {metadata?.fileName || t('File', 'ফাইল')}
               </p>
               {metadata?.fileSize && (
                 <p className="text-xs text-muted-foreground">
@@ -125,19 +129,86 @@ export function MessageBubble({
       case 'call_started':
       case 'call_ended':
         return (
-          <div className="flex items-center gap-2 text-bengali">
+          <div className="flex items-center gap-2">
             <span>📞</span>
-            <span>{message.type === 'call_started' ? 'কল শুরু হয়েছে' : 'কল শেষ হয়েছে'}</span>
+            <span>{message.type === 'call_started' ? t('Call started', 'কল শুরু হয়েছে') : t('Call ended', 'কল শেষ হয়েছে')}</span>
           </div>
         );
 
+      case 'missed_call': {
+        const callMeta = message.metadata as { callType?: string; callerId?: string; receiverId?: string; duration?: number };
+        const isMissedByMe = callMeta?.callerId !== currentUserId;
+        const callBackUserId = isMissedByMe ? callMeta?.callerId : callMeta?.receiverId;
+        const callType = (callMeta?.callType === 'video' ? 'video' : 'voice') as 'voice' | 'video';
+        
+        return (
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-xl ${isMissedByMe ? 'bg-destructive/10' : 'bg-muted/50'}`}>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isMissedByMe ? 'bg-destructive/20' : 'bg-muted'}`}>
+              <PhoneMissed className={`w-5 h-5 ${isMissedByMe ? 'text-destructive' : 'text-muted-foreground'}`} />
+            </div>
+            <div className="flex-1">
+              <p className={`font-medium ${isMissedByMe ? 'text-destructive' : ''}`}>
+                {isMissedByMe ? t('Missed Call', 'মিসড কল') : t('Call not answered', 'কল গ্রহণ করা হয়নি')}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {callMeta?.callType === 'video' ? t('Video Call', 'ভিডিও কল') : t('Voice Call', 'ভয়েস কল')}
+              </p>
+            </div>
+            {callBackUserId && onCallBack && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onCallBack(callBackUserId, callType)}
+                className="gap-2"
+              >
+                {callType === 'video' ? (
+                  <Video className="w-4 h-4" />
+                ) : (
+                  <Phone className="w-4 h-4" />
+                )}
+                {t('Call Back', 'কল ব্যাক')}
+              </Button>
+            )}
+          </div>
+        );
+      }
+
+      case 'call_summary': {
+        const summaryMeta = message.metadata as { callType?: string; duration?: number; status?: string };
+        const durationSecs = summaryMeta?.duration || 0;
+        const mins = Math.floor(durationSecs / 60);
+        const secs = durationSecs % 60;
+        const durationText = mins > 0 
+          ? t(`${mins} minutes ${secs} seconds`, `${mins} মিনিট ${secs} সেকেন্ড`) 
+          : t(`${secs} seconds`, `${secs} সেকেন্ড`);
+        
+        return (
+          <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-success/10">
+            <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+              {summaryMeta?.callType === 'video' ? (
+                <Video className="w-5 h-5 text-success" />
+              ) : (
+                <Phone className="w-5 h-5 text-success" />
+              )}
+            </div>
+            <div className="flex-1">
+              <p className="font-medium text-success">{t('Call completed', 'কল সম্পন্ন')}</p>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Clock className="w-3 h-3" />
+                <span>{durationText}</span>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       case 'system':
         return (
-          <span className="text-muted-foreground text-bengali">{message.content}</span>
+          <span className="text-muted-foreground">{message.content}</span>
         );
 
       default:
-        return <span className="whitespace-pre-wrap text-bengali">{message.content}</span>;
+        return <span className="whitespace-pre-wrap">{message.content}</span>;
     }
   };
 
@@ -180,12 +251,16 @@ export function MessageBubble({
     );
   };
 
-  // System messages are centered
-  if (message.type === 'system') {
+  // System messages and call messages are centered
+  if (message.type === 'system' || message.type === 'missed_call' || message.type === 'call_summary' || message.type === 'call_started' || message.type === 'call_ended') {
     return (
       <div className="flex justify-center py-2">
-        <div className="px-4 py-2 bg-muted/50 rounded-full text-sm text-muted-foreground text-bengali">
-          {message.content}
+        <div className={`px-4 py-2 rounded-xl text-sm ${
+          message.type === 'system' 
+            ? 'bg-muted/50 rounded-full text-muted-foreground' 
+            : ''
+        }`}>
+          {renderContent()}
         </div>
       </div>
     );
@@ -218,8 +293,8 @@ export function MessageBubble({
               isOwn ? 'bg-primary/5 border-primary' : 'bg-muted/50 border-muted-foreground'
             }`}
           >
-            <p className="font-medium text-bengali">{message.reply_to.sender?.full_name}</p>
-            <p className="text-muted-foreground truncate text-bengali">
+            <p className="font-medium">{message.reply_to.sender?.full_name}</p>
+            <p className="text-muted-foreground truncate">
               {message.reply_to.content?.slice(0, 50)}
             </p>
           </div>
@@ -235,7 +310,7 @@ export function MessageBubble({
         >
           {/* Sender name for group chats */}
           {!isOwn && showAvatar && message.sender && (
-            <p className="text-xs font-medium mb-1 text-primary text-bengali">
+            <p className="text-xs font-medium mb-1 text-primary">
               {message.sender.full_name}
               {message.sender.trust_score && message.sender.trust_score > 0 && (
                 <span className="ml-2 opacity-70">⭐ {message.sender.trust_score}</span>
@@ -251,10 +326,10 @@ export function MessageBubble({
             isOwn ? 'justify-end' : ''
           }`}>
             {message.is_edited && (
-              <span className="text-bengali">সম্পাদিত</span>
+              <span>{t('edited', 'সম্পাদিত')}</span>
             )}
             {message.is_forwarded && (
-              <span className="text-bengali">ফরওয়ার্ড</span>
+              <span>{t('forwarded', 'ফরওয়ার্ড')}</span>
             )}
             <span>{formatTime(message.created_at)}</span>
             {renderReadStatus()}
@@ -302,12 +377,12 @@ export function MessageBubble({
               <DropdownMenuContent align={isOwn ? 'end' : 'start'}>
                 <DropdownMenuItem onClick={() => onForward(message)}>
                   <Forward className="w-4 h-4 mr-2" />
-                  <span className="text-bengali">ফরওয়ার্ড</span>
+                  <span>{t('Forward', 'ফরওয়ার্ড')}</span>
                 </DropdownMenuItem>
                 {isOwn && message.type === 'text' && (
                   <DropdownMenuItem onClick={() => onEdit(message)}>
                     <Edit className="w-4 h-4 mr-2" />
-                    <span className="text-bengali">সম্পাদনা</span>
+                    <span>{t('Edit', 'সম্পাদনা')}</span>
                   </DropdownMenuItem>
                 )}
                 {isOwn && (
@@ -318,7 +393,7 @@ export function MessageBubble({
                       className="text-destructive focus:text-destructive"
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
-                      <span className="text-bengali">মুছে ফেলুন</span>
+                      <span>{t('Delete', 'মুছে ফেলুন')}</span>
                     </DropdownMenuItem>
                   </>
                 )}

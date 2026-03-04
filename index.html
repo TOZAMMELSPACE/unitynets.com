@@ -3,18 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
-    <title>UnityNets - Trust • Learn • Unite | একত্রে শক্তিশালী</title>
-    <meta name="description" content="UnityNets - বাংলাদেশের প্রথম trust-based community platform। স্থানীয় সম্প্রদায়ে যুক্ত হন, জ্ঞান শেয়ার করুন, Unity Note দিয়ে সেবা বিনিময় করুন। Join the community for local engagement, learning, and building trust." />
+    <title>UnityNets - Trust • Learn • Unite</title>
+    <meta name="description" content="UnityNets - Build Together, Grow Together – Join the world&#39;s most trusted community platform for skill sharing and mutual growth. Building bridges of unity from South Asia to the world.">
     <meta name="author" content="UnityNets Community" />
-    <meta name="keywords" content="UnityNets, ইউনিটিনেটস, community platform, Bangladesh, বাংলাদেশ, trust network, Unity Note, local community, সম্প্রদায়, civic engagement, learning platform, social network" />
+    <meta name="keywords" content="UnityNets, ইউনিটিনেটস, community platform, Bangladesh, বাংলাদেশ, trust network, Unity Note, local community, সম্প্রদায়, civic engagement, learning platform, social network">
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://unitynets.com/" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://unitynets.com/" />
-    <meta property="og:title" content="UnityNets - Trust • Learn • Unite | একত্রে শক্তিশালী" />
-    <meta property="og:description" content="বাংলাদেশের প্রথম trust-based community platform। স্থানীয় সম্প্রদায়ে যুক্ত হন, জ্ঞান শেয়ার করুন, Unity Note দিয়ে সেবা বিনিময় করুন।" />
+    
+    
     <meta property="og:image" content="https://unitynets.com/og-image.png" />
     <meta property="og:locale" content="bn_BD" />
     <meta property="og:locale:alternate" content="en_US" />
@@ -23,14 +23,14 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://unitynets.com/" />
-    <meta name="twitter:title" content="UnityNets - Trust • Learn • Unite" />
-    <meta name="twitter:description" content="বাংলাদেশের প্রথম trust-based community platform। একত্রে শক্তিশালী!" />
+    
+    
     <meta name="twitter:image" content="https://unitynets.com/og-image.png" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="/logo.jpg" />
-    <link rel="apple-touch-icon" href="/logo.jpg" />
-    <link rel="shortcut icon" href="/logo.jpg" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="shortcut icon" href="/logo.png" />
 
     <!-- Structured Data - Organization -->
     <script type="application/ld+json">
@@ -72,7 +72,7 @@
     </script>
     
     <!-- Preload optimized logo for faster rendering -->
-    <link rel="preload" as="image" href="/logo-optimized.webp" type="image/webp" fetchpriority="high">
+    <link rel="preload" as="image" href="/logo.png" type="image/png" fetchpriority="high">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -117,23 +117,29 @@
         align-items: center;
         justify-content: center;
         min-height: 100vh;
-        gap: 1rem;
+        gap: 1.5rem;
         background: var(--bg);
       }
-      #initial-loader h1 {
-        font-size: 1.75rem;
-        font-weight: 700;
-        margin: 0;
-        color: var(--primary);
+      .loader-logo {
+        width: 180px;
+        height: auto;
+        animation: pulse-logo 2s ease-in-out infinite;
       }
-      #initial-loader p {
-        font-size: 0.875rem;
-        opacity: 0.7;
+      @keyframes pulse-logo {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(0.98); }
+      }
+      #initial-loader .loader-tagline {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--primary);
+        opacity: 0.9;
         margin: 0;
+        letter-spacing: 0.5px;
       }
       .loader-spinner {
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 2rem;
+        height: 2rem;
         border: 3px solid rgba(42, 157, 143, 0.2);
         border-top-color: var(--primary);
         border-radius: 50%;
@@ -206,14 +212,17 @@
         });
       }
     </script>
-  </head>
+    <meta property="og:title" content="UnityNets - Trust • Learn • Unite">
+  <meta name="twitter:title" content="UnityNets - Trust • Learn • Unite">
+  <meta property="og:description" content="UnityNets - Build Together, Grow Together – Join the world&#39;s most trusted community platform for skill sharing and mutual growth. Building bridges of unity from South Asia to the world.">
+  <meta name="twitter:description" content="UnityNets - Build Together, Grow Together – Join the world&#39;s most trusted community platform for skill sharing and mutual growth. Building bridges of unity from South Asia to the world.">
+</head>
 
   <body class="antialiased">
     <div id="root">
       <!-- Initial loader shown before React hydrates -->
       <div id="initial-loader">
-        <h1>UnityNets</h1>
-        <p>একত্রে শক্তিশালী</p>
+        <img src="/logo.png" alt="UnityNets" class="loader-logo" />
         <div class="loader-spinner"></div>
       </div>
     </div>

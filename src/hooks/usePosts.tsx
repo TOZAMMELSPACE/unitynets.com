@@ -39,6 +39,11 @@ export interface DbComment {
   created_at: string;
 }
 
+export interface PollOption {
+  option: string;
+  votes: number;
+}
+
 export interface PostWithAuthor {
   id: string;
   content: string;
@@ -53,6 +58,7 @@ export interface PostWithAuthor {
   views: number;
   location?: string;
   hashtags?: string[];
+  pollOptions?: PollOption[];
   author: {
     id: string;
     name: string;
@@ -204,17 +210,28 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
             };
           });
 
+        // Determine post type based on content
+        let postType: 'text' | 'image' | 'video' | 'poll' | 'event' | 'job' = 'text';
+        if (post.poll_options && Array.isArray(post.poll_options) && post.poll_options.length > 0) {
+          postType = 'poll';
+        } else if (post.video_url) {
+          postType = 'video';
+        } else if (post.image_urls && post.image_urls.length > 0) {
+          postType = 'image';
+        }
+
         return {
           id: post.id,
           content: post.content,
           images: post.image_urls || undefined,
           videoUrl: post.video_url || undefined,
           community: post.community_tag || 'global',
-          postType: post.video_url ? 'video' as const : (post.image_urls && post.image_urls.length > 0 ? 'image' as const : 'text' as const),
+          postType,
           createdAt: post.created_at,
           likes: post.likes_count,
           dislikes: post.dislikes_count,
           views: post.views_count,
+          pollOptions: post.poll_options ? (post.poll_options as unknown as PollOption[]) : undefined,
           author: {
             id: post.user_id,
             name: profile?.full_name || 'Unknown User',
@@ -285,7 +302,8 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
     content: string,
     imageUrls?: string[],
     communityTag?: string,
-    videoUrl?: string
+    videoUrl?: string,
+    pollOptions?: PollOption[]
   ) => {
     if (!userId) {
       toast({
@@ -297,15 +315,26 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
     }
 
     try {
+      // Build the insert object with proper typing
+      const insertData: {
+        user_id: string;
+        content: string;
+        image_urls: string[] | null;
+        video_url: string | null;
+        community_tag: string;
+        poll_options: unknown;
+      } = {
+        user_id: userId,
+        content,
+        image_urls: imageUrls || null,
+        video_url: videoUrl || null,
+        community_tag: communityTag || 'global',
+        poll_options: pollOptions && pollOptions.length > 0 ? pollOptions : null,
+      };
+
       const { data, error } = await supabase
         .from('posts')
-        .insert({
-          user_id: userId,
-          content,
-          image_urls: imageUrls || null,
-          video_url: videoUrl || null,
-          community_tag: communityTag || 'global',
-        })
+        .insert(insertData as any)
         .select()
         .single();
 
@@ -318,6 +347,16 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         .eq('user_id', userId)
         .single();
 
+      // Determine post type
+      let newPostType: 'text' | 'image' | 'video' | 'poll' | 'event' | 'job' = 'text';
+      if (pollOptions && pollOptions.length > 0) {
+        newPostType = 'poll';
+      } else if (data.video_url) {
+        newPostType = 'video';
+      } else if (data.image_urls && data.image_urls.length > 0) {
+        newPostType = 'image';
+      }
+
       // Optimistic update - add new post immediately to UI
       const newPost: PostWithAuthor = {
         id: data.id,
@@ -325,11 +364,12 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         images: data.image_urls || undefined,
         videoUrl: data.video_url || undefined,
         community: data.community_tag || 'global',
-        postType: data.video_url ? 'video' : (data.image_urls && data.image_urls.length > 0 ? 'image' : 'text'),
+        postType: newPostType,
         createdAt: data.created_at,
         likes: 0,
         dislikes: 0,
         views: 0,
+        pollOptions: pollOptions || undefined,
         author: {
           id: userId,
           name: profileData?.full_name || 'Unknown User',
@@ -408,8 +448,20 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         .eq('user_id', userId)
         .maybeSingle();
 
+      // Get fresh post data from database
+      const { data: freshPost } = await supabase
+        .from('posts')
+        .select('likes_count, dislikes_count')
+        .eq('id', postId)
+        .single();
+
+      const currentLikes = freshPost?.likes_count || 0;
+      const currentDislikes = freshPost?.dislikes_count || 0;
       const currentPost = posts.find(p => p.id === postId);
       
+      let newLikesCount = currentLikes;
+      let newDislikesCount = currentDislikes;
+
       if (existingLike) {
         if (existingLike.is_like) {
           // Already liked, remove like
@@ -418,10 +470,11 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
             .delete()
             .eq('id', existingLike.id);
           
-          // Decrement likes count
+          newLikesCount = Math.max(0, currentLikes - 1);
+          
           await supabase
             .from('posts')
-            .update({ likes_count: Math.max(0, (currentPost?.likes || 1) - 1) })
+            .update({ likes_count: newLikesCount })
             .eq('id', postId);
         } else {
           // Was dislike, change to like
@@ -430,12 +483,14 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
             .update({ is_like: true })
             .eq('id', existingLike.id);
           
-          // Increment likes, decrement dislikes
+          newLikesCount = currentLikes + 1;
+          newDislikesCount = Math.max(0, currentDislikes - 1);
+          
           await supabase
             .from('posts')
             .update({ 
-              likes_count: (currentPost?.likes || 0) + 1,
-              dislikes_count: Math.max(0, (currentPost?.dislikes || 1) - 1)
+              likes_count: newLikesCount,
+              dislikes_count: newDislikesCount
             })
             .eq('id', postId);
         }
@@ -449,11 +504,11 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
             is_like: true,
           });
         
-        // Increment likes count
-        const currentPost = posts.find(p => p.id === postId);
+        newLikesCount = currentLikes + 1;
+        
         await supabase
           .from('posts')
-          .update({ likes_count: (currentPost?.likes || 0) + 1 })
+          .update({ likes_count: newLikesCount })
           .eq('id', postId);
 
         // Create notification for post owner (if not self)
@@ -462,16 +517,16 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
         }
       }
 
-      // Optimistic update
+      // Update with accurate count from database
       setPosts(prev => prev.map(post => 
         post.id === postId 
-          ? { ...post, likes: post.likes + 1 }
+          ? { ...post, likes: newLikesCount, dislikes: newDislikesCount }
           : post
       ));
     } catch (err) {
       console.error('Error liking post:', err);
     }
-  }, [userId, posts]);
+  }, [userId, posts, createNotification]);
 
   const addComment = useCallback(async (postId: string, content: string) => {
     if (!userId) return null;
@@ -560,54 +615,209 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
 
   // Track unique view for a post
   const trackView = useCallback(async (postId: string) => {
-    if (!userId) return;
+    try {
+      // Generate a device fingerprint for guest users
+      const deviceFingerprint = !userId ? 
+        `guest_${navigator.userAgent.slice(0, 50)}_${screen.width}x${screen.height}` : null;
+
+      if (userId) {
+        // Logged in user - check by user_id
+        const { data: existingView } = await supabase
+          .from('post_views')
+          .select('id')
+          .eq('post_id', postId)
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (existingView) return;
+
+        // Insert new view
+        const { error } = await supabase
+          .from('post_views')
+          .insert({
+            post_id: postId,
+            user_id: userId,
+          });
+
+        if (error) return;
+      } else {
+        // Guest user - check by device fingerprint using localStorage
+        const viewedPosts = JSON.parse(localStorage.getItem('viewed_posts') || '[]');
+        if (viewedPosts.includes(postId)) return;
+        
+        // Mark as viewed in localStorage
+        viewedPosts.push(postId);
+        localStorage.setItem('viewed_posts', JSON.stringify(viewedPosts));
+      }
+
+      // Increment views count in database
+      const { data: postData } = await supabase
+        .from('posts')
+        .select('views_count')
+        .eq('id', postId)
+        .single();
+
+      const newViewCount = (postData?.views_count || 0) + 1;
+
+      await supabase
+        .from('posts')
+        .update({ views_count: newViewCount })
+        .eq('id', postId);
+
+      // Optimistic update
+      setPosts(prev => prev.map(post => 
+        post.id === postId 
+          ? { ...post, views: newViewCount }
+          : post
+      ));
+    } catch (err) {
+      console.log('View tracking error:', err);
+    }
+  }, [userId]);
+
+  // Delete a post
+  const deletePost = useCallback(async (postId: string) => {
+    if (!userId) return false;
 
     try {
-      // First check if user already viewed this post
-      const { data: existingView } = await supabase
-        .from('post_views')
-        .select('id')
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      // Remove from local state
+      setPosts(prev => {
+        const updated = prev.filter(post => post.id !== postId);
+        postsRef.current = updated;
+        return updated;
+      });
+
+      return true;
+    } catch (err) {
+      console.error('Error deleting post:', err);
+      return false;
+    }
+  }, [userId]);
+
+  // Update a post
+  const updatePost = useCallback(async (postId: string, newContent: string) => {
+    if (!userId) return false;
+
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .update({ content: newContent, updated_at: new Date().toISOString() })
+        .eq('id', postId)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      // Update local state
+      setPosts(prev => {
+        const updated = prev.map(post => 
+          post.id === postId ? { ...post, content: newContent } : post
+        );
+        postsRef.current = updated;
+        return updated;
+      });
+
+      return true;
+    } catch (err) {
+      console.error('Error updating post:', err);
+      return false;
+    }
+  }, [userId]);
+
+  // Vote on a poll option
+  const votePoll = useCallback(async (postId: string, optionIndex: number) => {
+    if (!userId) {
+      toast({
+        title: 'লগইন প্রয়োজন',
+        description: 'ভোট দিতে হলে প্রথমে লগইন করুন',
+        variant: 'destructive',
+      });
+      return false;
+    }
+
+    try {
+      // Check if user already voted on this poll
+      const { data: existingVote } = await supabase
+        .from('poll_votes')
+        .select('id, option_index')
         .eq('post_id', postId)
         .eq('user_id', userId)
         .maybeSingle();
 
-      // If already viewed, don't do anything
-      if (existingView) return;
+      if (existingVote) {
+        toast({
+          title: 'ইতিমধ্যে ভোট দিয়েছেন',
+          description: 'আপনি এই পোলে আগেই ভোট দিয়েছেন',
+        });
+        return false;
+      }
 
-      // Insert new view
-      const { error } = await supabase
-        .from('post_views')
+      // Get current poll options from database
+      const { data: postData, error: fetchError } = await supabase
+        .from('posts')
+        .select('poll_options')
+        .eq('id', postId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const pollOptions = postData?.poll_options as unknown as PollOption[];
+      if (!pollOptions || !Array.isArray(pollOptions)) return false;
+
+      // Record the vote
+      const { error: voteError } = await supabase
+        .from('poll_votes')
         .insert({
           post_id: postId,
           user_id: userId,
+          option_index: optionIndex,
         });
 
-      // If successful (new view), increment the views count
-      if (!error) {
-        // Get current count from database to be accurate
-        const { data: postData } = await supabase
-          .from('posts')
-          .select('views_count')
-          .eq('id', postId)
-          .single();
+      if (voteError) throw voteError;
 
-        const newViewCount = (postData?.views_count || 0) + 1;
+      // Increment vote count for the selected option
+      const updatedOptions = pollOptions.map((opt, index) => 
+        index === optionIndex ? { ...opt, votes: opt.votes + 1 } : opt
+      );
 
-        await supabase
-          .from('posts')
-          .update({ views_count: newViewCount })
-          .eq('id', postId);
+      // Update in database
+      const { error: updateError } = await supabase
+        .from('posts')
+        .update({ poll_options: updatedOptions as any })
+        .eq('id', postId);
 
-        // Optimistic update
-        setPosts(prev => prev.map(post => 
-          post.id === postId 
-            ? { ...post, views: newViewCount }
-            : post
-        ));
-      }
+      if (updateError) throw updateError;
+
+      // Update local state
+      setPosts(prev => {
+        const updated = prev.map(post => 
+          post.id === postId ? { ...post, pollOptions: updatedOptions } : post
+        );
+        postsRef.current = updated;
+        return updated;
+      });
+
+      toast({
+        title: 'ভোট সফল!',
+        description: 'আপনার ভোট গ্রহণ করা হয়েছে',
+      });
+
+      return true;
     } catch (err) {
-      // Silently fail - duplicate view is expected behavior
-      console.log('View tracking error:', err);
+      console.error('Error voting on poll:', err);
+      toast({
+        title: 'ত্রুটি',
+        description: 'ভোট দিতে সমস্যা হয়েছে',
+        variant: 'destructive',
+      });
+      return false;
     }
   }, [userId]);
 
@@ -629,5 +839,8 @@ export const usePosts = (userId?: string, createNotification?: (userId: string, 
     addComment,
     likeComment,
     trackView,
+    deletePost,
+    updatePost,
+    votePoll,
   };
 };

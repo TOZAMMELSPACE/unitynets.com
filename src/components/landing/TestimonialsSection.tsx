@@ -70,10 +70,10 @@ export const TestimonialsSection = () => {
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-muted/30">
-      <div className="container mx-auto px-4">
+    <section className="py-16 md:py-24 bg-muted/30 overflow-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-12 md:mb-16">
+        <div className="text-center mb-12 md:mb-16 animate-fade-in">
           <h2 className="section-header mb-4">
             {t("What Our Members Say", "আমাদের মেম্বাররা কী বলছেন")}
           </h2>
@@ -90,7 +90,8 @@ export const TestimonialsSection = () => {
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="group bg-card border border-border/30 rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative"
+              className="group bg-card border border-border/30 rounded-2xl p-6 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative animate-fade-in"
+              style={{ animationDelay: `${index * 80}ms` }}
             >
               {/* Quote Icon */}
               <Quote className="absolute top-4 right-4 w-8 h-8 text-primary/20" />

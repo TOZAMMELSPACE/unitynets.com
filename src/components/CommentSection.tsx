@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CommentSectionProps {
   postId: string;
@@ -21,9 +22,15 @@ export const CommentSection = ({
   onLikeComment 
 }: CommentSectionProps) => {
   const navigate = useNavigate();
+  const { language, t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString(language === 'bn' ? 'bn-BD' : 'en-US');
+  };
 
   const handleSubmit = async () => {
     if (!newComment.trim() || isSubmitting) return;
@@ -46,7 +53,9 @@ export const CommentSection = ({
         className="text-muted-foreground hover:text-primary transition-colors"
       >
         <MessageCircle className="w-4 h-4 mr-2" />
-        {comments.length > 0 ? `${comments.length} মন্তব্য` : 'মন্তব্য করুন'}
+        {comments.length > 0 
+          ? `${comments.length} ${t('comments', 'মন্তব্য')}` 
+          : t('Comment', 'মন্তব্য করুন')}
       </Button>
 
       {isExpanded && (
@@ -56,8 +65,8 @@ export const CommentSection = ({
             <Textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="আপনার মন্তব্য লিখুন..."
-              className="min-h-[80px] text-bengali"
+              placeholder={t("Write your comment...", "আপনার মন্তব্য লিখুন...")}
+              className="min-h-[80px]"
             />
             <div className="flex justify-end">
               <Button 
@@ -65,7 +74,9 @@ export const CommentSection = ({
                 disabled={!newComment.trim() || isSubmitting}
                 size="sm"
               >
-                {isSubmitting ? 'পোস্ট করা হচ্ছে...' : 'মন্তব্য করুন'}
+                {isSubmitting 
+                  ? t('Posting...', 'পোস্ট করা হচ্ছে...') 
+                  : t('Comment', 'মন্তব্য করুন')}
               </Button>
             </div>
           </div>
@@ -83,17 +94,17 @@ export const CommentSection = ({
                   </div>
                   <div className="flex-1">
                     <div 
-                      className="text-sm font-medium text-bengali cursor-pointer hover:text-primary hover:underline transition-colors"
+                      className="text-sm font-medium cursor-pointer hover:text-primary hover:underline transition-colors"
                       onClick={() => navigate('/profile', { state: { userId: comment.author.id } })}
                     >
                       {comment.author.name}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {new Date(comment.createdAt).toLocaleString('bn-BD')}
+                      {formatDate(comment.createdAt)}
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-bengali mb-2">{comment.content}</p>
+                <p className="text-sm mb-2">{comment.content}</p>
                 <Button
                   variant="ghost"
                   size="sm"

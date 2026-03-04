@@ -6,7 +6,7 @@ export interface ChatMessage {
   id: string;
   chat_id: string;
   sender_id: string;
-  type: 'text' | 'image' | 'video' | 'voice' | 'file' | 'call_started' | 'call_ended' | 'system';
+  type: 'text' | 'image' | 'video' | 'voice' | 'file' | 'call_started' | 'call_ended' | 'system' | 'missed_call' | 'call_summary';
   content: string | null;
   encrypted_content: string | null;
   metadata: Record<string, unknown>;

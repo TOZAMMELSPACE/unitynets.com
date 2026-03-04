@@ -34,13 +34,25 @@ interface GroupsProps {
   onSignOut: () => void;
 }
 
+const getCategoryName = (id: string) => {
+  const names: Record<string, string> = {
+    all: "All",
+    tech: "Technology",
+    education: "Education",
+    business: "Business",
+    health: "Health",
+    community: "Community",
+  };
+  return names[id] || "Other";
+};
+
 const categories = [
-  { id: "all", name: "সব", icon: Sparkles },
-  { id: "tech", name: "প্রযুক্তি", icon: Zap },
-  { id: "education", name: "শিক্ষা", icon: BookOpen },
-  { id: "business", name: "ব্যবসা", icon: TrendingUp },
-  { id: "health", name: "স্বাস্থ্য", icon: Heart },
-  { id: "community", name: "সমাজ", icon: Users },
+  { id: "all", icon: Sparkles },
+  { id: "tech", icon: Zap },
+  { id: "education", icon: BookOpen },
+  { id: "business", icon: TrendingUp },
+  { id: "health", icon: Heart },
+  { id: "community", icon: Users },
 ];
 
 export default function Groups({ currentUser }: GroupsProps) {
@@ -125,24 +137,24 @@ export default function Groups({ currentUser }: GroupsProps) {
             {group.is_official && (
               <Badge className="bg-blue-500/90 text-white">
                 <Shield className="w-3 h-3 mr-1" />
-                অফিশিয়াল
+                Official
               </Badge>
             )}
             {role === 'admin' && (
               <Badge className="bg-yellow-500/90 text-white">
                 <Crown className="w-3 h-3 mr-1" />
-                অ্যাডমিন
+                Admin
               </Badge>
             )}
             {group.is_private ? (
               <Badge variant="secondary" className="bg-black/50 text-white">
                 <Lock className="w-3 h-3 mr-1" />
-                প্রাইভেট
+                Private
               </Badge>
             ) : (
               <Badge variant="secondary" className="bg-black/50 text-white">
                 <Globe className="w-3 h-3 mr-1" />
-                পাবলিক
+                Public
               </Badge>
             )}
           </div>
@@ -153,13 +165,13 @@ export default function Groups({ currentUser }: GroupsProps) {
             {group.name}
           </h3>
           <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-            {group.description || "কোন বিবরণ নেই"}
+            {group.description || "No description"}
           </p>
           
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <span className="text-xs text-muted-foreground">
-                {formatMembers(group.members_count)} সদস্য
+                {formatMembers(group.members_count)} members
               </span>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <MessageCircle className="w-3 h-3" />
@@ -167,7 +179,7 @@ export default function Groups({ currentUser }: GroupsProps) {
               </div>
             </div>
             <Badge variant="outline" className="text-xs">
-              {categories.find(c => c.id === group.category)?.name || group.category}
+              {getCategoryName(group.category)}
             </Badge>
           </div>
           
@@ -184,7 +196,7 @@ export default function Groups({ currentUser }: GroupsProps) {
                       navigate(`/groups/${group.id}`);
                     }}
                   >
-                    দেখুন
+                    View
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                   <Button 
@@ -214,7 +226,7 @@ export default function Groups({ currentUser }: GroupsProps) {
                   ) : (
                     <Plus className="w-4 h-4" />
                   )}
-                  যোগ দিন
+                  Join
                 </Button>
               )}
             </div>
@@ -249,12 +261,12 @@ export default function Groups({ currentUser }: GroupsProps) {
             <div className="flex items-center gap-2 mb-2">
               <Badge className="bg-primary/90 text-primary-foreground">
                 <Star className="w-3 h-3 mr-1" />
-                ফিচার্ড গ্রুপ
+                Featured Group
               </Badge>
               {featuredGroup.is_official && (
                 <Badge variant="secondary" className="bg-blue-500/90 text-white">
                   <Shield className="w-3 h-3 mr-1" />
-                  অফিশিয়াল
+                  Official
                 </Badge>
               )}
             </div>
@@ -266,11 +278,11 @@ export default function Groups({ currentUser }: GroupsProps) {
             </p>
             <div className="flex items-center justify-between">
               <span className="text-white/90 text-sm">
-                <span className="font-semibold">{formatMembers(featuredGroup.members_count)}</span> সদস্য
+                <span className="font-semibold">{formatMembers(featuredGroup.members_count)}</span> members
               </span>
               {isMember(featuredGroup.id) ? (
                 <Button className="bg-white text-foreground hover:bg-white/90">
-                  দেখুন
+                  View
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               ) : (
@@ -282,7 +294,7 @@ export default function Groups({ currentUser }: GroupsProps) {
                   {joiningGroupId === featuredGroup.id ? (
                     <Loader2 className="w-4 h-4 animate-spin mr-1" />
                   ) : null}
-                  যোগ দিন
+                  Join
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               )}
@@ -295,54 +307,54 @@ export default function Groups({ currentUser }: GroupsProps) {
       <div className="mb-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-2xl font-bold">গ্রুপসমূহ</h2>
+            <h2 className="text-2xl font-bold">Groups</h2>
             <p className="text-muted-foreground text-sm">
-              আপনার আগ্রহের বিষয়ে কমিউনিটি খুঁজুন
+              Find communities on topics you're interested in
             </p>
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2 shadow-md">
                 <Plus size={18} />
-                নতুন গ্রুপ তৈরি করুন
+                Create New Group
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>নতুন গ্রুপ তৈরি করুন</DialogTitle>
+                <DialogTitle>Create New Group</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">গ্রুপের নাম *</Label>
+                  <Label htmlFor="name">Group Name *</Label>
                   <Input
                     id="name"
-                    placeholder="আপনার গ্রুপের নাম লিখুন"
+                    placeholder="Enter your group name"
                     value={newGroup.name}
                     onChange={(e) => setNewGroup(prev => ({ ...prev, name: e.target.value }))}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="description">বিবরণ</Label>
+                  <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
-                    placeholder="গ্রুপ সম্পর্কে সংক্ষেপে লিখুন"
+                    placeholder="Write briefly about the group"
                     value={newGroup.description}
                     onChange={(e) => setNewGroup(prev => ({ ...prev, description: e.target.value }))}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="category">ক্যাটাগরি</Label>
+                  <Label htmlFor="category">Category</Label>
                   <Select 
                     value={newGroup.category} 
                     onValueChange={(value) => setNewGroup(prev => ({ ...prev, category: value }))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="ক্যাটাগরি নির্বাচন করুন" />
+                      <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.filter(c => c.id !== 'all').map((cat) => (
                         <SelectItem key={cat.id} value={cat.id}>
-                          {cat.name}
+                          {getCategoryName(cat.id)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -350,9 +362,9 @@ export default function Groups({ currentUser }: GroupsProps) {
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>প্রাইভেট গ্রুপ</Label>
+                    <Label>Private Group</Label>
                     <p className="text-xs text-muted-foreground">
-                      শুধুমাত্র আমন্ত্রিত সদস্যরা যোগ দিতে পারবে
+                      Only invited members can join
                     </p>
                   </div>
                   <Switch
@@ -363,10 +375,10 @@ export default function Groups({ currentUser }: GroupsProps) {
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                  বাতিল
+                  Cancel
                 </Button>
                 <Button onClick={handleCreateGroup} disabled={!newGroup.name.trim()}>
-                  তৈরি করুন
+                  Create
                 </Button>
               </div>
             </DialogContent>
@@ -377,7 +389,7 @@ export default function Groups({ currentUser }: GroupsProps) {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
-            placeholder="গ্রুপ খুঁজুন..."
+            placeholder="Search groups..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 h-12 text-base rounded-xl bg-muted/50 border-0 focus-visible:ring-2 focus-visible:ring-primary"
@@ -398,7 +410,7 @@ export default function Groups({ currentUser }: GroupsProps) {
               className="flex-shrink-0 gap-2 rounded-full"
             >
               <Icon className="w-4 h-4" />
-              {cat.name}
+              {getCategoryName(cat.id)}
             </Button>
           );
         })}
@@ -412,14 +424,14 @@ export default function Groups({ currentUser }: GroupsProps) {
             className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
             <Users className="w-4 h-4 mr-2" />
-            আমার গ্রুপ ({myGroups.length})
+            My Groups ({myGroups.length})
           </TabsTrigger>
           <TabsTrigger 
             value="discover"
             className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
             <Sparkles className="w-4 h-4 mr-2" />
-            আবিষ্কার করুন
+            Discover
           </TabsTrigger>
         </TabsList>
 
@@ -436,13 +448,13 @@ export default function Groups({ currentUser }: GroupsProps) {
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold mb-2">কোন গ্রুপে যোগ দেননি</h3>
+              <h3 className="text-xl font-bold mb-2">You haven't joined any groups</h3>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                আপনার আগ্রহের বিষয়ে গ্রুপ খুঁজুন এবং যোগ দিন। নতুন মানুষদের সাথে পরিচিত হন!
+                Find groups on topics you're interested in and join. Meet new people!
               </p>
               <Button className="gap-2">
                 <Sparkles size={18} />
-                গ্রুপ আবিষ্কার করুন
+                Discover Groups
               </Button>
             </div>
           )}
@@ -455,7 +467,7 @@ export default function Groups({ currentUser }: GroupsProps) {
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-4">
                 <TrendingUp className="w-5 h-5 text-primary" />
-                <h3 className="font-bold text-lg">জনপ্রিয় গ্রুপ</h3>
+                <h3 className="font-bold text-lg">Trending Groups</h3>
               </div>
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                 {trendingGroups.map((group) => (
@@ -472,14 +484,14 @@ export default function Groups({ currentUser }: GroupsProps) {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <Badge className="absolute top-2 left-2 bg-orange-500/90 text-white">
                         <TrendingUp className="w-3 h-3 mr-1" />
-                        জনপ্রিয়
+                        Trending
                       </Badge>
                     </div>
                     <CardContent className="p-3">
                       <h4 className="font-semibold text-sm line-clamp-1">{group.name}</h4>
                       <div className="flex items-center justify-between mt-2">
                         <span className="text-xs text-muted-foreground">
-                          {formatMembers(group.members_count)} সদস্য
+                          {formatMembers(group.members_count)} members
                         </span>
                         <Button 
                           size="sm" 
@@ -490,7 +502,7 @@ export default function Groups({ currentUser }: GroupsProps) {
                           {joiningGroupId === group.id ? (
                             <Loader2 className="w-3 h-3 animate-spin" />
                           ) : (
-                            "যোগ দিন"
+                            "Join"
                           )}
                         </Button>
                       </div>
@@ -503,7 +515,7 @@ export default function Groups({ currentUser }: GroupsProps) {
 
           {/* All Suggested Groups */}
           <div>
-            <h3 className="font-bold text-lg mb-4">সব গ্রুপ</h3>
+            <h3 className="font-bold text-lg mb-4">All Groups</h3>
             {filteredSuggested.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2">
                 {filteredSuggested.map((group) => (
@@ -515,15 +527,15 @@ export default function Groups({ currentUser }: GroupsProps) {
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Search className="w-8 h-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">কোন গ্রুপ পাওয়া যায়নি</h3>
+                <h3 className="text-xl font-bold mb-2">No groups found</h3>
                 <p className="text-muted-foreground mb-4">
-                  অন্য সার্চ টার্ম বা ক্যাটাগরি ব্যবহার করুন
+                  Try a different search term or category
                 </p>
                 <Button variant="outline" onClick={() => {
                   setSearchQuery("");
                   setSelectedCategory("all");
                 }}>
-                  ফিল্টার রিসেট করুন
+                  Reset Filters
                 </Button>
               </div>
             )}
@@ -535,15 +547,15 @@ export default function Groups({ currentUser }: GroupsProps) {
       <AlertDialog open={!!leaveGroupId} onOpenChange={() => setLeaveGroupId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>গ্রুপ থেকে বের হতে চান?</AlertDialogTitle>
+            <AlertDialogTitle>Leave this group?</AlertDialogTitle>
             <AlertDialogDescription>
-              আপনি কি নিশ্চিত যে এই গ্রুপ থেকে বের হতে চান? আপনি পরে আবার যোগ দিতে পারবেন।
+              Are you sure you want to leave this group? You can rejoin later.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>বাতিল</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleLeaveConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              বের হন
+              Leave
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
