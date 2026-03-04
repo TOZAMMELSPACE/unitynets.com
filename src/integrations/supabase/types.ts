@@ -14,6 +14,103 @@ export type Database = {
   }
   public: {
     Tables: {
+      call_history: {
+        Row: {
+          call_type: string
+          caller_id: string
+          chat_id: string
+          created_at: string
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          receiver_id: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          call_type: string
+          caller_id: string
+          chat_id: string
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          receiver_id: string
+          started_at?: string | null
+          status: string
+        }
+        Update: {
+          call_type?: string
+          caller_id?: string
+          chat_id?: string
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          receiver_id?: string
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_history_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      call_signals: {
+        Row: {
+          call_type: string
+          caller_id: string
+          chat_id: string
+          created_at: string
+          ended_at: string | null
+          id: string
+          receiver_id: string
+          signal_data: Json | null
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          call_type: string
+          caller_id: string
+          chat_id: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          receiver_id: string
+          signal_data?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          call_type?: string
+          caller_id?: string
+          chat_id?: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          receiver_id?: string
+          signal_data?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_signals_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_messages: {
         Row: {
           chat_id: string
@@ -459,6 +556,7 @@ export type Database = {
           messages: Json
           title: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -467,6 +565,7 @@ export type Database = {
           messages?: Json
           title: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -475,6 +574,139 @@ export type Database = {
           messages?: Json
           title?: string
           updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      learning_progress: {
+        Row: {
+          completed_at: string | null
+          course_id: string
+          course_title: string
+          created_at: string
+          id: string
+          is_completed: boolean
+          lessons_completed: number
+          progress_percentage: number
+          total_lessons: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          course_id: string
+          course_title: string
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          lessons_completed?: number
+          progress_percentage?: number
+          total_lessons?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          course_id?: string
+          course_title?: string
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          lessons_completed?: number
+          progress_percentage?: number
+          total_lessons?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      learning_stats: {
+        Row: {
+          courses_completed: number
+          created_at: string
+          current_level: number
+          current_streak: number
+          id: string
+          last_activity_date: string | null
+          longest_streak: number
+          quizzes_completed: number
+          total_xp: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          courses_completed?: number
+          created_at?: string
+          current_level?: number
+          current_streak?: number
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number
+          quizzes_completed?: number
+          total_xp?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          courses_completed?: number
+          created_at?: string
+          current_level?: number
+          current_streak?: number
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number
+          quizzes_completed?: number
+          total_xp?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      learning_user_memory: {
+        Row: {
+          accomplishments: Json | null
+          conversation_summary: string | null
+          created_at: string
+          device_fingerprint: string | null
+          goals: Json | null
+          id: string
+          important_dates: Json | null
+          last_mood: string | null
+          learning_interests: string[] | null
+          personality_notes: string | null
+          preferences: Json | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          accomplishments?: Json | null
+          conversation_summary?: string | null
+          created_at?: string
+          device_fingerprint?: string | null
+          goals?: Json | null
+          id?: string
+          important_dates?: Json | null
+          last_mood?: string | null
+          learning_interests?: string[] | null
+          personality_notes?: string | null
+          preferences?: Json | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          accomplishments?: Json | null
+          conversation_summary?: string | null
+          created_at?: string
+          device_fingerprint?: string | null
+          goals?: Json | null
+          id?: string
+          important_dates?: Json | null
+          last_mood?: string | null
+          learning_interests?: string[] | null
+          personality_notes?: string | null
+          preferences?: Json | null
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -541,6 +773,38 @@ export type Database = {
         }
         Relationships: []
       }
+      poll_votes: {
+        Row: {
+          created_at: string
+          id: string
+          option_index: number
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          option_index: number
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          option_index?: number
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_votes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_likes: {
         Row: {
           created_at: string
@@ -606,7 +870,10 @@ export type Database = {
           id: string
           image_urls: string[] | null
           likes_count: number | null
+          poll_options: Json | null
+          privacy: string
           sentiment_score: number | null
+          target_country: string | null
           updated_at: string
           user_id: string
           video_url: string | null
@@ -620,7 +887,10 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           likes_count?: number | null
+          poll_options?: Json | null
+          privacy?: string
           sentiment_score?: number | null
+          target_country?: string | null
           updated_at?: string
           user_id: string
           video_url?: string | null
@@ -634,7 +904,10 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           likes_count?: number | null
+          poll_options?: Json | null
+          privacy?: string
           sentiment_score?: number | null
+          target_country?: string | null
           updated_at?: string
           user_id?: string
           video_url?: string | null
@@ -729,6 +1002,42 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_results: {
+        Row: {
+          correct_answers: number
+          created_at: string
+          id: string
+          quiz_topic: string
+          quiz_type: string
+          score_percentage: number
+          total_questions: number
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          correct_answers?: number
+          created_at?: string
+          id?: string
+          quiz_topic: string
+          quiz_type?: string
+          score_percentage?: number
+          total_questions?: number
+          user_id: string
+          xp_earned?: number
+        }
+        Update: {
+          correct_answers?: number
+          created_at?: string
+          id?: string
+          quiz_topic?: string
+          quiz_type?: string
+          score_percentage?: number
+          total_questions?: number
+          user_id?: string
+          xp_earned?: number
+        }
+        Relationships: []
+      }
       saved_posts: {
         Row: {
           created_at: string
@@ -757,6 +1066,150 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      study_room_members: {
+        Row: {
+          id: string
+          joined_at: string
+          role: string
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          role?: string
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          role?: string
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_room_members_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "study_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_room_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          message_type: string
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          message_type?: string
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          message_type?: string
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_room_messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "study_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_room_notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_pinned: boolean
+          room_id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          room_id: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          room_id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_room_notes_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "study_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_rooms: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          is_active: boolean
+          max_members: number
+          name: string
+          topic: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_members?: number
+          name: string
+          topic?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_members?: number
+          name?: string
+          topic?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       typing_indicators: {
         Row: {
