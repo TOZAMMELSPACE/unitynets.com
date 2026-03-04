@@ -17,7 +17,7 @@ export const Navbar = () => {
     { name: t("Home", "হোম"), path: "/" },
     { name: t("About", "মিশন"), path: "/about" },
     { name: t("Learning Zone", "লার্নিং জোন"), path: "/learning-zone" },
-    { name: t("Donation", "ডোনেশন"), path: "/donation" },
+    
     { name: t("Feed", "ফিড"), path: "/feed" },
     { name: t("Contribute", "কন্ট্রিবিউট"), path: "/contribute" },
   ];
