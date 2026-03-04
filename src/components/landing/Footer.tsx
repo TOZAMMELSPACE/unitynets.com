@@ -70,6 +70,11 @@ export const Footer = () => {
                   {t("Feed", "ফিড")}
                 </Link>
               </li>
+              <li>
+                <Link to="/donation" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  {t("Donation", "ডোনেশন")}
+                </Link>
+              </li>
             </ul>
           </div>
 
