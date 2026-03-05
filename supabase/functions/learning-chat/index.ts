@@ -285,7 +285,8 @@ D) Option D
 - Use beautiful markdown formatting
 - Be helpful and encouraging
 - Remember user's context
-- Match user's language (Bengali/English)`;
+- **DEFAULT LANGUAGE: English.** Always respond in English unless the user explicitly asks you to speak in another language (e.g., "বাংলায় বলো", "speak in Bengali"). Once asked, use that language until told otherwise.
+- Do NOT auto-detect or match the user's input language. Stick to English by default.`;
 
 
     // Fetch user memory
