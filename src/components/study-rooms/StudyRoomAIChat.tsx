@@ -157,29 +157,22 @@ export function StudyRoomAIChat({ roomId, userId, roomTopic }: StudyRoomAIChatPr
       const recentMessages = messages
         .slice(-20)
         .map(m => ({
-          role: m.message_type === 'ai_response' ? 'assistant' : 'user',
+          role: m.message_type === 'ai_response' ? 'assistant' as const : 'user' as const,
           content: m.content,
         }));
 
-      // Add current message
-      recentMessages.push({ role: 'user', content: userMessage });
-
-      // Add room context
+      // Add room context to the current message
       const contextPrefix = roomTopic 
-        ? `[Study Room Topic: ${roomTopic}] [Group learning session - multiple users may be asking questions]\n\n`
-        : `[Group learning session - multiple users may be asking questions]\n\n`;
+        ? `[Study Room Topic: ${roomTopic}] [Group learning session]\n\n`
+        : `[Group learning session]\n\n`;
+
+      // Add current message with context
+      recentMessages.push({ role: 'user' as const, content: contextPrefix + userMessage });
 
       // Call learning-chat edge function
       const response = await supabase.functions.invoke('learning-chat', {
         body: {
-          messages: [
-            { role: 'user', content: contextPrefix + userMessage },
-            ...recentMessages.slice(0, -1), // history without the last one we just added with context
-          ].length > 1 ? recentMessages.map((m, i) => 
-            i === recentMessages.length - 1 
-              ? { ...m, content: contextPrefix + m.content }
-              : m
-          ) : [{ role: 'user', content: contextPrefix + userMessage }],
+          messages: recentMessages,
           userId,
         },
       });
