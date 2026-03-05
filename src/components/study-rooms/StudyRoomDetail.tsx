@@ -19,13 +19,15 @@ import {
   Crown,
   Loader2,
   Pin,
-  Sparkles
+  Sparkles,
+  Bot
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { StudyRoom, StudyRoomMember, StudyRoomMessage, StudyRoomNote } from '@/hooks/useStudyRooms';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { bn } from 'date-fns/locale';
+import { StudyRoomAIChat } from './StudyRoomAIChat';
 
 interface StudyRoomDetailProps {
   room: StudyRoom | null;
@@ -146,12 +148,16 @@ export function StudyRoomDetail({
 
       {/* Main Content */}
       <Tabs defaultValue="chat" className="flex-1">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="chat" className="gap-2">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="chat" className="gap-1 text-xs">
             <MessageCircle className="h-4 w-4" />
             {t('Chat', 'চ্যাট')}
           </TabsTrigger>
-          <TabsTrigger value="notes" className="gap-2">
+          <TabsTrigger value="ai-buddy" className="gap-1 text-xs">
+            <Bot className="h-4 w-4" />
+            {t('AI Buddy', 'AI বাডি')}
+          </TabsTrigger>
+          <TabsTrigger value="notes" className="gap-1 text-xs">
             <FileText className="h-4 w-4" />
             {t('Notes', 'নোট')}
             {notes.length > 0 && (
@@ -160,7 +166,7 @@ export function StudyRoomDetail({
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="members" className="gap-2">
+          <TabsTrigger value="members" className="gap-1 text-xs">
             <Users className="h-4 w-4" />
             {t('Members', 'সদস্য')}
           </TabsTrigger>
@@ -273,6 +279,16 @@ export function StudyRoomDetail({
               </div>
             </div>
           </Card>
+        </TabsContent>
+
+
+        {/* AI Buddy Tab */}
+        <TabsContent value="ai-buddy" className="mt-4">
+          <StudyRoomAIChat
+            roomId={room.id}
+            userId={userId}
+            roomTopic={room.topic}
+          />
         </TabsContent>
 
         {/* Notes Tab */}
