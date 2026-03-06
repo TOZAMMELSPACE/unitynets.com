@@ -34,7 +34,7 @@ export interface StudyRoomMessage {
   room_id: string;
   user_id: string;
   content: string;
-  message_type: 'text' | 'note' | 'quiz' | 'system';
+  message_type: 'text' | 'note' | 'quiz' | 'system' | 'ai_request' | 'ai_response';
   created_at: string;
   profile?: {
     full_name: string;
@@ -326,7 +326,7 @@ export function useStudyRoomDetail(roomId: string | null, userId: string | null)
       setMessages(
         (messagesData || []).map(m => ({
           ...m,
-          message_type: m.message_type as 'text' | 'note' | 'quiz' | 'system',
+          message_type: m.message_type as StudyRoomMessage['message_type'],
           profile: senderMap.get(m.user_id) || { full_name: 'Unknown', avatar_url: null },
         }))
       );
@@ -392,7 +392,7 @@ export function useStudyRoomDetail(roomId: string | null, userId: string | null)
 
           setMessages(prev => [...prev, {
             ...newMessage,
-            message_type: newMessage.message_type as 'text' | 'note' | 'quiz' | 'system',
+            message_type: newMessage.message_type as StudyRoomMessage['message_type'],
             profile: profile || { full_name: 'Unknown', avatar_url: null },
           }]);
         }
