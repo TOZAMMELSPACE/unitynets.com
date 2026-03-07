@@ -117,14 +117,23 @@ export function StudyRoomDetail({
 
         recentAIMessages.push({ role: 'user' as const, content: contextPrefix + aiQuestion });
 
-        const response = await supabase.functions.invoke('learning-chat', {
-          body: { messages: recentAIMessages, userId },
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        
+        const response = await fetch(`${supabaseUrl}/functions/v1/learning-chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseKey}`,
+            'apikey': supabaseKey,
+          },
+          body: JSON.stringify({ messages: recentAIMessages, userId }),
         });
 
-        if (response.error) throw response.error;
+        if (!response.ok) throw new Error(`AI error: ${response.status}`);
 
         // Stream response
-        const reader = response.data.getReader();
+        const reader = response.body!.getReader();
         const decoder = new TextDecoder();
         let fullResponse = '';
 
