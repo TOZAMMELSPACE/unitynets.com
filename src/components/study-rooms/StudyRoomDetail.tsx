@@ -377,12 +377,23 @@ export function StudyRoomDetail({
                 )}
 
                 {aiLoading && !streamingContent && (
-                  <div className="flex gap-3">
-                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                      <Bot className="h-4 w-4 text-primary animate-pulse" />
+                  <div className="flex gap-3 animate-fade-in">
+                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 animate-pulse">
+                      <Bot className="h-4 w-4 text-primary" />
                     </div>
-                    <div className="rounded-2xl rounded-tl-sm px-4 py-2 text-sm bg-muted">
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                    <div className="max-w-[80%]">
+                      <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
+                        <Sparkles className="h-3 w-3 text-primary animate-pulse" />
+                        Learning Buddy
+                      </p>
+                      <div className="rounded-2xl rounded-tl-sm px-4 py-3 bg-muted flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="h-2 w-2 rounded-full bg-primary/60 animate-bounce [animation-delay:0ms]" />
+                          <span className="h-2 w-2 rounded-full bg-primary/60 animate-bounce [animation-delay:150ms]" />
+                          <span className="h-2 w-2 rounded-full bg-primary/60 animate-bounce [animation-delay:300ms]" />
+                        </div>
+                        <span className="text-xs text-muted-foreground ml-1">thinking...</span>
+                      </div>
                     </div>
                   </div>
                 )}
