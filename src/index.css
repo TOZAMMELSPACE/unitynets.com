@@ -9,162 +9,162 @@
 
 @layer base {
   :root {
-    /* Peaceful Color Palette - Soft Blues, Teals & Greens */
-    --background: 195 30% 98%;
-    --foreground: 200 30% 12%;
+    /* Glassmorphism Design System - Purple/Blue Gradients */
+    --background: 230 25% 96%;
+    --foreground: 230 30% 15%;
     
     --card: 0 0% 100%;
-    --card-foreground: 200 30% 12%;
+    --card-foreground: 230 30% 15%;
     
     --popover: 0 0% 100%;
-    --popover-foreground: 200 30% 12%;
+    --popover-foreground: 230 30% 15%;
     
-    /* Peaceful Teal Primary */
-    --primary: 175 55% 42%;
+    /* Vibrant Purple Primary */
+    --primary: 262 80% 55%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 175 60% 55%;
+    --primary-glow: 262 85% 65%;
     
-    /* Soft Blue-Green Secondary */
-    --secondary: 190 40% 94%;
-    --secondary-foreground: 200 30% 18%;
+    /* Soft Lavender Secondary */
+    --secondary: 250 40% 94%;
+    --secondary-foreground: 230 30% 18%;
     
-    --muted: 195 25% 94%;
-    --muted-foreground: 200 15% 45%;
+    --muted: 230 20% 93%;
+    --muted-foreground: 230 15% 45%;
     
-    /* Gentle Sea Green Accent */
-    --accent: 160 50% 45%;
+    /* Electric Blue Accent */
+    --accent: 220 90% 56%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 160 55% 55%;
+    --accent-glow: 220 95% 66%;
     
-    /* Nature-inspired Success */
-    --success: 145 55% 42%;
+    /* Teal Success */
+    --success: 170 70% 45%;
     --success-foreground: 0 0% 100%;
     
-    /* Soft Amber Warning */
-    --warning: 45 85% 55%;
-    --warning-foreground: 45 95% 15%;
+    /* Warm Amber Warning */
+    --warning: 38 92% 55%;
+    --warning-foreground: 38 95% 15%;
     
-    --destructive: 0 65% 55%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 195 25% 88%;
-    --input: 195 25% 88%;
-    --ring: 175 55% 42%;
+    --border: 230 20% 88%;
+    --input: 230 20% 88%;
+    --ring: 262 80% 55%;
     
-    --radius: 0.75rem;
+    --radius: 0.875rem;
     
-    /* Peaceful Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(175 55% 42%), hsl(160 50% 45%));
-    --gradient-trust: linear-gradient(135deg, hsl(175 60% 55%), hsl(175 55% 42%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(195 30% 98%));
-    --gradient-subtle: linear-gradient(180deg, hsl(195 40% 98%), hsl(195 25% 95%));
-    --gradient-vibrant: linear-gradient(135deg, hsl(175 55% 42%), hsl(160 50% 45%));
-    --gradient-cool: linear-gradient(135deg, hsl(190 50% 50%), hsl(175 55% 42%));
+    /* Glassmorphism Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(262 80% 55%), hsl(220 90% 56%));
+    --gradient-trust: linear-gradient(135deg, hsl(262 85% 65%), hsl(262 80% 55%));
+    --gradient-card: linear-gradient(145deg, hsla(0, 0%, 100%, 0.9), hsla(250, 40%, 98%, 0.7));
+    --gradient-subtle: linear-gradient(180deg, hsl(250 30% 98%), hsl(230 25% 95%));
+    --gradient-vibrant: linear-gradient(135deg, hsl(262 80% 55%), hsl(310 75% 55%));
+    --gradient-cool: linear-gradient(135deg, hsl(220 90% 56%), hsl(262 80% 55%));
 
-    --sidebar-background: 195 30% 98%;
-    --sidebar-foreground: 200 30% 12%;
-    --sidebar-primary: 175 55% 42%;
+    --sidebar-background: 250 25% 97%;
+    --sidebar-foreground: 230 30% 15%;
+    --sidebar-primary: 262 80% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 190 40% 94%;
-    --sidebar-accent-foreground: 200 30% 18%;
-    --sidebar-border: 195 25% 88%;
-    --sidebar-ring: 175 55% 42%;
+    --sidebar-accent: 250 40% 94%;
+    --sidebar-accent-foreground: 230 30% 18%;
+    --sidebar-border: 230 20% 88%;
+    --sidebar-ring: 262 80% 55%;
   }
 
   .dark {
-    /* Dark mode - Peaceful deep teal theme */
-    --background: 200 35% 8%;
-    --foreground: 195 25% 94%;
+    /* Dark mode - Deep Navy Glassmorphism */
+    --background: 230 30% 8%;
+    --foreground: 230 15% 92%;
     
-    --card: 200 30% 12%;
-    --card-foreground: 195 25% 94%;
+    --card: 230 25% 12%;
+    --card-foreground: 230 15% 92%;
     
-    --popover: 200 30% 12%;
-    --popover-foreground: 195 25% 94%;
+    --popover: 230 25% 12%;
+    --popover-foreground: 230 15% 92%;
     
-    /* Peaceful Teal Primary for Dark */
-    --primary: 175 60% 50%;
-    --primary-foreground: 200 35% 8%;
-    --primary-glow: 175 65% 60%;
+    /* Vibrant Purple Primary for Dark */
+    --primary: 262 85% 62%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 262 90% 72%;
     
-    --secondary: 200 25% 18%;
-    --secondary-foreground: 195 25% 90%;
+    --secondary: 230 20% 18%;
+    --secondary-foreground: 230 15% 90%;
     
-    --muted: 200 20% 15%;
-    --muted-foreground: 195 15% 55%;
+    --muted: 230 18% 15%;
+    --muted-foreground: 230 12% 55%;
     
-    /* Sea Green Accent for Dark */
-    --accent: 160 55% 48%;
-    --accent-foreground: 200 35% 8%;
-    --accent-glow: 160 60% 58%;
+    /* Electric Blue Accent for Dark */
+    --accent: 220 95% 62%;
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 220 100% 72%;
     
-    --success: 145 50% 48%;
-    --success-foreground: 200 35% 8%;
+    --success: 170 65% 50%;
+    --success-foreground: 0 0% 100%;
     
-    --warning: 45 80% 52%;
-    --warning-foreground: 200 35% 8%;
+    --warning: 38 88% 52%;
+    --warning-foreground: 0 0% 100%;
     
-    --destructive: 0 60% 52%;
+    --destructive: 0 68% 55%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 200 25% 20%;
-    --input: 200 20% 15%;
-    --ring: 175 60% 50%;
+    --border: 230 20% 20%;
+    --input: 230 18% 15%;
+    --ring: 262 85% 62%;
     
-    --gradient-hero: linear-gradient(135deg, hsl(175 60% 50%), hsl(160 55% 48%));
-    --gradient-trust: linear-gradient(135deg, hsl(175 65% 60%), hsl(175 60% 50%));
-    --gradient-card: linear-gradient(180deg, hsl(200 30% 12%), hsl(200 35% 10%));
-    --gradient-subtle: linear-gradient(180deg, hsl(200 30% 10%), hsl(200 35% 8%));
-    --gradient-vibrant: linear-gradient(135deg, hsl(175 60% 50%), hsl(160 55% 48%));
-    --gradient-cool: linear-gradient(135deg, hsl(190 55% 52%), hsl(175 60% 50%));
+    --gradient-hero: linear-gradient(135deg, hsl(262 85% 62%), hsl(220 95% 62%));
+    --gradient-trust: linear-gradient(135deg, hsl(262 90% 72%), hsl(262 85% 62%));
+    --gradient-card: linear-gradient(145deg, hsla(230, 25%, 14%, 0.8), hsla(230, 30%, 10%, 0.6));
+    --gradient-subtle: linear-gradient(180deg, hsl(230 25% 10%), hsl(230 30% 8%));
+    --gradient-vibrant: linear-gradient(135deg, hsl(262 85% 62%), hsl(310 80% 58%));
+    --gradient-cool: linear-gradient(135deg, hsl(220 95% 62%), hsl(262 85% 62%));
 
-    --sidebar-background: 200 35% 8%;
-    --sidebar-foreground: 195 25% 94%;
-    --sidebar-primary: 175 60% 50%;
-    --sidebar-primary-foreground: 200 35% 8%;
-    --sidebar-accent: 200 25% 18%;
-    --sidebar-accent-foreground: 195 25% 90%;
-    --sidebar-border: 200 25% 20%;
-    --sidebar-ring: 175 60% 50%;
+    --sidebar-background: 230 28% 10%;
+    --sidebar-foreground: 230 15% 92%;
+    --sidebar-primary: 262 85% 62%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 230 20% 18%;
+    --sidebar-accent-foreground: 230 15% 90%;
+    --sidebar-border: 230 20% 20%;
+    --sidebar-ring: 262 85% 62%;
   }
 
   /* WhatsApp-style messaging theme (scoped with .wa wrapper) */
   .wa {
-    --primary: 167 100% 33%;
+    --primary: 262 80% 55%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 167 100% 40%;
+    --primary-glow: 262 85% 65%;
 
-    --accent: 142 69% 49%;
+    --accent: 220 90% 56%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 142 75% 56%;
+    --accent-glow: 220 95% 66%;
 
-    --success: 142 69% 49%;
+    --success: 170 70% 45%;
     --success-foreground: 0 0% 100%;
 
-    --wa-sidebar: 195 30% 98%;
-    --wa-chat: 48 33% 96%;
+    --wa-sidebar: 250 25% 97%;
+    --wa-chat: 245 25% 96%;
     --wa-bubble-in: 0 0% 100%;
-    --wa-bubble-out: 92 67% 90%;
-    --wa-border: 195 25% 86%;
+    --wa-bubble-out: 262 50% 94%;
+    --wa-border: 230 20% 86%;
   }
 
   .dark .wa {
-    --primary: 167 90% 38%;
+    --primary: 262 85% 62%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 167 95% 48%;
+    --primary-glow: 262 90% 72%;
 
-    --accent: 142 60% 46%;
+    --accent: 220 95% 62%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 142 70% 56%;
+    --accent-glow: 220 100% 72%;
 
-    --success: 142 60% 46%;
+    --success: 170 65% 50%;
     --success-foreground: 0 0% 100%;
 
-    --wa-sidebar: 200 30% 10%;
-    --wa-chat: 200 35% 8%;
-    --wa-bubble-in: 200 25% 14%;
-    --wa-bubble-out: 167 25% 16%;
-    --wa-border: 200 20% 20%;
+    --wa-sidebar: 230 28% 10%;
+    --wa-chat: 230 30% 8%;
+    --wa-bubble-in: 230 25% 14%;
+    --wa-bubble-out: 262 25% 18%;
+    --wa-border: 230 20% 20%;
   }
 }
 
