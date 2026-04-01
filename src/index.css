@@ -73,60 +73,61 @@
   }
 
   .dark {
-    /* Dark mode - Deep Navy Glassmorphism */
-    --background: 230 30% 8%;
-    --foreground: 230 15% 92%;
+    /* Dark mode - Deep Ocean Abyss */
+    --background: 210 35% 7%;
+    --foreground: 200 20% 92%;
     
-    --card: 230 25% 12%;
-    --card-foreground: 230 15% 92%;
+    --card: 210 30% 11%;
+    --card-foreground: 200 20% 92%;
     
-    --popover: 230 25% 12%;
-    --popover-foreground: 230 15% 92%;
+    --popover: 210 30% 11%;
+    --popover-foreground: 200 20% 92%;
     
-    /* Vibrant Purple Primary for Dark */
-    --primary: 262 85% 62%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 262 90% 72%;
+    /* Neon Aqua Primary for Dark */
+    --primary: 195 95% 55%;
+    --primary-foreground: 210 35% 7%;
+    --primary-glow: 195 100% 65%;
     
-    --secondary: 230 20% 18%;
-    --secondary-foreground: 230 15% 90%;
+    --secondary: 210 25% 16%;
+    --secondary-foreground: 200 20% 90%;
     
-    --muted: 230 18% 15%;
-    --muted-foreground: 230 12% 55%;
+    --muted: 210 22% 14%;
+    --muted-foreground: 210 15% 50%;
     
-    /* Electric Blue Accent for Dark */
-    --accent: 220 95% 62%;
+    /* Bright Ocean Accent for Dark */
+    --accent: 230 90% 65%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 220 100% 72%;
+    --accent-glow: 230 100% 75%;
     
-    --success: 170 65% 50%;
+    --success: 160 70% 48%;
     --success-foreground: 0 0% 100%;
     
-    --warning: 38 88% 52%;
+    --warning: 25 90% 55%;
     --warning-foreground: 0 0% 100%;
     
     --destructive: 0 68% 55%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 230 20% 20%;
-    --input: 230 18% 15%;
-    --ring: 262 85% 62%;
+    --border: 210 25% 18%;
+    --input: 210 22% 14%;
+    --ring: 195 95% 55%;
     
-    --gradient-hero: linear-gradient(135deg, hsl(262 85% 62%), hsl(220 95% 62%));
-    --gradient-trust: linear-gradient(135deg, hsl(262 90% 72%), hsl(262 85% 62%));
-    --gradient-card: linear-gradient(145deg, hsla(230, 25%, 14%, 0.8), hsla(230, 30%, 10%, 0.6));
-    --gradient-subtle: linear-gradient(180deg, hsl(230 25% 10%), hsl(230 30% 8%));
-    --gradient-vibrant: linear-gradient(135deg, hsl(262 85% 62%), hsl(310 80% 58%));
-    --gradient-cool: linear-gradient(135deg, hsl(220 95% 62%), hsl(262 85% 62%));
+    --gradient-hero: linear-gradient(135deg, hsl(195 95% 55%), hsl(230 90% 65%));
+    --gradient-trust: linear-gradient(135deg, hsl(195 100% 65%), hsl(195 95% 55%));
+    --gradient-card: linear-gradient(145deg, hsla(210, 30%, 13%, 0.8), hsla(210, 35%, 9%, 0.6));
+    --gradient-subtle: linear-gradient(180deg, hsl(210 30% 9%), hsl(210 35% 7%));
+    --gradient-vibrant: linear-gradient(135deg, hsl(195 95% 55%), hsl(160 80% 48%));
+    --gradient-cool: linear-gradient(135deg, hsl(230 90% 65%), hsl(195 95% 55%));
+    --gradient-water: linear-gradient(135deg, hsl(195 95% 55%), hsl(210 85% 58%), hsl(230 90% 65%));
 
-    --sidebar-background: 230 28% 10%;
-    --sidebar-foreground: 230 15% 92%;
-    --sidebar-primary: 262 85% 62%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 230 20% 18%;
-    --sidebar-accent-foreground: 230 15% 90%;
-    --sidebar-border: 230 20% 20%;
-    --sidebar-ring: 262 85% 62%;
+    --sidebar-background: 210 32% 9%;
+    --sidebar-foreground: 200 20% 92%;
+    --sidebar-primary: 195 95% 55%;
+    --sidebar-primary-foreground: 210 35% 7%;
+    --sidebar-accent: 210 25% 16%;
+    --sidebar-accent-foreground: 200 20% 90%;
+    --sidebar-border: 210 25% 18%;
+    --sidebar-ring: 195 95% 55%;
   }
 
   /* WhatsApp-style messaging theme (scoped with .wa wrapper) */
