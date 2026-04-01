@@ -130,41 +130,41 @@
 
   /* WhatsApp-style messaging theme (scoped with .wa wrapper) */
   .wa {
-    --primary: 195 90% 48%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 195 100% 58%;
+    --primary: 45 95% 52%;
+    --primary-foreground: 30 10% 10%;
+    --primary-glow: 45 100% 60%;
 
-    --accent: 230 85% 60%;
+    --accent: 30 10% 15%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 230 95% 70%;
+    --accent-glow: 30 12% 25%;
 
-    --success: 160 75% 42%;
+    --success: 145 65% 42%;
     --success-foreground: 0 0% 100%;
 
-    --wa-sidebar: 200 28% 97%;
-    --wa-chat: 200 25% 96%;
-    --wa-bubble-in: 200 20% 99%;
-    --wa-bubble-out: 195 45% 93%;
-    --wa-border: 200 25% 86%;
+    --wa-sidebar: 45 20% 97%;
+    --wa-chat: 45 18% 96%;
+    --wa-bubble-in: 0 0% 100%;
+    --wa-bubble-out: 45 50% 93%;
+    --wa-border: 40 20% 86%;
   }
 
   .dark .wa {
-    --primary: 195 95% 55%;
-    --primary-foreground: 210 35% 7%;
-    --primary-glow: 195 100% 65%;
+    --primary: 45 100% 55%;
+    --primary-foreground: 30 12% 8%;
+    --primary-glow: 45 100% 65%;
 
-    --accent: 230 90% 65%;
-    --accent-foreground: 0 0% 100%;
-    --accent-glow: 230 100% 75%;
+    --accent: 45 90% 50%;
+    --accent-foreground: 30 12% 8%;
+    --accent-glow: 45 100% 62%;
 
-    --success: 160 70% 48%;
+    --success: 145 60% 45%;
     --success-foreground: 0 0% 100%;
 
-    --wa-sidebar: 210 32% 9%;
-    --wa-chat: 210 35% 7%;
-    --wa-bubble-in: 210 30% 13%;
-    --wa-bubble-out: 195 30% 16%;
-    --wa-border: 210 25% 18%;
+    --wa-sidebar: 30 10% 9%;
+    --wa-chat: 30 12% 8%;
+    --wa-bubble-in: 30 10% 14%;
+    --wa-bubble-out: 45 20% 16%;
+    --wa-border: 30 10% 20%;
   }
 }
 
