@@ -231,11 +231,12 @@
 }
 
 @layer components {
-  /* Premium Hero Button */
+  /* Glassmorphism Hero Button */
   .btn-hero {
     @apply bg-primary text-primary-foreground font-medium
            shadow-lg hover:shadow-xl hover:-translate-y-0.5 
            transition-all duration-300 ease-out;
+    background-image: var(--gradient-hero);
   }
   
   /* Trust Button Variant */
@@ -245,23 +246,23 @@
            shadow-sm hover:shadow-md transition-all duration-300;
   }
   
-  /* Premium Card */
+  /* Glassmorphism Card */
   .card-enhanced {
-    @apply bg-card shadow-elegant border border-border/50
+    @apply bg-card/80 backdrop-blur-xl shadow-elegant border border-border/30
            hover:shadow-lg transition-all duration-300
-           rounded-xl;
+           rounded-2xl;
   }
   
-  /* Minimal Card */
+  /* Glass Card */
   .card-minimal {
-    @apply bg-card border border-border/30 rounded-xl
+    @apply bg-card/70 backdrop-blur-lg border border-border/20 rounded-2xl
            shadow-soft hover:shadow-medium transition-all duration-300;
   }
   
   /* Trust Score Badge */
   .trust-score {
     @apply bg-primary/10 text-primary px-2.5 py-0.5 rounded-full 
-           text-xs font-medium tracking-wide;
+           text-xs font-medium tracking-wide backdrop-blur-sm;
   }
   
   /* Bengali Text */
@@ -290,7 +291,6 @@
     color: hsl(var(--foreground));
   }
 
-
   /* Premium Section Header */
   .section-header {
     @apply text-2xl md:text-3xl font-semibold text-foreground tracking-tight;
@@ -301,20 +301,20 @@
     @apply border-t border-border/50;
   }
 
-  /* Premium Input */
+  /* Glassmorphism Input */
   .input-premium {
-    @apply bg-muted/50 border-0 focus:ring-2 focus:ring-primary/20
-           rounded-lg transition-all duration-200;
+    @apply bg-muted/50 backdrop-blur-sm border-0 focus:ring-2 focus:ring-primary/30
+           rounded-xl transition-all duration-200;
   }
 
   /* Floating Glass Effect */
   .glass-effect {
-    @apply bg-background/80 backdrop-blur-lg border border-border/30 shadow-lg;
+    @apply bg-background/60 backdrop-blur-2xl border border-white/10 shadow-lg;
   }
 
   /* Premium Badge */
   .badge-premium {
-    @apply bg-primary/10 text-primary text-xs font-medium px-2 py-0.5 rounded-full;
+    @apply bg-primary/15 text-primary text-xs font-medium px-2.5 py-0.5 rounded-full backdrop-blur-sm;
   }
 
   /* Accent Highlight */
