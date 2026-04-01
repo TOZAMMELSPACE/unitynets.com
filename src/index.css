@@ -9,66 +9,67 @@
 
 @layer base {
   :root {
-    /* Glassmorphism Design System - Purple/Blue Gradients */
-    --background: 230 25% 96%;
-    --foreground: 230 30% 15%;
+    /* Aqua Glow Design System - Water-inspired Gradients */
+    --background: 200 30% 96%;
+    --foreground: 210 35% 12%;
     
-    --card: 0 0% 100%;
-    --card-foreground: 230 30% 15%;
+    --card: 200 20% 99%;
+    --card-foreground: 210 35% 12%;
     
-    --popover: 0 0% 100%;
-    --popover-foreground: 230 30% 15%;
+    --popover: 200 20% 99%;
+    --popover-foreground: 210 35% 12%;
     
-    /* Vibrant Purple Primary */
-    --primary: 262 80% 55%;
+    /* Aqua Primary */
+    --primary: 195 90% 48%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 262 85% 65%;
+    --primary-glow: 195 100% 58%;
     
-    /* Soft Lavender Secondary */
-    --secondary: 250 40% 94%;
-    --secondary-foreground: 230 30% 18%;
+    /* Soft Sky Secondary */
+    --secondary: 200 45% 93%;
+    --secondary-foreground: 210 35% 15%;
     
-    --muted: 230 20% 93%;
-    --muted-foreground: 230 15% 45%;
+    --muted: 200 22% 92%;
+    --muted-foreground: 210 15% 45%;
     
-    /* Electric Blue Accent */
-    --accent: 220 90% 56%;
+    /* Deep Ocean Accent */
+    --accent: 230 85% 60%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 220 95% 66%;
+    --accent-glow: 230 95% 70%;
     
-    /* Teal Success */
-    --success: 170 70% 45%;
+    /* Emerald Glow Success */
+    --success: 160 75% 42%;
     --success-foreground: 0 0% 100%;
     
-    /* Warm Amber Warning */
-    --warning: 38 92% 55%;
-    --warning-foreground: 38 95% 15%;
+    /* Sunset Coral Warning */
+    --warning: 25 95% 58%;
+    --warning-foreground: 25 95% 12%;
     
     --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 230 20% 88%;
-    --input: 230 20% 88%;
-    --ring: 262 80% 55%;
+    --border: 200 25% 88%;
+    --input: 200 25% 88%;
+    --ring: 195 90% 48%;
     
     --radius: 0.875rem;
     
-    /* Glassmorphism Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(262 80% 55%), hsl(220 90% 56%));
-    --gradient-trust: linear-gradient(135deg, hsl(262 85% 65%), hsl(262 80% 55%));
-    --gradient-card: linear-gradient(145deg, hsla(0, 0%, 100%, 0.9), hsla(250, 40%, 98%, 0.7));
-    --gradient-subtle: linear-gradient(180deg, hsl(250 30% 98%), hsl(230 25% 95%));
-    --gradient-vibrant: linear-gradient(135deg, hsl(262 80% 55%), hsl(310 75% 55%));
-    --gradient-cool: linear-gradient(135deg, hsl(220 90% 56%), hsl(262 80% 55%));
+    /* Water Glow Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(195 90% 48%), hsl(230 85% 60%));
+    --gradient-trust: linear-gradient(135deg, hsl(195 100% 58%), hsl(195 90% 48%));
+    --gradient-card: linear-gradient(145deg, hsla(200, 30%, 100%, 0.9), hsla(200, 45%, 98%, 0.7));
+    --gradient-subtle: linear-gradient(180deg, hsl(200 30% 98%), hsl(200 25% 95%));
+    --gradient-vibrant: linear-gradient(135deg, hsl(195 90% 48%), hsl(170 80% 45%));
+    --gradient-cool: linear-gradient(135deg, hsl(230 85% 60%), hsl(195 90% 48%));
+    --gradient-water: linear-gradient(135deg, hsl(195 90% 48%), hsl(200 85% 55%), hsl(230 85% 60%));
 
-    --sidebar-background: 250 25% 97%;
-    --sidebar-foreground: 230 30% 15%;
-    --sidebar-primary: 262 80% 55%;
+    --sidebar-background: 200 28% 97%;
+    --sidebar-foreground: 210 35% 12%;
+    --sidebar-primary: 195 90% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 250 40% 94%;
-    --sidebar-accent-foreground: 230 30% 18%;
-    --sidebar-border: 230 20% 88%;
-    --sidebar-ring: 262 80% 55%;
+    --sidebar-accent: 200 45% 93%;
+    --sidebar-accent-foreground: 210 35% 15%;
+    --sidebar-border: 200 25% 88%;
+    --sidebar-ring: 195 90% 48%;
   }
 
   .dark {
