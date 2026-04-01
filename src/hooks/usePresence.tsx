@@ -2,7 +2,7 @@ import { useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export function usePresence(currentUserId: string | null) {
-  const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const updatePresence = useCallback(async (isOnline: boolean) => {
     if (!currentUserId) return;
