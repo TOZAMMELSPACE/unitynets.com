@@ -57,8 +57,8 @@ export function useWebRTC({ currentUserId, onCallEnded }: UseWebRTCProps) {
   const [callDuration, setCallDuration] = useState(0);
 
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
-  const callTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const callTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const callTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const callTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const iceCandidatesQueueRef = useRef<RTCIceCandidate[]>([]);
   const callStartTimeRef = useRef<Date | null>(null);
   const callIdRef = useRef<string | null>(null);
