@@ -100,22 +100,12 @@ export const Navbar = () => {
               )}
             </Button>
 
-            {/* Login Button */}
+            {/* Login Button — coral pill style */}
             <Button
-              variant="ghost"
-              className="hidden sm:flex"
+              className="hidden sm:flex rounded-full bg-gradient-hero text-primary-foreground px-6 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
               onClick={() => navigate('/auth?mode=login')}
             >
               {t("Login", "লগইন")}
-            </Button>
-
-            {/* Signup Button */}
-            <Button
-              variant="hero"
-              className="hidden sm:flex"
-              onClick={() => navigate('/auth?mode=signup')}
-            >
-              {t("Join Now", "জয়েন করুন")}
             </Button>
 
             {/* Mobile Menu Button */}
