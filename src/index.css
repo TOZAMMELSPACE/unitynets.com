@@ -5,39 +5,39 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Soft Pink & Coral Design System — inspired by ShikkhaBondhu */
+/* Dark Teal Design System */
 
 @layer base {
   :root {
-    /* Soft Pink & Coral Design System */
-    --background: 0 60% 97%;
-    --foreground: 0 10% 15%;
+    /* Dark Teal Design System — Light Mode */
+    --background: 200 15% 95%;
+    --foreground: 200 10% 10%;
     
     --card: 0 0% 100%;
-    --card-foreground: 0 10% 15%;
+    --card-foreground: 200 10% 10%;
     
     --popover: 0 0% 100%;
-    --popover-foreground: 0 10% 15%;
+    --popover-foreground: 200 10% 10%;
     
-    /* Coral / Salmon Primary */
-    --primary: 10 80% 60%;
+    /* Teal Primary */
+    --primary: 170 65% 45%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 10 90% 68%;
+    --primary-glow: 170 70% 55%;
     
-    /* Soft Pink Secondary */
-    --secondary: 0 40% 95%;
-    --secondary-foreground: 0 10% 20%;
+    /* Subtle Teal Secondary */
+    --secondary: 200 15% 93%;
+    --secondary-foreground: 200 10% 15%;
     
-    --muted: 0 20% 94%;
-    --muted-foreground: 0 5% 45%;
+    --muted: 200 10% 92%;
+    --muted-foreground: 200 5% 45%;
     
-    /* Warm Orange Accent */
-    --accent: 25 95% 58%;
+    /* Teal Accent */
+    --accent: 175 60% 42%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 25 100% 65%;
+    --accent-glow: 175 70% 52%;
     
     /* Fresh Green Success */
-    --success: 145 60% 45%;
+    --success: 160 60% 42%;
     --success-foreground: 0 0% 100%;
     
     /* Warm Amber Warning */
@@ -47,58 +47,58 @@
     --destructive: 0 72% 52%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 0 15% 90%;
-    --input: 0 15% 90%;
-    --ring: 10 80% 60%;
+    --border: 200 12% 88%;
+    --input: 200 12% 88%;
+    --ring: 170 65% 45%;
     
     --radius: 1rem;
     
-    /* Soft Pink Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(10 80% 60%), hsl(25 95% 58%));
-    --gradient-trust: linear-gradient(135deg, hsl(10 90% 68%), hsl(10 80% 60%));
-    --gradient-card: linear-gradient(145deg, hsla(0, 0%, 100%, 0.95), hsla(0, 50%, 98%, 0.8));
-    --gradient-subtle: linear-gradient(180deg, hsl(0 60% 97%), hsl(0 40% 95%));
-    --gradient-vibrant: linear-gradient(135deg, hsl(10 80% 60%), hsl(25 95% 55%));
-    --gradient-cool: linear-gradient(135deg, hsl(0 10% 15%), hsl(0 8% 25%));
+    /* Teal Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(170 65% 45%), hsl(175 60% 42%));
+    --gradient-trust: linear-gradient(135deg, hsl(170 70% 55%), hsl(170 65% 45%));
+    --gradient-card: linear-gradient(145deg, hsla(0, 0%, 100%, 0.95), hsla(200, 15%, 96%, 0.8));
+    --gradient-subtle: linear-gradient(180deg, hsl(200 15% 95%), hsl(200 15% 93%));
+    --gradient-vibrant: linear-gradient(135deg, hsl(170 65% 45%), hsl(175 60% 38%));
+    --gradient-cool: linear-gradient(135deg, hsl(200 20% 12%), hsl(200 15% 20%));
 
-    --sidebar-background: 0 40% 97%;
-    --sidebar-foreground: 0 10% 15%;
-    --sidebar-primary: 10 80% 60%;
+    --sidebar-background: 200 15% 96%;
+    --sidebar-foreground: 200 10% 10%;
+    --sidebar-primary: 170 65% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 40% 95%;
-    --sidebar-accent-foreground: 0 10% 20%;
-    --sidebar-border: 0 15% 90%;
-    --sidebar-ring: 10 80% 60%;
+    --sidebar-accent: 200 15% 93%;
+    --sidebar-accent-foreground: 200 10% 15%;
+    --sidebar-border: 200 12% 88%;
+    --sidebar-ring: 170 65% 45%;
   }
 
   .dark {
-    /* Dark mode — Deep Rose & Coral */
-    --background: 0 10% 8%;
-    --foreground: 0 10% 92%;
+    /* Dark mode — Deep Dark Teal */
+    --background: 200 15% 7%;
+    --foreground: 180 10% 92%;
     
-    --card: 0 8% 12%;
-    --card-foreground: 0 10% 92%;
+    --card: 200 12% 11%;
+    --card-foreground: 180 10% 92%;
     
-    --popover: 0 8% 12%;
-    --popover-foreground: 0 10% 92%;
+    --popover: 200 12% 11%;
+    --popover-foreground: 180 10% 92%;
     
-    /* Bright Coral Primary for Dark */
-    --primary: 10 85% 62%;
+    /* Bright Teal Primary for Dark */
+    --primary: 170 70% 48%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 10 90% 70%;
+    --primary-glow: 170 75% 55%;
     
-    --secondary: 0 8% 16%;
-    --secondary-foreground: 0 10% 90%;
+    --secondary: 200 10% 14%;
+    --secondary-foreground: 180 10% 90%;
     
-    --muted: 0 6% 14%;
-    --muted-foreground: 0 5% 50%;
+    --muted: 200 8% 13%;
+    --muted-foreground: 200 5% 50%;
     
-    /* Warm Orange Accent for Dark */
-    --accent: 25 90% 55%;
+    /* Teal Accent for Dark */
+    --accent: 175 65% 44%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 25 100% 62%;
+    --accent-glow: 175 70% 52%;
     
-    --success: 145 55% 45%;
+    --success: 160 55% 42%;
     --success-foreground: 0 0% 100%;
     
     --warning: 35 90% 52%;
@@ -107,25 +107,25 @@
     --destructive: 0 68% 52%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 0 8% 20%;
-    --input: 0 6% 14%;
-    --ring: 10 85% 62%;
+    --border: 200 10% 18%;
+    --input: 200 8% 13%;
+    --ring: 170 70% 48%;
     
-    --gradient-hero: linear-gradient(135deg, hsl(10 85% 62%), hsl(25 90% 55%));
-    --gradient-trust: linear-gradient(135deg, hsl(10 90% 70%), hsl(10 85% 62%));
-    --gradient-card: linear-gradient(145deg, hsla(0, 8%, 14%, 0.85), hsla(0, 10%, 10%, 0.7));
-    --gradient-subtle: linear-gradient(180deg, hsl(0 8% 10%), hsl(0 10% 8%));
-    --gradient-vibrant: linear-gradient(135deg, hsl(10 85% 62%), hsl(25 85% 52%));
-    --gradient-cool: linear-gradient(135deg, hsl(0 8% 18%), hsl(0 8% 28%));
+    --gradient-hero: linear-gradient(135deg, hsl(170 70% 48%), hsl(175 65% 44%));
+    --gradient-trust: linear-gradient(135deg, hsl(170 75% 55%), hsl(170 70% 48%));
+    --gradient-card: linear-gradient(145deg, hsla(200, 12%, 13%, 0.85), hsla(200, 15%, 9%, 0.7));
+    --gradient-subtle: linear-gradient(180deg, hsl(200 12% 9%), hsl(200 15% 7%));
+    --gradient-vibrant: linear-gradient(135deg, hsl(170 70% 48%), hsl(175 60% 40%));
+    --gradient-cool: linear-gradient(135deg, hsl(200 15% 15%), hsl(200 12% 22%));
 
-    --sidebar-background: 0 8% 9%;
-    --sidebar-foreground: 0 10% 92%;
-    --sidebar-primary: 10 85% 62%;
+    --sidebar-background: 200 12% 8%;
+    --sidebar-foreground: 180 10% 92%;
+    --sidebar-primary: 170 70% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 8% 16%;
-    --sidebar-accent-foreground: 0 10% 90%;
-    --sidebar-border: 0 8% 20%;
-    --sidebar-ring: 10 85% 62%;
+    --sidebar-accent: 200 10% 14%;
+    --sidebar-accent-foreground: 180 10% 90%;
+    --sidebar-border: 200 10% 18%;
+    --sidebar-ring: 170 70% 48%;
   }
 
   /* WhatsApp-style messaging theme (scoped with .wa wrapper) */
