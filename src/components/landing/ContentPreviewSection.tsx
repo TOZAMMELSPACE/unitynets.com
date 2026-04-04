@@ -1,7 +1,7 @@
 import { memo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { FileText, MessageSquare, Eye, ArrowRight, Lock, Heart, Loader2, Clock, Play } from "lucide-react";
+import { ArrowRight, Heart, Loader2, Clock, Play, Eye, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -67,7 +67,6 @@ export const ContentPreviewSection = () => {
         return;
       }
 
-      // Get user profiles
       const userIds = [...new Set(postsData.map(p => p.user_id))];
       
       const { data: profilesData } = await supabase
@@ -79,7 +78,6 @@ export const ContentPreviewSection = () => {
         (profilesData || []).map(p => [p.user_id, p])
       );
 
-      // Map posts with authors and maintain the order of FEATURED_POST_IDS
       const postsWithAuthors: FeedPost[] = FEATURED_POST_IDS
         .map(id => postsData.find(p => p.id === id))
         .filter((post): post is NonNullable<typeof post> => post !== undefined)
@@ -135,7 +133,7 @@ export const ContentPreviewSection = () => {
     return language === "bn" ? `${diffInMonths} মাস আগে` : `${diffInMonths}mo ago`;
   };
 
-  const getPostExcerpt = (content: string, maxLength: number = 60) => {
+  const getPostExcerpt = (content: string, maxLength: number = 80) => {
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength).trim() + '...';
   };
@@ -146,119 +144,142 @@ export const ContentPreviewSection = () => {
   };
 
   return (
-    <section className="py-12 md:py-24 bg-background">
-      <div className="container mx-auto">
-        {/* Recent Posts Section */}
-        <div className="animate-fade-in">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8">
-            <div>
-              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2">
-                {t("Recent Posts from Feed", "নিউজ ফিড থেকে সাম্প্রতিক পোস্ট")}
-              </h2>
-              <p className="text-sm md:text-base text-muted-foreground">{t("Latest community posts", "সাম্প্রতিক কমিউনিটি পোস্ট")}</p>
-            </div>
-            <Button variant="ghost" className="mt-3 md:mt-0 group text-sm hover-scale" onClick={() => navigate('/public-feed')}>
-              <span>{t("View All", "সব দেখুন")}</span>
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
+    <section className="py-16 md:py-28 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/30 to-background" />
+      <div className="absolute top-20 left-0 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+
+      <div className="container mx-auto relative z-10">
+        {/* Premium Section Header */}
+        <div className="text-center mb-12 md:mb-16 animate-fade-in">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4 backdrop-blur-sm border border-primary/20">
+            <Sparkles className="w-4 h-4" />
+            <span>{t("Community Highlights", "কমিউনিটি হাইলাইটস")}</span>
           </div>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-3">
+            {t("Recent Posts from Feed", "নিউজ ফিড থেকে সাম্প্রতিক পোস্ট")}
+          </h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            {t(
+              "Discover what our community is sharing right now",
+              "আমাদের কমিউনিটি এখন কী শেয়ার করছে তা দেখুন"
+            )}
+          </p>
+        </div>
 
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
-          ) : posts.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              {t("No posts available", "কোনো পোস্ট নেই")}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
-              {posts.slice(0, 8).map((post, index) => (
-                <div
-                  key={post.id}
-                  onClick={() => navigate(`/post/${post.id}`)}
-                  className="group bg-card border border-border/30 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-2 transition-all duration-300 cursor-pointer flex flex-col animate-fade-in"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  {/* Post media thumbnail - image or video */}
-                  {(post.image_urls && post.image_urls.length > 0) || post.video_url ? (
-                    <div className="relative h-24 md:h-32 lg:h-36 overflow-hidden bg-muted">
-                      {post.video_url ? (
-                        <>
-                          <video 
-                            src={post.video_url} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            muted
-                            playsInline
-                            preload="metadata"
-                          />
-                          {/* Video play indicator */}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/60 flex items-center justify-center">
-                              <Play className="w-4 h-4 md:w-5 md:h-5 text-white fill-white" />
-                            </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-10 h-10 animate-spin text-primary" />
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="text-center py-16 text-muted-foreground">
+            {t("No posts available", "কোনো পোস্ট নেই")}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {posts.slice(0, 8).map((post, index) => (
+              <div
+                key={post.id}
+                onClick={() => navigate(`/post/${post.id}`)}
+                className="group relative bg-card/80 backdrop-blur-sm border border-border/40 rounded-2xl overflow-hidden hover:shadow-glow hover:-translate-y-2 transition-all duration-500 cursor-pointer flex flex-col animate-fade-in"
+                style={{ animationDelay: `${index * 80}ms` }}
+              >
+                {/* Hover glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
+
+                {/* Post media thumbnail */}
+                {(post.image_urls && post.image_urls.length > 0) || post.video_url ? (
+                  <div className="relative h-28 md:h-36 lg:h-44 overflow-hidden">
+                    {post.video_url ? (
+                      <>
+                        <video 
+                          src={post.video_url} 
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                          muted
+                          playsInline
+                          preload="metadata"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/80 backdrop-blur-sm flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform duration-300">
+                            <Play className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground fill-primary-foreground ml-0.5" />
                           </div>
-                        </>
-                      ) : post.image_urls && post.image_urls.length > 0 ? (
-                        <>
-                          <img 
-                            src={post.image_urls[0]} 
-                            alt="Post thumbnail"
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                          {/* Multiple images indicator */}
-                          {post.image_urls.length > 1 && (
-                            <div className="absolute top-1.5 right-1.5 md:top-2 md:right-2 bg-black/60 text-white text-[10px] md:text-xs px-1.5 py-0.5 rounded">
-                              +{post.image_urls.length - 1}
-                            </div>
-                          )}
-                        </>
-                      ) : null}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
-                    </div>
-                  ) : null}
-                  
-                  <div className="p-3 md:p-4 flex flex-col flex-1">
-                    {/* Author info with avatar */}
-                    <div className="flex items-center gap-2 mb-2 md:mb-3">
-                      <Avatar className="w-6 h-6 md:w-8 md:h-8 border-2 border-primary/20">
-                        <AvatarImage src={post.author.avatar_url || ''} alt={post.author.full_name || ''} />
-                        <AvatarFallback className="text-[10px] md:text-xs bg-primary/10 text-primary">
-                          {getAuthorInitials(post.author.full_name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[11px] md:text-sm font-medium text-foreground truncate">
-                          {post.author.full_name || t("Anonymous", "বেনামী")}
-                        </p>
-                        <div className="flex items-center gap-1 text-[10px] md:text-xs text-muted-foreground">
-                          <Clock className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                          <span>{formatTimeAgo(post.created_at)}</span>
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Post content */}
-                    <p className="text-xs md:text-sm text-foreground/80 mb-2 md:mb-3 line-clamp-2 flex-1">
-                      {getPostExcerpt(post.content)}
-                    </p>
-
-                    {/* Stats */}
-                    <div className="flex items-center justify-between text-[10px] md:text-xs text-muted-foreground pt-2 border-t border-border/30">
-                      <div className="flex items-center gap-1">
-                        <Heart className="w-3 h-3 md:w-3.5 md:h-3.5 text-destructive" />
-                        <span>{post.likes_count || 0}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Eye className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                        <span>{post.views_count || 0}</span>
+                      </>
+                    ) : post.image_urls && post.image_urls.length > 0 ? (
+                      <>
+                        <img 
+                          src={post.image_urls[0]} 
+                          alt="Post thumbnail"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                          loading="lazy"
+                        />
+                        {post.image_urls.length > 1 && (
+                          <div className="absolute top-2 right-2 bg-foreground/70 text-background text-[10px] md:text-xs font-medium px-2 py-0.5 rounded-full backdrop-blur-sm">
+                            +{post.image_urls.length - 1}
+                          </div>
+                        )}
+                      </>
+                    ) : null}
+                    <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-60 pointer-events-none" />
+                  </div>
+                ) : (
+                  /* Text-only post gets a decorative gradient top */
+                  <div className="h-2 bg-gradient-to-r from-primary/40 via-accent/30 to-primary/40" />
+                )}
+                
+                <div className="relative p-3 md:p-4 flex flex-col flex-1">
+                  {/* Author info */}
+                  <div className="flex items-center gap-2 mb-2.5 md:mb-3">
+                    <Avatar className="w-7 h-7 md:w-9 md:h-9 ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
+                      <AvatarImage src={post.author.avatar_url || ''} alt={post.author.full_name || ''} />
+                      <AvatarFallback className="text-[10px] md:text-xs bg-primary/15 text-primary font-semibold">
+                        {getAuthorInitials(post.author.full_name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] md:text-sm font-semibold text-foreground truncate">
+                        {post.author.full_name || t("Anonymous", "বেনামী")}
+                      </p>
+                      <div className="flex items-center gap-1 text-[10px] md:text-xs text-muted-foreground">
+                        <Clock className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                        <span>{formatTimeAgo(post.created_at)}</span>
                       </div>
                     </div>
                   </div>
+
+                  {/* Post content */}
+                  <p className="text-xs md:text-sm text-foreground/75 mb-3 md:mb-4 line-clamp-2 flex-1 leading-relaxed">
+                    {getPostExcerpt(post.content)}
+                  </p>
+
+                  {/* Stats bar */}
+                  <div className="flex items-center justify-between text-[10px] md:text-xs text-muted-foreground pt-2.5 border-t border-border/30">
+                    <div className="flex items-center gap-1.5 group/like">
+                      <Heart className="w-3.5 h-3.5 md:w-4 md:h-4 text-destructive/70 group-hover/like:text-destructive transition-colors" />
+                      <span className="font-medium">{post.likes_count || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Eye className="w-3.5 h-3.5 md:w-4 md:h-4 text-muted-foreground/60" />
+                      <span className="font-medium">{post.views_count || 0}</span>
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* View All CTA */}
+        <div className="text-center mt-10 md:mt-14 animate-fade-in">
+          <Button 
+            size="lg"
+            className="btn-hero rounded-xl px-8 py-6 text-base group"
+            onClick={() => navigate('/public-feed')}
+          >
+            <span>{t("Explore All Posts", "সকল পোস্ট দেখুন")}</span>
+            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+          </Button>
         </div>
       </div>
     </section>
