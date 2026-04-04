@@ -552,7 +552,7 @@ const WorldMapSection = () => {
 
   return (
     <section className="py-16 md:py-24 bg-gradient-to-b from-background via-muted/20 to-background overflow-hidden">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold mb-4">

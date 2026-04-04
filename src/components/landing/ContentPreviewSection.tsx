@@ -147,7 +147,7 @@ export const ContentPreviewSection = () => {
 
   return (
     <section className="py-12 md:py-24 bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto">
         {/* Recent Posts Section */}
         <div className="animate-fade-in">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8">
