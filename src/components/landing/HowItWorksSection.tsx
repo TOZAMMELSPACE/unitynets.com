@@ -58,7 +58,7 @@ const HowItWorksSection = memo(() => {
 
   return (
     <section id="how-it-works" className="py-20 bg-muted/30 scroll-mt-20 overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto">
         {/* Header */}
         <div className="text-center mb-16 animate-fade-in">
           <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
