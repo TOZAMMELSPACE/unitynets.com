@@ -1,7 +1,7 @@
 import { memo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Heart, Loader2, Clock, Play, Eye, TrendingUp } from "lucide-react";
+import { ArrowRight, Heart, Loader2, Clock, Play, Eye, TrendingUp, Sparkles, MessageSquare } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -106,61 +106,32 @@ export const ContentPreviewSection = () => {
   const hasMedia = (post: FeedPost) =>
     (post.image_urls && post.image_urls.length > 0) || post.video_url;
 
-  const MediaThumbnail = ({ post, tall = false }: { post: FeedPost; tall?: boolean }) => (
-    <div className={`relative overflow-hidden ${tall ? 'h-full min-h-[200px]' : 'h-32 md:h-40'}`}>
-      {post.video_url ? (
-        <>
-          <video src={post.video_url} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" muted playsInline preload="metadata" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-11 h-11 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center shadow-glow">
-              <Play className="w-5 h-5 text-primary-foreground fill-primary-foreground ml-0.5" />
-            </div>
-          </div>
-        </>
-      ) : post.image_urls && post.image_urls.length > 0 ? (
-        <>
-          <img src={post.image_urls[0]} alt="Post" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
-          {post.image_urls.length > 1 && (
-            <div className="absolute top-2 right-2 bg-foreground/60 text-background text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm">
-              +{post.image_urls.length - 1}
-            </div>
-          )}
-        </>
-      ) : null}
-      <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent pointer-events-none" />
-    </div>
-  );
-
-  // Split posts: first 2 featured (large), rest are compact
-  const featured = posts.slice(0, 2);
-  const rest = posts.slice(2, 8);
+  // Split: 1 spotlight + rest in masonry
+  const spotlight = posts[0];
+  const masonryPosts = posts.slice(1, 7);
+  const leftCol = masonryPosts.filter((_, i) => i % 2 === 0);
+  const rightCol = masonryPosts.filter((_, i) => i % 2 === 1);
 
   return (
     <section className="py-16 md:py-28 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-muted/40 via-background to-muted/30" />
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/[0.03] rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/[0.03] rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+      {/* Background decorations */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-background to-accent/[0.03]" />
+      <div className="absolute top-1/4 -right-32 w-[500px] h-[500px] bg-primary/[0.04] rounded-full blur-[100px]" />
+      <div className="absolute bottom-1/4 -left-32 w-[400px] h-[400px] bg-accent/[0.04] rounded-full blur-[100px]" />
 
       <div className="container mx-auto relative z-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 md:mb-14 animate-fade-in">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3.5 py-1 rounded-full text-xs font-semibold mb-3 border border-primary/15">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>{t("Trending Now", "এখন ট্রেন্ডিং")}</span>
-            </div>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-1.5">
-              {t("Community Feed", "কমিউনিটি ফিড")}
-            </h2>
-            <p className="text-sm md:text-base text-muted-foreground">
-              {t("Stories and moments shared by our members", "আমাদের সদস্যদের শেয়ার করা গল্প ও মুহূর্ত")}
-            </p>
+        <div className="text-center mb-12 md:mb-16 animate-fade-in">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-semibold mb-4 border border-primary/15">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{t("Community Highlights", "কমিউনিটি হাইলাইটস")}</span>
           </div>
-          <Button variant="outline" className="mt-4 md:mt-0 group text-sm rounded-full border-primary/20 hover:bg-primary hover:text-primary-foreground transition-all duration-300" onClick={() => navigate('/public-feed')}>
-            <span>{t("View All Posts", "সকল পোস্ট দেখুন")}</span>
-            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-          </Button>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3">
+            {t("What's Happening", "কী হচ্ছে")}
+          </h2>
+          <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto">
+            {t("Real stories, real moments — from our vibrant community", "সত্যিকারের গল্প, সত্যিকারের মুহূর্ত — আমাদের প্রাণবন্ত কমিউনিটি থেকে")}
+          </p>
         </div>
 
         {loading ? (
@@ -172,105 +143,187 @@ export const ContentPreviewSection = () => {
             {t("No posts available", "কোনো পোস্ট নেই")}
           </div>
         ) : (
-          <div className="space-y-6">
-            {/* Featured Row — 2 large horizontal cards */}
-            <div className="grid md:grid-cols-2 gap-5 md:gap-6">
-              {featured.map((post, i) => (
-                <div
-                  key={post.id}
-                  onClick={() => navigate(`/post/${post.id}`)}
-                  className="group relative flex flex-col md:flex-row bg-card/90 backdrop-blur-sm border border-border/40 rounded-2xl overflow-hidden hover:shadow-large hover:-translate-y-1 transition-all duration-500 cursor-pointer animate-fade-in"
-                  style={{ animationDelay: `${i * 100}ms` }}
-                >
-                  {/* Media — left side on desktop */}
-                  {hasMedia(post) ? (
-                    <div className="md:w-2/5 flex-shrink-0">
-                      <MediaThumbnail post={post} tall />
-                    </div>
-                  ) : (
-                    <div className="md:w-2/5 flex-shrink-0 bg-gradient-to-br from-primary/10 via-accent/5 to-primary/10 flex items-center justify-center">
-                      <TrendingUp className="w-12 h-12 text-primary/20" />
-                    </div>
-                  )}
+          <div className="grid lg:grid-cols-[1fr_1fr] gap-6 md:gap-8">
+            {/* LEFT — Spotlight Card */}
+            {spotlight && (
+              <div
+                onClick={() => navigate(`/post/${spotlight.id}`)}
+                className="group relative rounded-3xl overflow-hidden cursor-pointer animate-fade-in min-h-[420px] lg:min-h-[520px] flex flex-col justify-end"
+              >
+                {/* Full-bleed media background */}
+                {spotlight.video_url ? (
+                  <video src={spotlight.video_url} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" muted playsInline preload="metadata" />
+                ) : spotlight.image_urls && spotlight.image_urls.length > 0 ? (
+                  <img src={spotlight.image_urls[0]} alt="" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20" />
+                )}
 
-                  {/* Content — right side */}
-                  <div className="flex-1 p-4 md:p-5 flex flex-col justify-between">
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/40 to-transparent" />
+
+                {/* Video play icon */}
+                {spotlight.video_url && (
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                    <div className="w-16 h-16 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <Play className="w-7 h-7 text-primary-foreground fill-primary-foreground ml-1" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Trending badge */}
+                <div className="absolute top-4 left-4 z-10">
+                  <div className="flex items-center gap-1.5 bg-primary/90 backdrop-blur-sm text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                    <TrendingUp className="w-3 h-3" />
+                    {t("Featured", "ফিচার্ড")}
+                  </div>
+                </div>
+
+                {/* Content overlay */}
+                <div className="relative z-10 p-6 md:p-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Avatar className="w-10 h-10 ring-2 ring-background/30">
+                      <AvatarImage src={spotlight.author.avatar_url || ''} />
+                      <AvatarFallback className="text-xs bg-primary/20 text-primary font-bold">
+                        {getInitials(spotlight.author.full_name)}
+                      </AvatarFallback>
+                    </Avatar>
                     <div>
-                      <div className="flex items-center gap-2.5 mb-3">
-                        <Avatar className="w-8 h-8 ring-2 ring-primary/20">
-                          <AvatarImage src={post.author.avatar_url || ''} alt={post.author.full_name || ''} />
-                          <AvatarFallback className="text-xs bg-primary/15 text-primary font-semibold">
-                            {getInitials(post.author.full_name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="text-sm font-semibold text-foreground truncate">
-                            {post.author.full_name || t("Anonymous", "বেনামী")}
-                          </p>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Clock className="w-3 h-3" />
-                            <span>{formatTimeAgo(post.created_at)}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <p className="text-sm md:text-base text-foreground/80 leading-relaxed line-clamp-3">
-                        {getExcerpt(post.content, 150)}
+                      <p className="text-sm font-semibold text-background">
+                        {spotlight.author.full_name || t("Anonymous", "বেনামী")}
                       </p>
-                    </div>
-                    <div className="flex items-center gap-4 mt-4 pt-3 border-t border-border/30 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1.5"><Heart className="w-3.5 h-3.5 text-destructive/70" />{post.likes_count || 0}</span>
-                      <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5" />{post.views_count || 0}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Rest — compact grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
-              {rest.map((post, i) => (
-                <div
-                  key={post.id}
-                  onClick={() => navigate(`/post/${post.id}`)}
-                  className="group bg-card/70 backdrop-blur-sm border border-border/30 rounded-xl overflow-hidden hover:shadow-medium hover:-translate-y-1 transition-all duration-400 cursor-pointer flex flex-col animate-fade-in"
-                  style={{ animationDelay: `${(i + 2) * 80}ms` }}
-                >
-                  {hasMedia(post) ? (
-                    <MediaThumbnail post={post} />
-                  ) : (
-                    <div className="h-1.5 bg-gradient-to-r from-primary/30 via-accent/20 to-primary/30" />
-                  )}
-                  <div className="p-3 md:p-4 flex flex-col flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Avatar className="w-6 h-6 ring-1 ring-primary/15">
-                        <AvatarImage src={post.author.avatar_url || ''} alt={post.author.full_name || ''} />
-                        <AvatarFallback className="text-[9px] bg-primary/10 text-primary font-semibold">
-                          {getInitials(post.author.full_name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[11px] md:text-xs font-semibold text-foreground truncate">
-                          {post.author.full_name || t("Anonymous", "বেনামী")}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground">{formatTimeAgo(post.created_at)}</p>
+                      <div className="flex items-center gap-1 text-xs text-background/70">
+                        <Clock className="w-3 h-3" />
+                        <span>{formatTimeAgo(spotlight.created_at)}</span>
                       </div>
                     </div>
-                    <p className="text-xs text-foreground/75 line-clamp-2 flex-1 leading-relaxed mb-2">
-                      {getExcerpt(post.content, 70)}
-                    </p>
-                    <div className="flex items-center gap-3 text-[10px] md:text-xs text-muted-foreground pt-2 border-t border-border/20">
-                      <span className="flex items-center gap-1"><Heart className="w-3 h-3 text-destructive/60" />{post.likes_count || 0}</span>
-                      <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{post.views_count || 0}</span>
-                    </div>
+                  </div>
+                  <p className="text-background/90 text-base md:text-lg leading-relaxed line-clamp-3 mb-4">
+                    {getExcerpt(spotlight.content, 200)}
+                  </p>
+                  <div className="flex items-center gap-5 text-xs text-background/70">
+                    <span className="flex items-center gap-1.5"><Heart className="w-4 h-4" />{spotlight.likes_count || 0}</span>
+                    <span className="flex items-center gap-1.5"><Eye className="w-4 h-4" />{spotlight.views_count || 0}</span>
                   </div>
                 </div>
-              ))}
+              </div>
+            )}
+
+            {/* RIGHT — Masonry 2-column staggered grid */}
+            <div className="grid grid-cols-2 gap-4 md:gap-5 content-start">
+              {/* Left column */}
+              <div className="space-y-4 md:space-y-5">
+                {leftCol.map((post, i) => (
+                  <MasonryCard key={post.id} post={post} index={i} navigate={navigate} t={t} language={language} formatTimeAgo={formatTimeAgo} getExcerpt={getExcerpt} getInitials={getInitials} hasMedia={hasMedia} tall={i === 0} />
+                ))}
+              </div>
+              {/* Right column — offset for stagger */}
+              <div className="space-y-4 md:space-y-5 pt-8 md:pt-10">
+                {rightCol.map((post, i) => (
+                  <MasonryCard key={post.id} post={post} index={i + leftCol.length} navigate={navigate} t={t} language={language} formatTimeAgo={formatTimeAgo} getExcerpt={getExcerpt} getInitials={getInitials} hasMedia={hasMedia} tall={i === 1} />
+                ))}
+              </div>
             </div>
           </div>
         )}
+
+        {/* CTA */}
+        <div className="text-center mt-12 md:mt-16 animate-fade-in">
+          <Button
+            size="lg"
+            className="rounded-full px-8 py-6 text-base group bg-gradient-hero shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+            onClick={() => navigate('/public-feed')}
+          >
+            <span>{t("Explore All Posts", "সকল পোস্ট দেখুন")}</span>
+            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </div>
       </div>
     </section>
   );
 };
+
+/* ─── Masonry Card ─── */
+interface MasonryCardProps {
+  post: FeedPost;
+  index: number;
+  navigate: ReturnType<typeof import("react-router-dom").useNavigate>;
+  t: (en: string, bn: string) => string;
+  language: string;
+  formatTimeAgo: (d: string) => string;
+  getExcerpt: (c: string, m?: number) => string;
+  getInitials: (n: string | null) => string;
+  hasMedia: (p: FeedPost) => boolean | string | null;
+  tall?: boolean;
+}
+
+const MasonryCard = memo(({ post, index, navigate, t, language, formatTimeAgo, getExcerpt, getInitials, hasMedia, tall }: MasonryCardProps) => (
+  <div
+    onClick={() => navigate(`/post/${post.id}`)}
+    className="group relative bg-card border border-border/40 rounded-2xl overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-500 animate-fade-in"
+    style={{ animationDelay: `${index * 100}ms` }}
+  >
+    {/* Hover glow */}
+    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
+
+    {/* Media */}
+    {hasMedia(post) ? (
+      <div className={`relative overflow-hidden ${tall ? 'h-44 md:h-56' : 'h-28 md:h-36'}`}>
+        {post.video_url ? (
+          <>
+            <video src={post.video_url} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" muted playsInline preload="metadata" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center">
+                <Play className="w-4 h-4 text-primary-foreground fill-primary-foreground ml-0.5" />
+              </div>
+            </div>
+          </>
+        ) : post.image_urls && post.image_urls.length > 0 ? (
+          <>
+            <img src={post.image_urls[0]} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+            {post.image_urls.length > 1 && (
+              <div className="absolute top-2 right-2 bg-foreground/60 text-background text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">
+                +{post.image_urls.length - 1}
+              </div>
+            )}
+          </>
+        ) : null}
+      </div>
+    ) : (
+      <div className="h-1 bg-gradient-to-r from-primary/40 via-accent/30 to-primary/40" />
+    )}
+
+    {/* Content */}
+    <div className="relative p-3 md:p-4">
+      <div className="flex items-center gap-2 mb-2">
+        <Avatar className="w-6 h-6 ring-1 ring-primary/15">
+          <AvatarImage src={post.author.avatar_url || ''} />
+          <AvatarFallback className="text-[9px] bg-primary/10 text-primary font-bold">
+            {getInitials(post.author.full_name)}
+          </AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] md:text-xs font-semibold text-foreground truncate">
+            {post.author.full_name || t("Anonymous", "বেনামী")}
+          </p>
+        </div>
+      </div>
+
+      <p className="text-xs text-foreground/75 line-clamp-2 leading-relaxed mb-2.5">
+        {getExcerpt(post.content, tall ? 80 : 55)}
+      </p>
+
+      <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-2 border-t border-border/30">
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1"><Heart className="w-3 h-3 text-destructive/60" />{post.likes_count || 0}</span>
+          <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{post.views_count || 0}</span>
+        </div>
+        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatTimeAgo(post.created_at)}</span>
+      </div>
+    </div>
+  </div>
+));
+
+MasonryCard.displayName = 'MasonryCard';
 
 export default memo(ContentPreviewSection);
