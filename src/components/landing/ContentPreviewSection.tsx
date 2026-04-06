@@ -197,8 +197,8 @@ const StoryCard = memo(({ post, index, gradient, navigate, t, formatTimeAgo, get
   return (
     <div
       onClick={() => navigate(`/post/${post.id}`)}
-      className="group flex-shrink-0 w-[220px] md:w-[260px] h-[340px] md:h-[400px] rounded-2xl overflow-hidden relative cursor-pointer snap-start animate-fade-in hover:-translate-y-2 transition-all duration-500"
-      style={{ animationDelay: `${index * 80}ms` }}
+      className="group flex-shrink-0 w-[260px] md:w-[320px] h-[400px] md:h-[480px] rounded-2xl overflow-hidden relative cursor-pointer snap-start hover:-translate-y-3 hover:shadow-glow transition-all duration-500"
+      style={{ opacity: 0, animation: `fade-in 0.5s ease-out ${index * 120}ms forwards` }}
     >
       {/* Background — media or gradient */}
       {hasVideo ? (
