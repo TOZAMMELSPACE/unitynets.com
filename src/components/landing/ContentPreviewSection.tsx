@@ -162,7 +162,7 @@ export const ContentPreviewSection = () => {
             {/* "View All" card */}
             <div
               onClick={() => navigate('/public-feed')}
-              className="flex-shrink-0 w-[220px] md:w-[260px] h-[340px] md:h-[400px] rounded-2xl bg-gradient-to-br from-primary/10 via-card to-accent/10 border border-border/40 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-500 snap-start"
+              className="flex-shrink-0 w-[260px] md:w-[320px] h-[400px] md:h-[480px] rounded-2xl bg-gradient-to-br from-primary/10 via-card to-accent/10 border border-border/40 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-lg hover:-translate-y-3 transition-all duration-500 snap-start"
             >
               <div className="w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center">
                 <ArrowRight className="w-6 h-6 text-primary" />
