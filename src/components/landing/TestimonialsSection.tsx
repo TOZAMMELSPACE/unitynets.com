@@ -165,19 +165,36 @@ export const TestimonialsSection = () => {
               <span className="text-xs font-medium text-muted-foreground mr-1">
                 {t("Category", "ক্যাটাগরি")}:
               </span>
-              {categories.map((cat) => (
-                <button
-                  key={cat.value}
-                  onClick={() => setSelectedCategory(cat.value)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border ${
-                    selectedCategory === cat.value
-                      ? "bg-primary text-primary-foreground border-primary shadow-glow"
-                      : "bg-muted/40 text-muted-foreground border-border/30 hover:border-primary/40 hover:text-foreground"
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              ))}
+              {categories.map((cat) => {
+                const count = categoryCounts[cat.value];
+                const isActive = selectedCategory === cat.value;
+                const isDisabled = count === 0 && !isActive;
+                return (
+                  <button
+                    key={cat.value}
+                    onClick={() => !isDisabled && setSelectedCategory(cat.value)}
+                    disabled={isDisabled}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border ${
+                      isActive
+                        ? "bg-primary text-primary-foreground border-primary shadow-glow"
+                        : isDisabled
+                        ? "bg-muted/20 text-muted-foreground/40 border-border/20 cursor-not-allowed"
+                        : "bg-muted/40 text-muted-foreground border-border/30 hover:border-primary/40 hover:text-foreground"
+                    }`}
+                  >
+                    {cat.label}
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                        isActive
+                          ? "bg-primary-foreground/20 text-primary-foreground"
+                          : "bg-background/60 text-muted-foreground"
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="hidden md:block w-px h-8 bg-border/40" />
@@ -188,19 +205,36 @@ export const TestimonialsSection = () => {
               <span className="text-xs font-medium text-muted-foreground mr-1">
                 {t("Rating", "রেটিং")}:
               </span>
-              {ratingOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => setMinRating(opt.value)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border ${
-                    minRating === opt.value
-                      ? "bg-warning text-background border-warning shadow-glow"
-                      : "bg-muted/40 text-muted-foreground border-border/30 hover:border-warning/40 hover:text-foreground"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
+              {ratingOptions.map((opt) => {
+                const count = ratingCounts[opt.value] ?? 0;
+                const isActive = minRating === opt.value;
+                const isDisabled = count === 0 && !isActive;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => !isDisabled && setMinRating(opt.value)}
+                    disabled={isDisabled}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border ${
+                      isActive
+                        ? "bg-warning text-background border-warning shadow-glow"
+                        : isDisabled
+                        ? "bg-muted/20 text-muted-foreground/40 border-border/20 cursor-not-allowed"
+                        : "bg-muted/40 text-muted-foreground border-border/30 hover:border-warning/40 hover:text-foreground"
+                    }`}
+                  >
+                    {opt.label}
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                        isActive
+                          ? "bg-background/30 text-background"
+                          : "bg-background/60 text-muted-foreground"
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
