@@ -107,6 +107,28 @@ export const TestimonialsSection = () => {
     });
   }, [selectedCategory, minRating, testimonials]);
 
+  // Counts per category respect current rating filter
+  const categoryCounts = useMemo(() => {
+    const base = testimonials.filter((t) => t.rating >= minRating);
+    return {
+      all: base.length,
+      skills: base.filter((t) => t.category === "skills").length,
+      community: base.filter((t) => t.category === "community").length,
+      support: base.filter((t) => t.category === "support").length,
+    } as Record<Category, number>;
+  }, [testimonials, minRating]);
+
+  // Counts per rating option respect current category filter
+  const ratingCounts = useMemo(() => {
+    const base = testimonials.filter(
+      (t) => selectedCategory === "all" || t.category === selectedCategory
+    );
+    return ratingOptions.reduce<Record<number, number>>((acc, opt) => {
+      acc[opt.value] = base.filter((t) => t.rating >= opt.value).length;
+      return acc;
+    }, {});
+  }, [testimonials, selectedCategory]);
+
   return (
     <section className="relative py-20 md:py-28 bg-background overflow-hidden">
       {/* Animated background */}
