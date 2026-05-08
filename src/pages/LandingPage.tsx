@@ -2,23 +2,17 @@ import { useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/landing/Navbar";
-import HeroSection from "@/components/landing/HeroSection";
+import MinimalHero from "@/components/landing/MinimalHero";
 import SEOHead from "@/components/SEOHead";
 
-// Lazy load below-the-fold sections for faster initial load
-// WorldMapSection is now integrated into HeroSection
-const ContentPreviewSection = lazy(() => import("@/components/landing/ContentPreviewSection"));
-const HowItWorksSection = lazy(() => import("@/components/landing/HowItWorksSection"));
-const FAQSection = lazy(() => import("@/components/landing/FAQSection"));
-const FeaturesSection = lazy(() => import("@/components/landing/FeaturesSection"));
-const TestimonialsSection = lazy(() => import("@/components/landing/TestimonialsSection"));
-const CTASection = lazy(() => import("@/components/landing/CTASection"));
-const Footer = lazy(() => import("@/components/landing/Footer"));
+const SocialProofBar = lazy(() => import("@/components/landing/SocialProofBar"));
+const WhyUnitySection = lazy(() => import("@/components/landing/WhyUnitySection"));
+const FinalCTASection = lazy(() => import("@/components/landing/FinalCTASection"));
+const MinimalFooter = lazy(() => import("@/components/landing/MinimalFooter"));
 
-// Minimal loading placeholder
 const SectionLoader = () => (
   <div className="py-8 flex justify-center">
-    <div className="animate-pulse h-32 w-full max-w-4xl bg-muted/20 rounded-lg" />
+    <div className="animate-pulse h-24 w-full max-w-4xl bg-muted/20 rounded-lg" />
   </div>
 );
 
@@ -27,9 +21,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && user) {
-      navigate('/home');
-    }
+    if (!loading && user) navigate("/home");
   }, [user, loading, navigate]);
 
   if (loading) {
@@ -43,38 +35,27 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Trust • Learn • Unite"
-        description="UnityNets - World's trusted community platform. Building bridges of unity from South Asia to the world. Join for skill sharing, learning, and mutual growth."
-        keywords="UnityNets, community platform, world community, trust network, Unity Note, global community, skill sharing, learning platform, social network, South Asia"
+        title="Trust. Learn. Unite. — UnityNets"
+        description="Join the world community. A free global platform where people share knowledge, build trust, and grow together. 100% free. No ads."
+        keywords="UnityNets, world community, learn skills, trust network, global community, free learning, social platform"
         canonicalUrl="https://unitynets.com/"
         ogType="website"
       />
       <Navbar />
       <main>
-        <HeroSection />
-        
-        {/* WorldMapSection removed - now integrated into HeroSection */}
+        <MinimalHero />
         <Suspense fallback={<SectionLoader />}>
-          <ContentPreviewSection />
+          <SocialProofBar />
         </Suspense>
         <Suspense fallback={<SectionLoader />}>
-          <HowItWorksSection />
+          <WhyUnitySection />
         </Suspense>
         <Suspense fallback={<SectionLoader />}>
-          <FAQSection />
-        </Suspense>
-        <Suspense fallback={<SectionLoader />}>
-          <FeaturesSection />
-        </Suspense>
-        <Suspense fallback={<SectionLoader />}>
-          <TestimonialsSection />
-        </Suspense>
-        <Suspense fallback={<SectionLoader />}>
-          <CTASection />
+          <FinalCTASection />
         </Suspense>
       </main>
       <Suspense fallback={<SectionLoader />}>
-        <Footer />
+        <MinimalFooter />
       </Suspense>
     </div>
   );
