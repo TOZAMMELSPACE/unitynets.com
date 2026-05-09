@@ -91,12 +91,8 @@ const Auth = () => {
         canonicalUrl="https://unitynets.com/auth"
         noIndex={true}
       />
-      <Login 
-        onLogin={handleLogin}
-        onRegister={handleRegister}
-        users={[]}
-        defaultMode={defaultMode}
-      />
+      <SplitAuthLanding />
+
     </>
   );
 };
