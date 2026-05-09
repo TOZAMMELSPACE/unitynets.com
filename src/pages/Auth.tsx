@@ -1,4 +1,4 @@
-import SplitAuthLanding from "@/components/landing/SplitAuthLanding";
+import { Login } from "@/components/Login";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
@@ -91,8 +91,12 @@ const Auth = () => {
         canonicalUrl="https://unitynets.com/auth"
         noIndex={true}
       />
-      <SplitAuthLanding />
-
+      <Login 
+        onLogin={handleLogin}
+        onRegister={handleRegister}
+        users={[]}
+        defaultMode={defaultMode}
+      />
     </>
   );
 };
