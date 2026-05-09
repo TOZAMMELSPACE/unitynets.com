@@ -59,12 +59,9 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {/* Landing page - New vibrant homepage */}
-            <Route path="/" element={
-              <Suspense fallback={<PageLoader />}>
-                <LandingPage />
-              </Suspense>
-            } />
+            {/* Root → redirect to /auth (auth IS the landing page) */}
+            <Route path="/" element={<Navigate to="/auth" replace />} />
+
             
             {/* About/Mission page */}
             <Route path="/about" element={
