@@ -1,4 +1,4 @@
-import { Login } from "@/components/Login";
+import SplitAuthLanding from "@/components/landing/SplitAuthLanding";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
