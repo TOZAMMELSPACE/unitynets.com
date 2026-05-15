@@ -46,15 +46,26 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
   const [showPassword, setShowPassword] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<null | 'google' | 'apple'>(null);
   const { language, toggleLanguage, t } = useLanguage();
-  const { activeUsers, totalPosts, isLoading: statsLoading } = useRealStats();
 
   const isEnglish = language === "en";
-  
-  // Format stats for display
-  const formatStat = (num: number): string => {
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}K+`;
-    return `${num}+`;
+
+  const handleOAuth = async (provider: 'google' | 'apple') => {
+    try {
+      setOauthLoading(provider);
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: `${window.location.origin}/home`,
+      });
+      if (result.error) {
+        toast({ title: t("Error", "ত্রুটি"), description: result.error.message ?? "OAuth failed", variant: "destructive" });
+        setOauthLoading(null);
+      }
+      // if redirected, browser leaves the page
+    } catch (e) {
+      toast({ title: t("Error", "ত্রুটি"), description: "OAuth failed", variant: "destructive" });
+      setOauthLoading(null);
+    }
   };
 
   // Memoize schemas based on language
