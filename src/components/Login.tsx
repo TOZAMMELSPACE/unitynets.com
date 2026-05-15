@@ -138,150 +138,40 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[hsl(220,18%,8%)]">
-      {/* Left Panel - Branding */}
+      {/* Left Panel - Minimal Branding */}
       <div className="hidden md:flex md:w-2/5 lg:w-1/2 relative overflow-hidden">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(174,55%,35%)] via-[hsl(174,50%,28%)] to-[hsl(220,18%,12%)]" />
-        
-        {/* Decorative Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-20 w-48 lg:w-64 h-48 lg:h-64 bg-[hsl(174,60%,50%)]/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-40 right-10 w-60 lg:w-80 h-60 lg:h-80 bg-[hsl(174,50%,40%)]/15 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/3 w-40 h-40 bg-white/5 rounded-full blur-2xl" />
-          
-          {/* Floating Shapes */}
-          <div className="absolute top-32 right-20 w-3 h-3 bg-white/30 rounded-full animate-pulse" />
-          <div className="absolute top-48 left-32 w-2 h-2 bg-white/40 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
-          <div className="absolute bottom-32 left-20 w-4 h-4 bg-white/20 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute bottom-48 right-40 w-2 h-2 bg-white/35 rounded-full animate-pulse" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(174,55%,30%)] via-[hsl(174,45%,20%)] to-[hsl(220,18%,10%)]" />
+        <div className="absolute inset-0">
+          <div className="absolute top-24 left-16 w-72 h-72 bg-[hsl(174,60%,50%)]/15 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-80 h-80 bg-[hsl(174,50%,40%)]/10 rounded-full blur-3xl" />
         </div>
 
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-center px-8 md:px-10 lg:px-12 xl:px-20">
-          {/* Logo */}
-          <div className="mb-6 lg:mb-10">
-            <img 
-              src="/logo.png" 
-              alt="UnityNets Logo" 
-              className="h-14 lg:h-20 w-auto"
-            />
-          </div>
-
-          {/* Tagline */}
-          <div className="mb-8 lg:mb-12">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-display font-bold text-white leading-tight mb-3 lg:mb-4">
-              {t("Build Together,", "একসাথে গড়ি,")}
-              <br />
-              <span className="text-[hsl(174,60%,70%)]">{t("Grow Together", "একসাথে বাড়ি")}</span>
-            </h2>
-            <p className="text-sm lg:text-lg text-white/70 max-w-md leading-relaxed">
-              {t("Join a global community platform for mutual growth and skill sharing, starting from South Asia.", "পারস্পরিক বৃদ্ধি ও দক্ষতা শেয়ারিংয়ের জন্য দক্ষিণ এশিয়া থেকে শুরু হওয়া একটি বিশ্বব্যাপী কমিউনিটি প্ল্যাটফর্মে যোগ দিন।")}
-            </p>
-          </div>
-
-          {/* Features */}
-          <div className="space-y-3 lg:space-y-5">
-            {features.map((feature, index) => (
-              <div key={index} className="flex items-start gap-3 lg:gap-4 group">
-                <div className="w-9 lg:w-11 h-9 lg:h-11 rounded-lg lg:rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/10 group-hover:bg-white/15 transition-colors flex-shrink-0">
-                  <feature.icon className="w-4 lg:w-5 h-4 lg:h-5 text-[hsl(174,60%,70%)]" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-sm lg:text-base text-white mb-0.5">{feature.title}</h3>
-                  <p className="text-xs lg:text-sm text-white/60">{feature.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Stats */}
-          <div className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-white/10">
-            <div className="flex gap-6 lg:gap-10">
-              <div>
-                <p className="text-xl lg:text-3xl font-bold text-white">
-                  {statsLoading ? "..." : formatStat(activeUsers)}
-                </p>
-                <p className="text-xs lg:text-sm text-white/60">{t("Active Users", "সক্রিয় ব্যবহারকারী")}</p>
-              </div>
-              <div>
-                <p className="text-xl lg:text-3xl font-bold text-white">
-                  {statsLoading ? "..." : formatStat(totalPosts)}
-                </p>
-                <p className="text-xs lg:text-sm text-white/60">{t("Posts", "পোস্ট")}</p>
-              </div>
-              <div>
-                <p className="text-xl lg:text-3xl font-bold text-white">{t("Growing", "বৃদ্ধি")}</p>
-                <p className="text-xs lg:text-sm text-white/60 flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3 text-[hsl(174,60%,70%)]" />
-                  {t("Community", "কমিউনিটি")}
-                </p>
-              </div>
-            </div>
-          </div>
+        <div className="relative z-10 flex flex-col justify-center px-10 lg:px-16 xl:px-20">
+          <img src="/logo.png" alt="UnityNets Logo" className="h-12 lg:h-14 w-auto mb-12" />
+          <h1 className="text-3xl lg:text-4xl xl:text-5xl font-display font-bold text-white leading-[1.1] tracking-tight mb-5">
+            {t("Trust. Learn.", "Trust. Learn.")} <span className="text-[hsl(174,60%,70%)]">{t("Unite.", "Unite.")}</span>
+          </h1>
+          <p className="text-base lg:text-lg text-white/65 max-w-md leading-relaxed">
+            {t(
+              "Join a global community platform for learning, sharing, and growth.",
+              "শেখা, শেয়ার ও বৃদ্ধির জন্য একটি বৈশ্বিক কমিউনিটি প্ল্যাটফর্মে যোগ দিন।"
+            )}
+          </p>
         </div>
       </div>
 
       {/* Right Panel - Form */}
-      <div className="w-full md:w-3/5 lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 min-h-screen md:min-h-0">
-        <div className="w-full max-w-sm sm:max-w-md animate-fade-in">
-          {/* Mobile Logo & Features */}
-          <div className="md:hidden mb-6 sm:mb-8">
-            <div className="text-center mb-5">
-              <div className="flex justify-center mb-3">
-                <img 
-                  src="/logo.png" 
-                  alt="UnityNets Logo" 
-                  className="h-12 sm:h-14 w-auto"
-                />
-              </div>
-            </div>
-            
-            {/* Mobile Tagline */}
-            <div className="text-center mb-4">
-              <h2 className="text-lg sm:text-xl font-display font-bold text-[hsl(220,10%,95%)] leading-tight">
-                {t("Build Together,", "একসাথে গড়ি,")} <span className="text-[hsl(174,55%,55%)]">{t("Grow Together", "একসাথে বাড়ি")}</span>
-              </h2>
-              <p className="text-xs sm:text-sm text-[hsl(220,10%,55%)] mt-1 max-w-xs mx-auto">
-                {t("Join a global community platform for mutual growth and skill sharing, starting from South Asia.", "পারস্পরিক বৃদ্ধি ও দক্ষতা শেয়ারিংয়ের জন্য দক্ষিণ এশিয়া থেকে শুরু হওয়া একটি বিশ্বব্যাপী কমিউনিটি প্ল্যাটফর্মে যোগ দিন।")}
-              </p>
-            </div>
-
-            {/* Mobile Features */}
-            <div className="grid grid-cols-3 gap-2 mb-4">
-              {features.map((feature, index) => (
-                <div key={index} className="bg-[hsl(220,15%,12%)] border border-[hsl(220,15%,18%)] rounded-lg p-2 text-center">
-                  <div className="w-7 h-7 mx-auto rounded-lg bg-[hsl(174,55%,45%)]/10 flex items-center justify-center mb-1">
-                    <feature.icon className="w-3.5 h-3.5 text-[hsl(174,55%,55%)]" />
-                  </div>
-                  <h3 className="font-medium text-[10px] text-[hsl(220,10%,90%)] leading-tight">{feature.title}</h3>
-                  <p className="text-[8px] text-[hsl(220,10%,50%)] leading-tight mt-0.5">{feature.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Mobile Stats */}
-            <div className="flex justify-center gap-4 py-2 px-3 bg-[hsl(220,15%,10%)] rounded-lg border border-[hsl(220,15%,16%)]">
-              <div className="text-center">
-                <p className="text-sm font-bold text-[hsl(220,10%,95%)]">
-                  {statsLoading ? "..." : formatStat(activeUsers)}
-                </p>
-                <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Active Users", "সক্রিয় ব্যবহারকারী")}</p>
-              </div>
-              <div className="w-px bg-[hsl(220,15%,20%)]" />
-              <div className="text-center">
-                <p className="text-sm font-bold text-[hsl(220,10%,95%)]">
-                  {statsLoading ? "..." : formatStat(totalPosts)}
-                </p>
-                <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Posts", "পোস্ট")}</p>
-              </div>
-              <div className="w-px bg-[hsl(220,15%,20%)]" />
-              <div className="text-center">
-                <p className="text-sm font-bold text-[hsl(220,10%,95%)] flex items-center gap-0.5 justify-center">
-                  {t("Growing", "বৃদ্ধি")} <TrendingUp className="w-2.5 h-2.5 text-[hsl(174,55%,55%)]" />
-                </p>
-                <p className="text-[9px] text-[hsl(220,10%,50%)]">{t("Community", "কমিউনিটি")}</p>
-              </div>
-            </div>
+      <div className="w-full md:w-3/5 lg:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-10 min-h-screen md:min-h-0">
+        <div className="w-full max-w-md animate-fade-in">
+          {/* Mobile Logo + Tagline only */}
+          <div className="md:hidden mb-8 text-center">
+            <img src="/logo.png" alt="UnityNets Logo" className="h-12 w-auto mx-auto mb-5" />
+            <h1 className="text-2xl font-display font-bold text-[hsl(220,10%,95%)] leading-tight">
+              {t("Trust. Learn.", "Trust. Learn.")} <span className="text-[hsl(174,55%,55%)]">{t("Unite.", "Unite.")}</span>
+            </h1>
+            <p className="text-sm text-[hsl(220,10%,55%)] mt-2 max-w-xs mx-auto">
+              {t("Join a global community for learning, sharing, and growth.", "শেখা, শেয়ার ও বৃদ্ধির জন্য কমিউনিটিতে যোগ দিন।")}
+            </p>
           </div>
 
           {/* Language Toggle */}
