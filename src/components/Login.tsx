@@ -130,11 +130,7 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
     }
   };
 
-  const features = [
-    { icon: Users, title: t("Community Driven", "সম্প্রদায় চালিত"), desc: t("Connect with our community", "আমাদের কমিউনিটিতে সংযুক্ত হন") },
-    { icon: Zap, title: t("Unity Notes", "ইউনিটি নোট"), desc: t("Earn by sharing your skills", "দক্ষতা শেয়ার করে আয় করুন") },
-    { icon: TrendingUp, title: t("Grow Together", "একসাথে বৃদ্ধি"), desc: t("Learn and build with others", "অন্যদের সাথে শিখুন ও তৈরি করুন") },
-  ];
+
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[hsl(220,18%,8%)]">
