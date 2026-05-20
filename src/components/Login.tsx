@@ -133,9 +133,9 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
 
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[hsl(220,18%,8%)]">
+    <div className="min-h-screen md:h-screen flex flex-col md:flex-row bg-[hsl(220,18%,8%)] md:overflow-hidden">
       {/* Left Panel - Premium Immersive Branding */}
-      <div className="hidden md:flex md:w-2/5 lg:w-1/2 relative overflow-hidden">
+      <div className="hidden md:flex md:w-2/5 lg:w-1/2 relative overflow-hidden md:h-screen">
         {/* Layered gradient background */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,hsl(174,70%,28%),transparent_55%),radial-gradient(ellipse_at_bottom_right,hsl(190,60%,22%),transparent_55%),linear-gradient(180deg,hsl(200,30%,8%),hsl(220,25%,6%))]" />
 
