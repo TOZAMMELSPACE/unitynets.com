@@ -134,112 +134,110 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
 
   return (
     <div className="min-h-screen md:h-screen flex flex-col md:flex-row bg-[hsl(220,18%,8%)] md:overflow-hidden">
-      {/* Left Panel - Premium Immersive Branding */}
-      <div className="hidden md:flex md:w-2/5 lg:w-1/2 relative overflow-hidden md:h-screen">
-        {/* Layered gradient background */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,hsl(174,70%,28%),transparent_55%),radial-gradient(ellipse_at_bottom_right,hsl(190,60%,22%),transparent_55%),linear-gradient(180deg,hsl(200,30%,8%),hsl(220,25%,6%))]" />
-
-        {/* Animated aurora orbs */}
-        <div className="absolute -top-20 -left-16 w-[28rem] h-[28rem] bg-[hsl(174,70%,45%)]/25 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
-        <div className="absolute bottom-0 -right-20 w-[26rem] h-[26rem] bg-[hsl(195,80%,50%)]/20 rounded-full blur-[110px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
-        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-[hsl(160,70%,45%)]/15 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
-
-        {/* Subtle grid overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: 'linear-gradient(hsl(174,60%,70%) 1px, transparent 1px), linear-gradient(90deg, hsl(174,60%,70%) 1px, transparent 1px)',
-            backgroundSize: '48px 48px',
-            maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
-          }}
-        />
-
-        {/* Floating sparkles */}
-        <div className="absolute top-[15%] right-[20%] w-1.5 h-1.5 bg-[hsl(174,80%,75%)] rounded-full animate-ping" style={{ animationDuration: '3s' }} />
-        <div className="absolute top-[60%] left-[18%] w-1 h-1 bg-[hsl(190,80%,75%)] rounded-full animate-ping" style={{ animationDuration: '4s', animationDelay: '1s' }} />
-        <div className="absolute bottom-[25%] right-[30%] w-1 h-1 bg-white/60 rounded-full animate-ping" style={{ animationDuration: '5s', animationDelay: '2s' }} />
-
-        <div className="relative z-10 flex flex-col justify-between px-10 lg:px-14 xl:px-20 py-12 lg:py-16 w-full">
-          {/* Top: Logo */}
-          <div className="flex items-center gap-3 animate-fade-in">
-            <div className="relative">
-              <div className="absolute inset-0 bg-[hsl(174,70%,50%)]/40 blur-xl rounded-full" />
-              <img src="/logo.png" alt="UnityNets Logo" className="relative h-11 lg:h-12 w-auto" />
-            </div>
-          </div>
-
-          {/* Middle: Headline + value chips */}
-          <div className="space-y-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-md">
-              <Sparkles className="w-3.5 h-3.5 text-[hsl(174,70%,65%)]" />
-              <span className="text-xs font-medium text-white/80 tracking-wide">{t("A free global community", "একটি ফ্রি বৈশ্বিক কমিউনিটি")}</span>
-            </div>
-
-            <div>
-              <h1 className="text-4xl lg:text-5xl xl:text-6xl font-display font-bold text-white leading-[1.05] tracking-tight">
-                {t("Trust.", "Trust.")}<br />
-                {t("Learn.", "Learn.")}{" "}
-                <span
-                  className="inline-block"
-                  style={{
-                    background: 'linear-gradient(135deg, hsl(174,75%,65%), hsl(195,85%,70%), hsl(160,70%,65%))',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }}
-                >
-                  {t("Unite.", "Unite.")}
-                </span>
-              </h1>
-              <p className="mt-5 text-base lg:text-lg text-white/65 max-w-md leading-relaxed">
-                {t(
-                  "Where curious minds meet kind hearts. Share what you know, learn what you love.",
-                  "যেখানে কৌতূহলী মন আর দয়ালু হৃদয়ের মিলন। যা জানেন শেয়ার করুন, যা ভালোবাসেন শিখুন।"
-                )}
-              </p>
-            </div>
-
-            {/* Value pills */}
-            <div className="flex flex-wrap gap-2.5">
-              {[
-                { icon: GraduationCap, label: t("Learn Skills", "দক্ষতা শিখুন") },
-                { icon: HandHeart, label: t("Share Trust", "বিশ্বাস ভাগ") },
-                { icon: Users, label: t("Connect Globally", "বিশ্বে যুক্ত") },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="group flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md hover:bg-white/[0.08] hover:border-[hsl(174,60%,50%)]/40 transition-all duration-300"
-                >
-                  <item.icon className="w-3.5 h-3.5 text-[hsl(174,70%,65%)]" />
-                  <span className="text-xs font-medium text-white/85">{item.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Bottom: Testimonial glass card */}
+      {/* Left Panel - Glass Editorial Branding */}
+      <div className="hidden md:flex md:w-2/5 lg:w-1/2 relative overflow-hidden md:h-screen bg-[#032121] text-white border-r border-emerald-900/30">
+        {/* Atmospheric blurs */}
+        <div className="absolute inset-0 z-0 opacity-50 pointer-events-none">
+          <div className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] bg-emerald-500/20 blur-[120px] rounded-full" />
+          <div className="absolute -bottom-[10%] -right-[10%] w-[60%] h-[60%] bg-teal-600/15 blur-[120px] rounded-full" />
           <div
-            className="relative p-5 lg:p-6 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-xl shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4)] animate-fade-in"
-            style={{ animationDelay: '0.25s' }}
-          >
-            <Quote className="absolute -top-3 left-5 w-7 h-7 p-1.5 rounded-full bg-[hsl(174,65%,40%)] text-white shadow-lg" />
-            <p className="text-sm lg:text-[15px] text-white/85 leading-relaxed italic">
-              {t(
-                "“This is the first place online that actually feels like a community — kind, real, and global.”",
-                "“এটাই প্রথম অনলাইন জায়গা যেটা সত্যিকারের কমিউনিটির মতো লাগে — দয়ালু, বাস্তব ও বৈশ্বিক।”"
-              )}
+            className="absolute inset-0"
+            style={{
+              backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(16,185,129,0.06) 1px, transparent 0)',
+              backgroundSize: '40px 40px',
+            }}
+          />
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col h-full w-full px-10 lg:px-14 xl:px-20 py-12 lg:py-16">
+          {/* Logo + Badge */}
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="absolute inset-0 bg-emerald-500/40 blur-xl rounded-full" />
+                <img src="/logo.png" alt="UnityNets" className="relative h-10 lg:h-11 w-auto" />
+              </div>
+              <span
+                className="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-emerald-200"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                UnityNets
+              </span>
+            </div>
+
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 w-fit">
+              <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-emerald-300">
+                A free global community
+              </span>
+            </div>
+          </div>
+
+          {/* Headline + Description */}
+          <div className="mt-14 mb-10">
+            <h1
+              className="text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] tracking-tight mb-6"
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
+              Trust.<br />
+              Learn.{" "}
+              <span
+                className="italic"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(174,75%,65%), hsl(160,70%,60%))',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Unite.
+              </span>
+            </h1>
+            <p
+              className="text-base lg:text-lg text-emerald-100/65 leading-[1.7] max-w-sm"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              Where curious minds meet kind hearts. Share what you know, learn what you love.
             </p>
-            <div className="mt-4 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[hsl(174,70%,50%)] to-[hsl(195,70%,45%)] flex items-center justify-center text-white text-sm font-semibold shadow-md">
-                A
+          </div>
+
+          {/* Value Pills */}
+          <div className="flex flex-wrap gap-2.5 mb-auto">
+            {[
+              { icon: GraduationCap, label: "Learn Skills" },
+              { icon: HandHeart, label: "Share Trust" },
+              { icon: Users, label: "Connect Globally" },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/50 transition-colors flex items-center gap-2 group"
+              >
+                <item.icon className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-white/90">{item.label}</span>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-white">Aisha R.</p>
-                <p className="text-[11px] text-white/55">{t("Student • Nairobi", "শিক্ষার্থী • নাইরোবি")}</p>
+            ))}
+          </div>
+
+          {/* Testimonial */}
+          <div className="mt-10 p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+            <Quote className="w-7 h-7 text-emerald-500/50 mb-3" />
+            <p className="text-[15px] lg:text-base font-medium leading-[1.65] italic text-emerald-50/95">
+              "This is the first place online that actually feels like a community — kind, real, and global."
+            </p>
+            <div className="mt-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white font-bold text-sm border-2 border-emerald-900/50">
+                  A
+                </div>
+                <div>
+                  <p className="text-sm font-semibold leading-tight">Aisha R.</p>
+                  <p className="text-[11px] text-emerald-400/80 mt-0.5">Student • Nairobi</p>
+                </div>
               </div>
-              <div className="ml-auto flex -space-x-2">
-                {['from-[hsl(20,80%,55%)]','from-[hsl(280,60%,55%)]','from-[hsl(140,60%,45%)]'].map((g,i)=>(
-                  <div key={i} className={`w-7 h-7 rounded-full bg-gradient-to-br ${g} to-white/20 border-2 border-[hsl(200,30%,8%)]`} />
-                ))}
+              <div className="flex -space-x-2 opacity-80">
+                <div className="w-6 h-6 rounded-full bg-orange-400/80 border border-[#032121]" />
+                <div className="w-6 h-6 rounded-full bg-purple-400/80 border border-[#032121]" />
+                <div className="w-6 h-6 rounded-full bg-emerald-400/80 border border-[#032121]" />
               </div>
             </div>
           </div>
