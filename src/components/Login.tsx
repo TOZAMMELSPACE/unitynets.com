@@ -247,7 +247,18 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
       </div>
 
       {/* Right Panel - Form */}
-      <div className="w-full md:w-3/5 lg:w-1/2 flex md:items-start lg:items-center justify-center p-6 sm:p-8 lg:p-10 md:h-screen md:overflow-y-auto">
+      <div
+        className="w-full md:w-3/5 lg:w-1/2 flex md:items-start lg:items-center justify-center p-6 sm:p-8 lg:p-10 md:h-screen md:overflow-y-auto pb-[40vh] md:pb-10"
+        onFocusCapture={(e) => {
+          const target = e.target as HTMLElement;
+          if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+            // Wait for mobile keyboard to appear, then bring field into view
+            window.setTimeout(() => {
+              target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }, 300);
+          }
+        }}
+      >
         <div className="w-full max-w-md animate-fade-in py-2 md:py-6">
           {/* Mobile Logo + Tagline only */}
           <div className="md:hidden mb-8 text-center">
