@@ -45,16 +45,7 @@ export const Navbar = () => {
       <div className="container mx-auto">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <img 
-              src="/logo.png" 
-              alt="UnityNets Logo" 
-              className="h-10 w-auto group-hover:scale-105 transition-transform"
-              fetchPriority="high"
-              loading="eager"
-              decoding="async"
-            />
-          </Link>
+          <Link to="/" className="flex items-center gap-2 group" aria-label="UnityNets Home" />
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
