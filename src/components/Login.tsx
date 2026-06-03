@@ -158,12 +158,6 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
                 <div className="absolute inset-0 bg-emerald-500/40 blur-xl rounded-full" />
                 <img src="/logo.png" alt="UnityNets" className="relative h-10 lg:h-11 w-auto" />
               </div>
-              <span
-                className="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-emerald-200"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                UnityNets
-              </span>
             </div>
 
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 w-fit">
