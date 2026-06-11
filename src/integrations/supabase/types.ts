@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      ambassador_applications: {
+        Row: {
+          age: number
+          contribution: string
+          country: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          social_handle: string
+          status: string
+          why_ambassador: string
+        }
+        Insert: {
+          age: number
+          contribution: string
+          country: string
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          social_handle: string
+          status?: string
+          why_ambassador: string
+        }
+        Update: {
+          age?: number
+          contribution?: string
+          country?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          social_handle?: string
+          status?: string
+          why_ambassador?: string
+        }
+        Relationships: []
+      }
       call_history: {
         Row: {
           call_type: string
