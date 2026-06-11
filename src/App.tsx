@@ -135,6 +135,13 @@ const App = () => (
                 <AmbassadorProgram />
               </Suspense>
             } />
+
+            {/* Ambassador Admin Dashboard */}
+            <Route path="/admin/ambassador" element={
+              <Suspense fallback={<PageLoader />}>
+                <AmbassadorAdmin />
+              </Suspense>
+            } />
             
             {/* All other routes inside AppLayout (require auth) */}
             <Route path="/*" element={
