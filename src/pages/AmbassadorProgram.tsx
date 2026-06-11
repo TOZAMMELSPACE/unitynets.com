@@ -138,7 +138,7 @@ const AmbassadorProgram = () => {
     setSubmitting(true);
     const { error } = await supabase
       .from("ambassador_applications")
-      .insert(parsed.data);
+      .insert(parsed.data as any);
     setSubmitting(false);
     if (error) {
       toast.error("Could not submit. Please try again.");
