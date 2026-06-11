@@ -31,6 +31,7 @@ const PublicLearningZone = lazy(() => import("./pages/PublicLearningZone"));
 const PublicFeed = lazy(() => import("./pages/PublicFeed"));
 const Contribute = lazy(() => import("./pages/Contribute"));
 const AmbassadorProgram = lazy(() => import("./pages/AmbassadorProgram"));
+const AmbassadorAdmin = lazy(() => import("./pages/AmbassadorAdmin"));
 
 // Loading fallback component
 const PageLoader = () => (
