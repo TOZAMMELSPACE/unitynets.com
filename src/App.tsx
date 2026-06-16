@@ -61,10 +61,10 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {/* Landing page - Auth-first */}
+            {/* Landing page */}
             <Route path="/" element={
               <Suspense fallback={<PageLoader />}>
-                <Auth />
+                <LandingPage />
               </Suspense>
             } />
             <Route path="/landing" element={
