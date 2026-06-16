@@ -8,23 +8,23 @@ const MinimalHero = memo(() => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden pt-24 pb-12">
+    <section className="relative min-h-[calc(100vh-4rem)] flex items-center overflow-hidden pt-20 md:pt-24 pb-12 md:pb-16">
       {/* Soft background gradients */}
       <div className="absolute inset-0 bg-background" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_-10%,hsl(var(--primary)/0.12),transparent)]" />
-      <div className="absolute top-20 right-[8%] w-80 h-80 bg-primary/10 rounded-full blur-[120px]" />
-      <div className="absolute bottom-10 left-[5%] w-72 h-72 bg-accent/10 rounded-full blur-[120px]" />
+      <div className="absolute top-20 right-[8%] w-60 h-60 md:w-80 md:h-80 bg-primary/10 rounded-full blur-[100px] md:blur-[120px]" />
+      <div className="absolute bottom-10 left-[5%] w-56 h-56 md:w-72 md:h-72 bg-accent/10 rounded-full blur-[100px] md:blur-[120px]" />
 
-      <div className="container mx-auto relative z-10 px-4">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <div className="container mx-auto relative z-10 px-4 sm:px-6">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Left */}
-          <div className="space-y-7 text-center lg:text-left" style={{ opacity: 0, animation: "fade-in 0.7s ease-out 0.1s forwards" }}>
+          <div className="space-y-6 md:space-y-7 text-center lg:text-left" style={{ opacity: 0, animation: "fade-in 0.7s ease-out 0.1s forwards" }}>
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-xs font-medium border border-primary/20 backdrop-blur-sm">
               <Sparkles className="w-3.5 h-3.5" />
               <span>A free global community</span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
               <span className="text-foreground">Trust. Learn. </span>
               <span
                 style={{
@@ -37,14 +37,14 @@ const MinimalHero = memo(() => {
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
               A free global community where people share knowledge, build trust, and grow together.
             </p>
 
-            <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center lg:justify-start">
               <Button
                 size="lg"
-                className="text-base px-8 py-6 rounded-full group bg-gradient-hero shadow-glow hover:shadow-[0_0_45px_hsl(var(--primary)/0.45)] hover:-translate-y-0.5 transition-all duration-300"
+                className="text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6 rounded-full group bg-gradient-hero shadow-glow hover:shadow-[0_0_45px_hsl(var(--primary)/0.45)] hover:-translate-y-0.5 transition-all duration-300"
                 onClick={() => navigate("/auth?mode=signup")}
               >
                 Join the World Community
@@ -53,23 +53,23 @@ const MinimalHero = memo(() => {
               <Button
                 size="lg"
                 variant="outline"
-                className="text-base px-8 py-6 rounded-full border-border/50 bg-card/50 backdrop-blur-sm hover:bg-primary/10 hover:border-primary/40 transition-all duration-300"
+                className="text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6 rounded-full border-border/50 bg-card/50 backdrop-blur-sm hover:bg-primary/10 hover:border-primary/40 transition-all duration-300"
                 onClick={() => navigate("/auth?mode=login")}
               >
                 Login
               </Button>
             </div>
 
-            <p className="text-sm text-muted-foreground/80 pt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground/80 pt-1">
               100% Free  •  No Ads  •  Community Driven
             </p>
           </div>
 
           {/* Right — illustration */}
           <div className="flex justify-center lg:justify-end" style={{ opacity: 0, animation: "fade-in 0.8s ease-out 0.3s forwards" }}>
-            <div className="relative w-full max-w-lg">
+            <div className="relative w-full max-w-xs sm:max-w-md lg:max-w-lg">
               <div className="absolute inset-6 bg-primary/15 rounded-[2rem] blur-[60px]" />
-              <div className="relative rounded-[2rem] overflow-hidden border border-border/30 shadow-elegant bg-card/40 backdrop-blur-xl">
+              <div className="relative rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden border border-border/30 shadow-elegant bg-card/40 backdrop-blur-xl">
                 <img
                   src={heroIllustration}
                   alt="Diverse community connecting globally on UnityNets"
