@@ -98,6 +98,7 @@ const Auth = () => {
         users={[]}
         defaultMode={defaultMode}
       />
+      <MinimalFooter />
     </>
   );
 };
