@@ -6,6 +6,7 @@ import { User } from "@/lib/storage";
 import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import MinimalFooter from "@/components/landing/MinimalFooter";
 
 const Auth = () => {
   const { user, loading } = useAuth();
