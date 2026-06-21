@@ -4,6 +4,7 @@ import { Moon, Sun, PenSquare, LogIn } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation, useNavigate } from "react-router-dom";
+import newLogoAsset from "@/assets/unitynets-logo-v2.png.asset.json";
 
 interface GlobalHeaderProps {
   currentUser: User | null;
@@ -29,7 +30,7 @@ export const GlobalHeader = ({ currentUser, onSignOut, onCreatePost }: GlobalHea
           {/* Logo */}
           <div className="flex items-center">
             <img 
-              src="/logo.png" 
+              src={newLogoAsset.url} 
               alt="UnityNets Logo" 
               className="h-10 sm:h-12 w-auto"
             />
