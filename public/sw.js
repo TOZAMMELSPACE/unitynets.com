@@ -15,8 +15,8 @@ self.addEventListener('push', function(event) {
 
   const options = {
     body: data.body || 'নতুন আপডেট পাওয়া গেছে',
-    icon: '/logo.jpg',
-    badge: '/logo.jpg',
+    icon: '/unitynets-logo-v2.png',
+    badge: '/unitynets-logo-v2.png',
     vibrate: [100, 50, 100],
     data: {
       url: data.url || '/',
