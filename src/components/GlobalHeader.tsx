@@ -4,6 +4,7 @@ import { Moon, Sun, PenSquare, LogIn } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation, useNavigate } from "react-router-dom";
+import newLogoAsset from "@/assets/unitynets-logo-v2.png.asset.json";
 
 interface GlobalHeaderProps {
   currentUser: User | null;
