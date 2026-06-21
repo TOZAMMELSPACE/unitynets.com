@@ -30,7 +30,7 @@ export const GlobalHeader = ({ currentUser, onSignOut, onCreatePost }: GlobalHea
           {/* Logo */}
           <div className="flex items-center">
             <img 
-              src="/logo.png" 
+              src={newLogoAsset.url} 
               alt="UnityNets Logo" 
               className="h-10 sm:h-12 w-auto"
             />
