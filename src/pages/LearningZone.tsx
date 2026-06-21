@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import newLogoAsset from "@/assets/unitynets-logo-v2.png.asset.json";
 import { User } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -234,7 +235,7 @@ export default function LearningZone({ currentUser, onSignOut }: LearningZonePro
       <header className="card-enhanced p-4 lg:p-6 mb-6">
         <div className="flex items-center gap-4">
           <img 
-            src="/logo.png" 
+            src={newLogoAsset.url} 
             alt="UnityNets Logo" 
             className="h-10 lg:h-12 w-auto"
           />
