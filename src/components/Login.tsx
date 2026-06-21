@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import newLogoAsset from "@/assets/unitynets-logo-v2.png.asset.json";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -156,7 +157,7 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
             <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="absolute inset-0 bg-emerald-500/40 blur-xl rounded-full" />
-                <img src="/logo.png" alt="UnityNets" className="relative h-10 lg:h-11 w-auto" />
+                <img src={newLogoAsset.url} alt="UnityNets" className="relative h-10 lg:h-11 w-auto" />
               </div>
             </div>
 
@@ -254,7 +255,7 @@ export const Login = ({ users, onLogin, onRegister, defaultMode = 'login' }: Log
         <div className="w-full max-w-md animate-fade-in py-2 md:py-6">
           {/* Mobile Logo + Tagline only */}
           <div className="md:hidden mb-8 text-center">
-            <img src="/logo.png" alt="UnityNets Logo" className="h-12 w-auto mx-auto mb-5" />
+            <img src={newLogoAsset.url} alt="UnityNets Logo" className="h-12 w-auto mx-auto mb-5" />
             <h1 className="text-2xl font-display font-bold text-[hsl(220,10%,95%)] leading-tight">
               {t("Trust. Learn.", "Trust. Learn.")} <span className="text-[hsl(174,55%,55%)]">{t("Unite.", "Unite.")}</span>
             </h1>
