@@ -203,6 +203,131 @@ const AmbassadorProgram = () => {
         </div>
       </section>
 
+      {/* MANIFESTO */}
+      <section className="relative overflow-hidden py-24 px-6 bg-gradient-to-b from-background via-card/20 to-background">
+        <div className="absolute inset-0 opacity-[0.05] [background-image:radial-gradient(circle_at_1px_1px,hsl(var(--primary))_1px,transparent_0)] [background-size:28px_28px]" />
+        <div className="relative mx-auto max-w-3xl">
+          <div data-reveal className="reveal text-center mb-14">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-primary">
+              <Star className="h-3.5 w-3.5" /> The UnityNets Manifesto
+            </span>
+            <h2 className="mt-6 font-display text-3xl font-bold sm:text-5xl">
+              A Declaration for the Youth of{" "}
+              <span className="bg-gradient-to-r from-primary via-teal-400 to-emerald-400 bg-clip-text text-transparent">
+                South &amp; Southeast Asia
+              </span>
+            </h2>
+          </div>
+
+          <article className="reveal space-y-12 rounded-2xl border border-border/50 bg-card/60 backdrop-blur p-8 sm:p-12 shadow-elegant" data-reveal>
+            <div>
+              <h3 className="font-display text-2xl font-semibold text-primary">We Were Never Meant to Be Divided.</h3>
+              <div className="mt-4 space-y-2 text-foreground/90 leading-relaxed">
+                <p>Before the borders were drawn —</p>
+                <p>before the wars were fought over lines on a map —</p>
+                <p>before religion became a weapon and language became a wall —</p>
+                <p className="font-semibold">we were neighbors.</p>
+                <p>We shared rivers. We shared spices. We shared stories.</p>
+                <p>We built temples and mosques and stupas side by side.</p>
+                <p>We sailed the same seas. We looked up at the same stars.</p>
+                <p className="pt-2 italic text-muted-foreground">Then someone came. Drew lines. And told us to hate each other.</p>
+                <p className="pt-2 text-xl font-bold text-primary">We refuse.</p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-display text-2xl font-semibold text-primary">Who We Are</h3>
+              <div className="mt-4 space-y-3 text-foreground/90 leading-relaxed">
+                <p>We are the youth of Bangladesh, India, Pakistan, Nepal, Sri Lanka, Bhutan, Maldives, Afghanistan, Myanmar, Thailand, Vietnam, Malaysia, Indonesia, Philippines, Cambodia, Laos, and Papua New Guinea.</p>
+                <p className="text-lg font-semibold">We are 3 billion people.</p>
+                <p>We are the largest, youngest, most diverse generation this region has ever seen.</p>
+                <p>And we are done waiting for politicians to build the bridges they keep burning.</p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-display text-2xl font-semibold text-primary">What We Believe</h3>
+              <ul className="mt-4 space-y-3 text-foreground/90 leading-relaxed list-none">
+                <li>We believe that <strong>culture is stronger than conflict</strong>.</li>
+                <li>We believe that a student in Dhaka and a student in Jakarta have more in common than their governments want them to know.</li>
+                <li>We believe that peace is not the absence of difference — it is the courage to connect across it.</li>
+                <li>We believe that technology can do what diplomacy has failed to do — bring ordinary people together, across borders, in real time.</li>
+                <li>We believe that South and Southeast Asia is not a collection of problems to be solved — it is a <strong>civilization to be awakened</strong>.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-display text-2xl font-semibold text-primary">What We Reject</h3>
+              <ul className="mt-4 space-y-3 text-foreground/90 leading-relaxed list-none">
+                <li>We reject the idea that our divisions are natural.</li>
+                <li>We reject hatred dressed up as patriotism.</li>
+                <li>We reject leaders who grow powerful by keeping us afraid of each other.</li>
+                <li>We reject the silence that lets injustice continue unchallenged.</li>
+                <li>We reject the belief that one person cannot change the direction of history.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-display text-2xl font-semibold text-primary">What We Are Building</h3>
+              <div className="mt-4 space-y-3 text-foreground/90 leading-relaxed">
+                <p>UnityNets is not just a platform.</p>
+                <p>It is a promise —</p>
+                <p>that every young person in this region deserves a community that sees them, a network that empowers them, and a movement that gives their voice a stage.</p>
+                <p className="pt-2 font-semibold">We are building:</p>
+                <ul className="space-y-2 pl-5 list-disc marker:text-primary">
+                  <li>A network of ambassadors — one in every nation, rooted in every community</li>
+                  <li>A shared identity — not erasing our differences, but celebrating them as our greatest strength</li>
+                  <li>A digital home for 3 billion voices that have never been heard together before</li>
+                  <li>An annual gathering — where the youth of Asia look each other in the eye and choose unity over division</li>
+                </ul>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-display text-2xl font-semibold text-primary">Our Commitment</h3>
+              <div className="mt-4 space-y-2 text-foreground/90 leading-relaxed">
+                <p>We will not wait for permission.</p>
+                <p>We will not wait for the perfect moment.</p>
+                <p>We will not wait for someone else to do it first.</p>
+                <p className="pt-2">We commit to showing up — online and offline, in our cities and our villages, in our languages and our silences — to build the connections that no border can break.</p>
+                <p>We commit to leading with empathy before ego.</p>
+                <p>To listening before speaking.</p>
+                <p>To building before claiming credit.</p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-display text-2xl font-semibold text-primary">The Call</h3>
+              <div className="mt-4 space-y-3 text-foreground/90 leading-relaxed">
+                <p>If you are between 18 and 30 —</p>
+                <p>if you have ever looked at this region and thought <em>"we could be so much more"</em> —</p>
+                <p>if you have ever felt the pain of a division you did not choose —</p>
+                <p className="font-semibold">this is your movement.</p>
+                <p className="text-lg">Not ours. <span className="text-primary font-bold">Yours.</span></p>
+                <p className="pt-2">We are not asking you to follow.</p>
+                <p>We are asking you to <strong>lead</strong> — in your city, your campus, your community.</p>
+                <p className="pt-2">One ambassador per nation.</p>
+                <p>One network across a continent.</p>
+                <p>One generation that finally chooses unity.</p>
+              </div>
+            </div>
+
+            <blockquote className="border-l-4 border-primary pl-6 py-2 italic text-lg sm:text-xl text-foreground/90">
+              "Borders are scars on the earth. We are here to heal them."
+              <footer className="mt-3 not-italic text-sm text-muted-foreground">— UnityNets, 2026</footer>
+            </blockquote>
+
+            <div className="text-center pt-2">
+              <p className="font-display text-2xl font-bold mb-5">Join Us.</p>
+              <Button size="lg" className="h-12 px-10 text-base shadow-elegant" onClick={() => scrollTo(formRef)}>
+                Become an Ambassador
+              </Button>
+              <p className="mt-4 text-sm text-muted-foreground">unitynets.com/ambassador</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
       {/* WHAT IS AN AMBASSADOR */}
       <section ref={aboutRef} className="py-24 px-6">
         <div className="mx-auto max-w-6xl">
