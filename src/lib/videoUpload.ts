@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { guardOrToast } from '@/lib/contentModeration';
 
 /**
  * Uploads a video file to Supabase Storage and returns the public URL
@@ -14,6 +15,12 @@ export const uploadPostVideo = async (file: File, userId: string): Promise<strin
       console.error('Invalid video type:', file.type);
       return null;
     }
+
+    // Content moderation: sample the first frame and screen it.
+    const ok = await guardOrToast('video', file);
+    if (!ok) return null;
+
+
 
     // Generate unique filename
     const fileExt = file.name.split('.').pop();
