@@ -27,6 +27,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { uploadPostImage } from "@/lib/imageUpload";
 import { uploadPostVideo } from "@/lib/videoUpload";
+import { moderateText } from "@/lib/contentModeration";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { worldCountries } from "@/lib/countries";
@@ -194,6 +195,27 @@ export const EnhancedPostForm = ({ user, onPostCreated, initialPostType = 'text'
     }
 
     setIsSubmitting(true);
+
+    // Moderate text content (title + body + descriptions) before doing any uploads.
+    const textToCheck = [content, eventTitle, eventDescription, jobTitle, jobDescription, ...pollOptions]
+      .filter(Boolean)
+      .join("\n");
+    if (textToCheck.trim()) {
+      const verdict = await moderateText(textToCheck);
+      if (!verdict.allowed) {
+        toast({
+          title: t("Content blocked", "কনটেন্ট ব্লক করা হয়েছে"),
+          description: verdict.reason || t(
+            "Your post violates UnityNets community rules.",
+            "আপনার পোস্ট UnityNets কমিউনিটি নিয়ম লঙ্ঘন করছে।",
+          ),
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
 
     try {
       // Upload images to storage if any
