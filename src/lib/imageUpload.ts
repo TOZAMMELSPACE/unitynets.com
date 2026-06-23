@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { guardOrToast } from '@/lib/contentModeration';
 
 /**
  * Uploads an image file to Supabase Storage and returns the public URL
@@ -8,6 +9,10 @@ import { supabase } from '@/integrations/supabase/client';
  */
 export const uploadPostImage = async (file: File, userId: string): Promise<string | null> => {
   try {
+    // Content moderation gate — block inappropriate uploads before they reach storage.
+    const ok = await guardOrToast('image', file);
+    if (!ok) return null;
+
     // Generate unique filename
     const fileExt = file.name.split('.').pop();
     const fileName = `${userId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;

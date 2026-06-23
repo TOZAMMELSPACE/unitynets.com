@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { guardOrToast } from '@/lib/contentModeration';
 
 /**
  * Uploads a chat media file to the chat-media storage bucket
@@ -15,6 +16,15 @@ export const uploadChatMedia = async (
   type: 'image' | 'video' | 'voice' | 'file'
 ): Promise<string | null> => {
   try {
+    // Content moderation for visual media (skip voice/file).
+    if (type === 'image') {
+      const ok = await guardOrToast('image', file);
+      if (!ok) return null;
+    } else if (type === 'video') {
+      const ok = await guardOrToast('video', file as File);
+      if (!ok) return null;
+    }
+
     // Determine file extension
     let fileExt = 'bin';
     if (file instanceof File) {

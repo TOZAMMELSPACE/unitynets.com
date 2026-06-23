@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { guardOrToast } from '@/lib/contentModeration';
 
 /**
  * Uploads a profile image (avatar or cover) to Supabase Storage
@@ -18,6 +19,10 @@ export const uploadProfileImage = async (
       console.error('File size exceeds 5MB limit');
       return null;
     }
+
+    // Content moderation gate
+    const ok = await guardOrToast('image', file);
+    if (!ok) return null;
 
     // Generate unique filename
     const fileExt = file.name.split('.').pop();
