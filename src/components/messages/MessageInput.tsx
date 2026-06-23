@@ -60,8 +60,21 @@ export function MessageInput({
     }
   }, [editMessage]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!message.trim() || disabled) return;
+
+    // Content moderation gate for chat text.
+    const { moderateText } = await import('@/lib/contentModeration');
+    const verdict = await moderateText(message.trim());
+    if (!verdict.allowed) {
+      const { toast } = await import('@/hooks/use-toast');
+      toast({
+        title: 'Message blocked',
+        description: verdict.reason || 'This message violates UnityNets community rules.',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     if (editMessage) {
       onSaveEdit(editMessage.id, message.trim());
